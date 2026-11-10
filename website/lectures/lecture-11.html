@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — Neo4j (2): Cypher CRUD Operations &amp; Aggregation — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NoSQL Databases — Neo4j (2): Cypher CRUD Operations &amp; Aggregation — Comprehensive Notes</h1><p>From S1_L18_Neo4j_2_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-11.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-11.html">☆ Bookmark</button></div><article class="prose"><h1 id="nosql-databases-neo4j-2-cypher-crud-operations-aggregation-comprehensive-notes">NoSQL Databases — Neo4j (2): Cypher CRUD Operations &amp; Aggregation — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-18-chapter-24-7th-edition">COS 326 Database Systems | Lecture 18 | Chapter 24 (7th Edition)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — Neo4j (2): Cypher CRUD Operations &amp; Aggregation — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Neo4j: Cypher operations</h1><p>Lecture 18 &middot; Course notes</p></div><button class="study" data-id="lecture-11.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-11.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-recap-neo4j-and-cypher">2. Recap — Neo4j and Cypher</a></li><li><a href="#3-crud-operations-overview">3. CRUD Operations — Overview</a></li><li><a href="#4-writing-clauses">4. Writing Clauses</a></li><li><a href="#5-reading-clauses">5. Reading Clauses</a></li><li><a href="#6-aggregation">6. Aggregation</a></li><li><a href="#7-homework-the-movie-graph">7. Homework — The Movie Graph</a></li><li><a href="#8-questions-memo">8. Questions &amp; Memo</a></li><li><a href="#1-understanding-neo4js-structure">1. Understanding Neo4j's structure</a></li><li><a href="#2-creating-nodes-and-relationships">2. Creating nodes and relationships</a></li><li><a href="#3-relationships-and-direction">3. Relationships and direction</a></li><li><a href="#4-match-finding-existing-patterns">4. MATCH — Finding existing patterns</a></li><li><a href="#5-understanding-properties-and-return">5. Understanding properties and RETURN</a></li><li><a href="#6-variables-are-not-permanent-identifiers">6. Variables are not permanent identifiers</a></li><li><a href="#7-matching-more-complex-relationships">7. Matching more complex relationships</a></li><li><a href="#8-multiple-match-clauses-and-multiple-results">8. Multiple MATCH clauses and multiple results</a></li><li><a href="#9-merge-match-or-create">9. MERGE — Match or create</a></li><li><a href="#10-updating-and-deleting-data">10. Updating and deleting data</a></li><li><a href="#11-aggregation-functions">11. Aggregation functions</a></li><li><a href="#12-additional-clauses-to-recognise">12. Additional clauses to recognise</a></li><li><a href="#13-sql-vs-cypher-comparison">13. SQL vs Cypher comparison</a></li><li><a href="#14-most-important-things-youve-established">14. Most important things you've established</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>This lecture covers:</strong><ol>
 <li><strong>Recap:</strong> the Neo4j DB environment.</li>
@@ -15,7 +13,7 @@
 </li>
 <li><strong>Reference:</strong> the <strong>Neo4j manual</strong> (https://neo4j.com/docs/getting-started/current/) and the <strong>Cypher manual clauses page.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>Lecture 17 introduced the property graph and a handful of Cypher statements (<code>CREATE</code>, <code>MATCH … WHERE … RETURN</code>). This lecture completes the toolkit: you can now <strong>create, read, update and delete</strong> graph data (CRUD), and <strong>summarise</strong> it with aggregation — the graph-database counterparts of SQL's <code>INSERT / SELECT / UPDATE / DELETE</code> and <code>GROUP BY</code>.</p>
 <hr />
 <h2 id="2-recap-neo4j-and-cypher">2. Recap — Neo4j and Cypher</h2>
@@ -42,7 +40,7 @@
 <li><strong>Relationships always have a direction and a type, and form patterns of data.</strong></li>
 <li><strong>Relationship properties</strong> store information <strong>shared by the two nodes</strong> — in a <strong>property graph, relationships are data records that can also contain properties.</strong></li>
 </ul>
-<h4 id="worked-example-this-lectures-follows-graph">📌 Worked Example — This lecture's <code>FOLLOWS</code> graph</h4>
+<h4 id="worked-example-this-lectures-follows-graph"> Worked Example — This lecture's <code>FOLLOWS</code> graph</h4>
 <table>
 <thead>
 <tr>
@@ -252,7 +250,7 @@ DETACH DELETE p;
 DETACH DELETE psn;
 </code></pre>
 <ul>
-<li>⚠️ <strong>Use with care:</strong> this deletes <strong>all <code>Person</code> nodes and their relationships.</strong></li>
+<li> <strong>Use with care:</strong> this deletes <strong>all <code>Person</code> nodes and their relationships.</strong></li>
 <li><strong>SQL analogy:</strong> like <code>DELETE FROM Person;</code> but also removing every connected "foreign key row" automatically.</li>
 </ul>
 <h3 id="47-remove-removing-properties-and-labels-from-the-slides">4.7 <code>REMOVE</code> — Removing Properties and Labels (from the slides)</h3>
@@ -546,7 +544,7 @@ RETURN collect(psn.name);
 <li><strong><code>collect(psn.name)</code></strong> gathers their names into <strong>one list (collection)</strong> in a <strong>single row/value</strong> — rather than one row per person.</li>
 <li><strong>Compare:</strong> <code>RETURN psn.name</code> → <strong>4 rows</strong>; <code>RETURN collect(psn.name)</code> → <strong>1 row containing a list of 4 names.</strong></li>
 </ol>
-<h4 id="extra-examples-added-for-step-by-step-clarity">📌 Extra Examples (added for step-by-step clarity)</h4>
+<h4 id="extra-examples-added-for-step-by-step-clarity"> Extra Examples (added for step-by-step clarity)</h4>
 <pre><code class="language-cypher">// How many people are there?
 MATCH (p:Person) RETURN count(p) AS people;                      // 4
 

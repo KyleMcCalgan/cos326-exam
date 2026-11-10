@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — MongoDB (4): Text Search, Shell Functions and Java Applications — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NoSQL Databases — MongoDB (4): Text Search, Shell Functions and Java Applications — Comprehensive Notes</h1><p>From S1_L16_Search_ShellFunctions.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-09.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-09.html">☆ Bookmark</button></div><article class="prose"><h1 id="nosql-databases-mongodb-4-text-search-shell-functions-and-java-applications-comprehensive-notes">NoSQL Databases — MongoDB (4): Text Search, Shell Functions and Java Applications — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-16-chapter-24-7th-edition">COS 326 Database Systems | Lecture 16 | Chapter 24 (7th Edition)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — MongoDB (4): Text Search, Shell Functions and Java Applications — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>MongoDB: search and shell functions</h1><p>Lecture 16 &middot; Course notes</p></div><button class="study" data-id="lecture-09.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-09.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-the-dataset-the-blogs-collection-from-the-slides">2. The Dataset — the blogs Collection (from the slides)</a></li><li><a href="#3-searching-for-text">3. Searching for Text</a></li><li><a href="#4-mongo-shell-client-functions">4. Mongo Shell (Client) Functions</a></li><li><a href="#5-java-mongodb-applications">5. Java &amp; MongoDB Applications</a></li><li><a href="#6-quick-reference">6. Quick Reference</a></li><li><a href="#7-questions-memo">7. Questions &amp; Memo</a></li><li><a href="#1-connecting-to-a-database-and-collection">1. Connecting to a database and collection</a></li><li><a href="#2-crud-operations">2. CRUD operations</a></li><li><a href="#3-comparison-operators">3. Comparison operators</a></li><li><a href="#4-logical-operators">4. Logical operators</a></li><li><a href="#5-projections-sorting-and-limits">5. Projections, sorting and limits</a></li><li><a href="#6-update-operators">6. Update operators</a></li><li><a href="#7-aggregation-pipeline">7. Aggregation pipeline</a></li><li><a href="#8-cursors-and-iteration">8. Cursors and iteration</a></li><li><a href="#9-indexing-and-text-search">9. Indexing and text search</a></li><li><a href="#10-java-imports">10. Java imports</a></li><li><a href="#11-can-you-use-mongodb-syntax-directly-in-java">11. Can you use MongoDB syntax directly in Java?</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>In this lecture:</strong><ul>
 <li>MongoDB <strong>text search</strong> (text indexes and <code>$text</code>).</li>
@@ -94,7 +92,7 @@
 <blockquote>
 <p><strong>Modern MongoDB (slide note):</strong> <strong>MongoDB Search</strong> provides more advanced full-text search and is <strong>recommended for new full-text search applications.</strong> The <strong><code>$text</code> operator remains supported</strong> and is useful for <strong>learning basic MongoDB text indexes.</strong></p>
 </blockquote>
-<h4 id="example-added-for-clarity-a-multi-field-text-index">📌 Example (added for clarity) — A Multi-Field Text Index</h4>
+<h4 id="example-added-for-clarity-a-multi-field-text-index"> Example (added for clarity) — A Multi-Field Text Index</h4>
 <pre><code class="language-js">db.blogs.createIndex( { title: &quot;text&quot;, comments: &quot;text&quot; } )
 </code></pre>
 <p>This is still <strong>one</strong> text index (allowed) but covers <strong>two</strong> fields. Trying to create a <em>second, separate</em> text index on the same collection would fail — to change the indexed fields you must <strong>drop</strong> the old text index first (<code>db.blogs.dropIndex("comments_text")</code>).</p>
@@ -130,7 +128,7 @@ while ( c.hasNext() )  printjson( c.next() )
 <li><strong>Document 1</strong> contains both "Big" and "Data"; <strong>document 6</strong> contains "data" only. Both match.</li>
 <li><strong>Why don't the "database" documents match "data"?</strong> <code>$text</code> matches <strong>whole (stemmed) words</strong>, not substrings: "database" is a <strong>different word</strong> from "data".</li>
 </ol>
-<h4 id="additional-examples-added-for-clarity-standard-text-features-not-on-the-slides">📌 Additional Examples (added for clarity — standard <code>$text</code> features, not on the slides)</h4>
+<h4 id="additional-examples-added-for-clarity-standard-text-features-not-on-the-slides"> Additional Examples (added for clarity — standard <code>$text</code> features, not on the slides)</h4>
 <pre><code class="language-js">db.blogs.find( { $text: { $search: &quot;\&quot;big data\&quot;&quot; } } )   // exact PHRASE: both words together
 db.blogs.find( { $text: { $search: &quot;database -Neo4j&quot; } } ) // minus sign EXCLUDES a term
 </code></pre>
@@ -146,9 +144,9 @@ db.blogs.find( { $text: { $search: &quot;database -Neo4j&quot; } } ) // minus si
 <li><strong>Useful for highly unstructured data</strong> where it is <strong>unclear which fields to include</strong>, or for <strong>ad-hoc querying.</strong></li>
 </ul>
 <blockquote>
-<p>⚠️ <strong>Caution (slide note):</strong> use wildcard text indexes <strong>cautiously</strong> — they can <strong>increase index size</strong> and <strong>hurt insert/update performance.</strong> <strong>Targeted text indexes are preferable</strong> when the searchable fields are known.</p>
+<p> <strong>Caution (slide note):</strong> use wildcard text indexes <strong>cautiously</strong> — they can <strong>increase index size</strong> and <strong>hurt insert/update performance.</strong> <strong>Targeted text indexes are preferable</strong> when the searchable fields are known.</p>
 </blockquote>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>On <code>blogs</code>, <code>db.blogs.createIndex({ "$**": "text" })</code> would index <strong>both <code>title</code> and <code>comments</code></strong>, so <code>$search: "Neo4j"</code> would now match on titles too. That is convenient while exploring unknown data, but for a production blog search you would index just <code>comments</code> (and perhaps <code>title</code>).</p>
 <h3 id="35-text-search-in-the-aggregation-pipeline">3.5 Text Search in the Aggregation Pipeline</h3>
 <ul>
@@ -179,7 +177,7 @@ db.blogs.find( { $text: { $search: &quot;database -Neo4j&quot; } } ) // minus si
 </ul>
 </li>
 <li><strong><code>$group</code> with <code>_id: null</code></strong> — <strong>one single group</strong> for <em>all</em> surviving documents (no grouping key).</li>
-<li><strong><code>totalLikes: { $sum: "$likes" }</code></strong> — adds the <code>likes</code> values: 400 + 100 + 50 = <strong>550</strong> ✔. Note <strong><code>"$likes"</code></strong> — the <strong><code>$</code> prefix</strong> refers to the <strong>value of the field</strong> in each document.</li>
+<li><strong><code>totalLikes: { $sum: "$likes" }</code></strong> — adds the <code>likes</code> values: 400 + 100 + 50 = <strong>550</strong> . Note <strong><code>"$likes"</code></strong> — the <strong><code>$</code> prefix</strong> refers to the <strong>value of the field</strong> in each document.</li>
 </ol>
 <hr />
 <h2 id="4-mongo-shell-client-functions">4. Mongo Shell (Client) Functions</h2>
@@ -240,12 +238,12 @@ db.blogs.find( { $text: { $search: &quot;database -Neo4j&quot; } } ) // minus si
 <li><code>$match: { title: blogTitle }</code> — the <strong>JavaScript variable</strong> is dropped straight into the pipeline.</li>
 <li><code>_id: blogTitle</code> — the group key is the <strong>title value</strong> (the earlier version used <code>"$title"</code>, a field reference; here the variable's value is used, so the output <code>_id</code> is <code>'Neo4j'</code>).</li>
 <li><code>col.aggregate(...)</code> returns a <strong>cursor</strong>, so the <strong><code>while (res.hasNext()) printjson(res.next())</code></strong> loop prints each result.</li>
-<li><strong>Trace:</strong> Neo4j documents have likes <strong>50 + 150 + 250 = 450</strong> ✔ (docs 5, 6, 7).</li>
+<li><strong>Trace:</strong> Neo4j documents have likes <strong>50 + 150 + 250 = 450</strong>  (docs 5, 6, 7).</li>
 </ol>
 <blockquote>
 <p><strong>Note (slide detail):</strong> in the call, the first argument is the <strong>database name</strong> (<code>"db"</code> in the demo — a database that happens to be named <code>db</code>), not the shell's <code>db</code> object.</p>
 </blockquote>
-<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
 <p><code>computeTotalLikes("db", "blogs", "MongoDB")</code> → <code>{ _id: 'MongoDB', num_likes: 300 }</code> (100 + 150 + 50).</p>
 <h3 id="44-why-use-shell-functions-summary-added-for-clarity">4.4 Why Use Shell Functions? (summary, added for clarity)</h3>
 <table>
@@ -307,7 +305,7 @@ db.blogs.find( { $text: { $search: &quot;database -Neo4j&quot; } } ) // minus si
 <li><strong>Demo:</strong> follow the demo to learn how to <strong>create and test a Java application that uses a MongoDB database.</strong></li>
 <li><strong>Further reading:</strong> the <strong>MongoDB Java Driver documentation</strong> — mongodb.com/docs/drivers/java/sync/current/get-started/</li>
 </ul>
-<h4 id="illustrative-example-added-for-clarity-not-from-the-slides">📌 Illustrative Example (added for clarity — NOT from the slides)</h4>
+<h4 id="illustrative-example-added-for-clarity-not-from-the-slides"> Illustrative Example (added for clarity — NOT from the slides)</h4>
 <p>A minimal sketch tying the three core classes together (using the <code>blogs</code> collection):</p>
 <pre><code class="language-java">import com.mongodb.client.*;
 import org.bson.Document;

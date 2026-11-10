@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Data Warehousing &amp; OLAP (1): Business Intelligence, Warehouse Architecture &amp; the Star Schema — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Data Warehousing &amp; OLAP (1): Business Intelligence, Warehouse Architecture &amp; the Star Schema — Comprehensive Notes</h1><p>From S1_L23_Data_Warehousing_OLAP_1_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-16.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-16.html">☆ Bookmark</button></div><article class="prose"><h1 id="data-warehousing-olap-1-business-intelligence-warehouse-architecture-the-star-schema-comprehensive-notes">Data Warehousing &amp; OLAP (1): Business Intelligence, Warehouse Architecture &amp; the Star Schema — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-23-chapter-29-7th-edition">COS 326 Database Systems | Lecture 23 | Chapter 29 (7th Edition)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Data Warehousing &amp; OLAP (1): Business Intelligence, Warehouse Architecture &amp; the Star Schema — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Data warehousing and OLAP: foundations</h1><p>Lecture 23 &middot; Course notes</p></div><button class="study" data-id="lecture-16.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-16.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-the-business-environment">2. The Business Environment</a></li><li><a href="#3-operational-vs-informational-systems">3. Operational vs Informational Systems</a></li><li><a href="#4-business-intelligence-bi">4. Business Intelligence (BI)</a></li><li><a href="#5-why-data-warehousing-is-a-viable-solution-for-informational-systems">5. Why Data Warehousing Is a Viable Solution for Informational Systems</a></li><li><a href="#6-the-data-warehouse-definition">6. The Data Warehouse — Definition</a></li><li><a href="#7-the-data-warehousing-environment-architecture">7. The Data Warehousing Environment (Architecture)</a></li><li><a href="#8-data-warehousing-roles-responsibilities">8. Data Warehousing Roles &amp; Responsibilities</a></li><li><a href="#9-dimensional-modelling">9. Dimensional Modelling</a></li><li><a href="#10-the-data-mart">10. The Data Mart</a></li><li><a href="#11-the-star-schema-for-the-data-mart-rolap">11. The Star Schema (for the data mart) — ROLAP</a></li><li><a href="#12-the-dimensional-view-data-cube-hypercube">12. The Dimensional View — Data Cube (Hypercube)</a></li><li><a href="#13-dimension-hierarchies-roll-up-and-drill-down">13. Dimension Hierarchies — Roll-up and Drill-down</a></li><li><a href="#14-starjoin-starindex-and-materialised-views">14. STARjoin, STARindex and Materialised Views</a></li><li><a href="#15-sql-for-data-warehousing-bi">15. SQL for Data Warehousing &amp; BI</a></li><li><a href="#16-questions-memo">16. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>This lecture covers:</strong><ol>
 <li><strong>Business intelligence (BI) and data warehousing.</strong></li>
@@ -13,7 +11,7 @@
 </li>
 <li><strong>Also on the slides (second half):</strong> dimensional modelling, the <strong>star schema</strong>, information packages, the data cube, hierarchies (drill-down/roll-up), STARjoin/STARindex/materialised views, and the SQL used for data warehousing.</li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>Lecture 22 (data mining) said mining can run on data "stored in a warehouse." This lecture explains <strong>what that warehouse is</strong>, how it differs from the database that runs the business day to day, and how it is <strong>structured for analysis</strong> (star schema, cubes, roll-up/drill-down).</p>
 <hr />
 <h2 id="2-the-business-environment">2. The Business Environment</h2>
@@ -116,7 +114,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="example-added">📌 Example (added)</h4>
+<h4 id="example-added"> Example (added)</h4>
 <p>At a supermarket, the <strong>till</strong> (POS) that scans your items and updates stock is <strong>OLTP.</strong> The <strong>head-office report</strong> "Show the five branches furthest below monthly sales target" is <strong>OLAP</strong> — it reads across <strong>many</strong> transactions, branches and months. Running that big report on the live till database would <strong>slow the tills down</strong> — one reason a separate warehouse exists.</p>
 <blockquote>
 <p><strong>Link to Lecture 20:</strong> OLTP (short, frequent, concurrent transactions) is exactly the workload NewSQL targets; OLAP is the <strong>analytical</strong> counterpart.</p>
@@ -151,7 +149,7 @@
 <li><strong>Content includes current and historical data.</strong></li>
 <li><strong>Data designed for analytical tasks</strong> — organised around <strong>key business measures</strong> and <strong>business dimensions</strong> (Section 9).</li>
 </ol>
-<h4 id="example-added_1">📌 Example (added)</h4>
+<h4 id="example-added_1"> Example (added)</h4>
 <p>The POS system knows today's sales; the inventory system knows stock; the finance system knows costs. A <strong>warehouse</strong> loads all three, keeps <strong>years</strong> of history, and organises them so a manager can ask <em>"revenue by product, branch and month"</em> in one query.</p>
 <hr />
 <h2 id="6-the-data-warehouse-definition">6. The Data Warehouse — Definition</h2>
@@ -257,7 +255,7 @@
 <ul>
 <li><strong>ETL vs ELT (slide note):</strong> modern <strong>cloud platforms often load raw data first and perform transformations inside the analytical platform</strong> (ELT).</li>
 </ul>
-<h4 id="etl-vs-elt-worked-comparison-added">📌 ETL vs ELT — worked comparison (added)</h4>
+<h4 id="etl-vs-elt-worked-comparison-added"> ETL vs ELT — worked comparison (added)</h4>
 <table>
 <thead>
 <tr>
@@ -400,7 +398,7 @@
 <ul>
 <li><strong>Created as business requirements are gathered; one information package per specific subject.</strong></li>
 </ul>
-<h4 id="worked-example-slide-information-package-for-the-subject-hotel-occupancy">📌 Worked Example — Slide: information package for the subject <strong>Hotel occupancy</strong></h4>
+<h4 id="worked-example-slide-information-package-for-the-subject-hotel-occupancy"> Worked Example — Slide: information package for the subject <strong>Hotel occupancy</strong></h4>
 <table>
 <thead>
 <tr>
@@ -514,7 +512,7 @@ GROUP BY h.Province, t.Year, t.Month;
 <li><strong>Slide example:</strong> axes <strong>TIME</strong> (Jan, Feb, Mar), <strong>PRODUCT / room type</strong> (Luxury room, Budget room), <strong>PROVINCE</strong> (KZN, Gauteng). <strong>Each cell holds one value of the measure</strong> — e.g., <strong>one sales figure for Feb, Luxury room, Gauteng</strong> (<strong>R20m</strong> on the slide).</li>
 <li><strong>Note (slide):</strong> a <strong>data cube is a conceptual multidimensional representation</strong>, <strong>not necessarily physically stored</strong> as a cube (in ROLAP it is stored in relational tables).</li>
 </ul>
-<h4 id="example-added_2">📌 Example (added)</h4>
+<h4 id="example-added_2"> Example (added)</h4>
 <p>With 3 months × 2 room types × 2 provinces the cube has <strong>3 × 2 × 2 = 12 cells</strong>; each cell = one revenue figure. Adding a fourth dimension (e.g., promotion) makes a <strong>hyper-cube</strong> that can no longer be drawn simply, but works the same way.</p>
 <hr />
 <h2 id="13-dimension-hierarchies-roll-up-and-drill-down">13. Dimension Hierarchies — Roll-up and Drill-down</h2>
@@ -525,7 +523,7 @@ GROUP BY h.Province, t.Year, t.Month;
 </ul>
 </li>
 </ul>
-<h4 id="worked-example-slide-time-hierarchy-with-revenue-figures">📌 Worked Example — Slide: Time hierarchy with revenue figures</h4>
+<h4 id="worked-example-slide-time-hierarchy-with-revenue-figures"> Worked Example — Slide: Time hierarchy with revenue figures</h4>
 <ul>
 <li>The slide shows <strong>Qtr1 = R20m</strong>, <strong>Qtr2</strong> (another figure), and the months under Qtr1 — <strong>Jan, Feb, Mar</strong> — with figures <strong>R5m, R10m, R5m.</strong></li>
 </ul>
@@ -585,7 +583,7 @@ GROUP BY h.Province, t.Year, t.Month;
 </tr>
 </tbody>
 </table>
-<h4 id="examples-added-for-clarity">📌 Examples (added for clarity)</h4>
+<h4 id="examples-added-for-clarity"> Examples (added for clarity)</h4>
 <ul>
 <li><strong>Bitmap index:</strong> a column such as <strong><code>Room_Type</code></strong> (only a few distinct values: Luxury, Budget, …) can have one <strong>bit-vector per value</strong> marking which rows have that value — very <strong>fast to filter and combine</strong> (AND/OR) in analytical queries. <strong>Low cardinality</strong> = few distinct values.</li>
 <li><strong>Materialised view:</strong> store the result of <strong>"total revenue by province and month"</strong> once; queries read the <strong>stored summary</strong> instead of re-aggregating millions of fact rows. Trade-off: it <strong>must be refreshed</strong> after new data loads (<strong>storage and maintenance cost</strong> vs <strong>query speed</strong>).</li>

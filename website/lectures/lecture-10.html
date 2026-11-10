@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — Neo4j (1): Graph Theory, Graph Database Concepts &amp; Basic Cypher — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NoSQL Databases — Neo4j (1): Graph Theory, Graph Database Concepts &amp; Basic Cypher — Comprehensive Notes</h1><p>From S1_L17_Neo4j_1_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-10.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-10.html">☆ Bookmark</button></div><article class="prose"><h1 id="nosql-databases-neo4j-1-graph-theory-graph-database-concepts-basic-cypher-comprehensive-notes">NoSQL Databases — Neo4j (1): Graph Theory, Graph Database Concepts &amp; Basic Cypher — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-17-chapter-24-7th-edition">COS 326 Database Systems | Lecture 17 | Chapter 24 (7th Edition)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — Neo4j (1): Graph Theory, Graph Database Concepts &amp; Basic Cypher — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Neo4j: graph fundamentals</h1><p>Lecture 17 &middot; Course notes</p></div><button class="study" data-id="lecture-10.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-10.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-graph-theory-the-mathematical-perspective">2. Graph Theory — The Mathematical Perspective</a></li><li><a href="#3-graph-data-structure-the-computational-perspective">3. Graph Data Structure — The Computational Perspective</a></li><li><a href="#4-graph-database-concepts">4. Graph Database Concepts</a></li><li><a href="#5-the-neo4j-graph-database">5. The Neo4j Graph Database</a></li><li><a href="#6-neo4j-installation-desktop-interface">6. Neo4j Installation &amp; Desktop Interface</a></li><li><a href="#7-cypher-neo4js-query-language">7. Cypher — Neo4j's Query Language</a></li><li><a href="#8-questions-memo">8. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>This lecture covers:</strong><ol>
 <li><strong>Graph theory.</strong></li>
@@ -11,7 +9,7 @@
 </li>
 <li><strong>Reference:</strong> the <strong>Neo4j manual</strong> (https://neo4j.com/docs/getting-started/current/).</li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>In Lecture 13 the <strong>graph database</strong> was one of the five NoSQL data models (nodes, edges, properties — used for social networks, recommendations, forensic investigations; example DBs Neo4j and Amazon Neptune). This lecture starts by explaining the <strong>mathematics</strong> behind graphs, then moves to <strong>Neo4j</strong>, the graph DBMS you will use in the practicals, and its query language <strong>Cypher.</strong></p>
 <hr />
 <h2 id="2-graph-theory-the-mathematical-perspective">2. Graph Theory — The Mathematical Perspective</h2>
@@ -66,7 +64,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="worked-example-the-slides-simple-weighted-directed-graph-v0v5">📌 Worked Example — The slides' simple weighted directed graph (V0–V5)</h4>
+<h4 id="worked-example-the-slides-simple-weighted-directed-graph-v0v5"> Worked Example — The slides' simple weighted directed graph (V0–V5)</h4>
 <p>The figure shows six vertices and nine <strong>weighted, directed</strong> edges:</p>
 <pre><code class="language-mermaid">flowchart LR
   V0 --&gt;|5| V1
@@ -178,7 +176,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="coding-example-added-for-step-by-step-clarity">📌 Coding Example (added for step-by-step clarity)</h4>
+<h4 id="coding-example-added-for-step-by-step-clarity"> Coding Example (added for step-by-step clarity)</h4>
 <pre><code class="language-python">g = Graph()                # 1
 g.addVertex(&quot;V0&quot;)          # 2
 g.addVertex(&quot;V1&quot;)          # 3
@@ -289,7 +287,7 @@ print(g.getVertices())     # 6  list of all vertices
 </ul>
 </li>
 </ul>
-<h4 id="example-slide-figure-a-node-with-label-person">📌 Example — Slide figure: a Node with label <code>Person</code></h4>
+<h4 id="example-slide-figure-a-node-with-label-person"> Example — Slide figure: a Node with label <code>Person</code></h4>
 <pre><code>(:Person { name: &quot;Thandi&quot;, from: &quot;Durban&quot; })
 </code></pre>
 <ul>
@@ -308,7 +306,7 @@ print(g.getVertices())     # 6  list of all vertices
 </ol>
 </li>
 </ul>
-<h4 id="worked-example-slide-figure-the-follows-relationship">📌 Worked Example — Slide figure: the <code>FOLLOWS</code> relationship</h4>
+<h4 id="worked-example-slide-figure-the-follows-relationship"> Worked Example — Slide figure: the <code>FOLLOWS</code> relationship</h4>
 <p><strong>Nodes:</strong> Thandi (Durban), Neo (Cape Town), Johan (Pretoria).</p>
 <ul>
 <li><strong>Thandi FOLLOWS Neo</strong> and <strong>Thandi FOLLOWS Johan.</strong></li>
@@ -325,7 +323,7 @@ print(g.getVertices())     # 6  list of all vertices
 <li>Relationship properties <strong>store attributes of the relationship</strong> between two nodes.</li>
 <li><strong>In a property graph, relationships are data records (objects) that can also contain properties.</strong></li>
 </ul>
-<h4 id="worked-example-slide-figure-follows-with-since">📌 Worked Example — Slide figure: <code>FOLLOWS</code> with <code>since</code></h4>
+<h4 id="worked-example-slide-figure-follows-with-since"> Worked Example — Slide figure: <code>FOLLOWS</code> with <code>since</code></h4>
 <table>
 <thead>
 <tr>
@@ -541,7 +539,7 @@ CREATE
 <li><strong>Result (slide screenshot):</strong> <em>"Created 2 nodes, created 3 relationships, set 9 properties, added 2 labels."</em> — check the count: 2 nodes × 3 properties = 6, plus 3 relationships × 1 property (<code>since</code>) = 3 → <strong>9 properties.</strong></li>
 <li>The <strong>variables</strong> (<code>psT</code>, <code>psJ</code>, <code>psN</code>) exist only <strong>within this one query</strong> — they let the relationship patterns refer to the nodes just created.</li>
 </ol>
-<h4 id="important-warning-from-the-slide">⚠️ Important warning from the slide</h4>
+<h4 id="important-warning-from-the-slide"> Important warning from the slide</h4>
 <ul>
 <li><strong><code>CREATE</code> does not check whether the data already exists.</strong></li>
 <li><strong>Running the same <code>CREATE</code> statement repeatedly can create duplicate nodes/relationships.</strong></li>
@@ -613,7 +611,7 @@ RETURN followed
 <ul>
 <li>Returns just the <strong>Johan</strong> and <strong>Neo</strong> nodes; in <strong>Graph mode</strong>, clicking a node (e.g., Neo or Johan) displays its <strong>properties</strong> (name, from, hobby).</li>
 </ul>
-<h4 id="extra-examples-added-for-step-by-step-clarity">📌 Extra Examples (added for step-by-step clarity)</h4>
+<h4 id="extra-examples-added-for-step-by-step-clarity"> Extra Examples (added for step-by-step clarity)</h4>
 <pre><code class="language-cypher">// Who follows Thandi?  (reverse the arrow direction)
 MATCH (follower)-[:FOLLOWS]-&gt;(psT:Person)
 WHERE psT.name = &quot;Thandi&quot;

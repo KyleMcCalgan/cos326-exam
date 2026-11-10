@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Data Warehousing &amp; OLAP (2): Implementing ROLAP, Slowly Changing Dimensions &amp; SQL OLAP Extensions — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Data Warehousing &amp; OLAP (2): Implementing ROLAP, Slowly Changing Dimensions &amp; SQL OLAP Extensions — Comprehensive Notes</h1><p>From S1_L24_Data_Warehousing_OLAP_2_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-17.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-17.html">☆ Bookmark</button></div><article class="prose"><h1 id="data-warehousing-olap-2-implementing-rolap-slowly-changing-dimensions-sql-olap-extensions-comprehensive-notes">Data Warehousing &amp; OLAP (2): Implementing ROLAP, Slowly Changing Dimensions &amp; SQL OLAP Extensions — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-24-chapter-29-7th-edition">COS 326 Database Systems | Lecture 24 | Chapter 29 (7th Edition)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Data Warehousing &amp; OLAP (2): Implementing ROLAP, Slowly Changing Dimensions &amp; SQL OLAP Extensions — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Data warehousing and OLAP: implementation</h1><p>Lecture 24 &middot; Course notes</p></div><button class="study" data-id="lecture-17.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-17.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-recap-rolap-structure">2. Recap — ROLAP Structure</a></li><li><a href="#3-sql-statements-for-data-warehousing-olap">3. SQL Statements for Data Warehousing &amp; OLAP</a></li><li><a href="#4-slowly-changing-dimensions-scds">4. Slowly Changing Dimensions (SCDs)</a></li><li><a href="#5-loading-data-into-the-rolap-structure">5. Loading Data into the ROLAP Structure</a></li><li><a href="#6-olap-analysis-for-bi-why-sql-needed-extensions">6. OLAP Analysis for BI — Why SQL Needed Extensions</a></li><li><a href="#7-extended-grouping-cube-rollup-grouping-sets">7. Extended Grouping — CUBE, ROLLUP, GROUPING SETS</a></li><li><a href="#8-olap-and-statistical-analysis-windowing-and-ranking">8. OLAP and Statistical Analysis — Windowing and Ranking</a></li><li><a href="#9-modern-data-warehousing-and-bi-tools">9. Modern Data Warehousing and BI Tools</a></li><li><a href="#10-olap-tools-categories">10. OLAP Tools — Categories</a></li><li><a href="#11-homework">11. Homework</a></li><li><a href="#12-questions-memo">12. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>This lecture covers:</strong><ol>
 <li><strong>Data warehousing &amp; OLAP</strong> (continued from Lecture 23).</li>
@@ -11,7 +9,7 @@
 </li>
 <li><strong>Also on the slides:</strong> slowly changing dimensions, loading with <code>MERGE</code>, windowing and ranking functions, modern BI tools, OLAP tool categories, and two homework tasks.</li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>Lecture 23 explained <strong>what</strong> a star schema is (fact table + dimension tables) and showed the hotel example. Lecture 24 explains <strong>how to build and load it in SQL</strong>, how to handle <strong>changing dimension data</strong>, and how SQL was <strong>extended</strong> to answer routine business questions (subtotals, moving averages, rankings).</p>
 <hr />
 <h2 id="2-recap-rolap-structure">2. Recap — ROLAP Structure</h2>
@@ -51,7 +49,7 @@
 <ul>
 <li><strong>Key point (slide):</strong> <strong>surrogate keys allow a dimension to maintain multiple historical versions of the same business entity</strong> (see slowly changing dimensions, Section 4).</li>
 </ul>
-<h4 id="example-added">📌 Example (added)</h4>
+<h4 id="example-added"> Example (added)</h4>
 <p><code>Hotel_ID</code> is the <strong>business key</strong> from the source system (e.g., "H0017"); <code>Hotel_Key</code> is the <strong>surrogate key</strong> (e.g., 12345) generated by the warehouse. If the hotel is later reclassified, a <strong>new row</strong> with a <strong>new <code>Hotel_Key</code></strong> but the <strong>same <code>Hotel_ID</code></strong> can be added without disturbing historical facts.</p>
 <hr />
 <h2 id="3-sql-statements-for-data-warehousing-olap">3. SQL Statements for Data Warehousing &amp; OLAP</h2>
@@ -205,7 +203,7 @@ CREATE DIMENSION HOTELS_DIM
 <li><strong>Why this works:</strong> <strong>old fact rows</strong> still point to <code>Cust_Key</code> 12345 (she was <strong>single</strong> when those sales happened), while <strong>new facts</strong> point to 12347 — so history by marital status is <strong>correct.</strong></li>
 <li>The table structure on the slide: <strong><code>CUSTOMER(Cust_Key, Cust_ID, Eff_start_date, Eff_end_date, Cust_sname, Marital_stat, …)</code></strong> — the <strong>effective start/end dates</strong> support Type 2.</li>
 </ol>
-<h4 id="same-event-under-type-1-and-type-3-added-for-comparison">📌 Same event under Type 1 and Type 3 (added for comparison)</h4>
+<h4 id="same-event-under-type-1-and-type-3-added-for-comparison"> Same event under Type 1 and Type 3 (added for comparison)</h4>
 <table>
 <thead>
 <tr>
@@ -262,7 +260,7 @@ WHEN NOT MATCHED THEN
 <li><strong>Why one statement for both loads:</strong> on the <strong>initial load</strong> the dimension is empty → everything is <code>NOT MATCHED</code> → inserted; on <strong>incremental loads</strong> it adds new rows and updates existing ones.</li>
 </ol>
 <blockquote>
-<p><strong>⚠️ Cautions (added — not on the slide):</strong> (a) because the <code>ON</code> condition <strong>includes <code>Marital_Status</code></strong>, a "matched" row is one whose marital status is <strong>unchanged</strong>, so <code>UPDATE</code> there would be for <strong>other, non-tracked attributes</strong> (Type 1 corrections); a <strong>changed marital status</strong> never matches and is inserted. (b) A complete <strong>Type 2</strong> load also needs to <strong>set the <code>End_date</code> of the old row</strong> (and give the new row a new surrogate key from the sequence) — typically with an additional <code>UPDATE</code> step. Check your practical/textbook for the exact pattern you must use.</p>
+<p><strong> Cautions (added — not on the slide):</strong> (a) because the <code>ON</code> condition <strong>includes <code>Marital_Status</code></strong>, a "matched" row is one whose marital status is <strong>unchanged</strong>, so <code>UPDATE</code> there would be for <strong>other, non-tracked attributes</strong> (Type 1 corrections); a <strong>changed marital status</strong> never matches and is inserted. (b) A complete <strong>Type 2</strong> load also needs to <strong>set the <code>End_date</code> of the old row</strong> (and give the new row a new surrogate key from the sequence) — typically with an additional <code>UPDATE</code> step. Check your practical/textbook for the exact pattern you must use.</p>
 </blockquote>
 <hr />
 <h2 id="6-olap-analysis-for-bi-why-sql-needed-extensions">6. OLAP Analysis for BI — Why SQL Needed Extensions</h2>
@@ -350,7 +348,7 @@ GROUP BY B.province, T.month;
 <blockquote>
 <p><strong>Observation (added):</strong> this <code>GROUPING SETS</code> list produces <strong>the same groups as <code>ROLLUP (province, month)</code>.</strong> <code>GROUPING SETS</code> is the general form: you choose <strong>any</strong> groupings (e.g., omit some, or include <code>(month)</code> alone).</p>
 </blockquote>
-<h4 id="worked-example-added-for-step-by-step-clarity-the-three-operations-on-made-up-data">📌 Worked Example (added for step-by-step clarity) — the three operations on made-up data</h4>
+<h4 id="worked-example-added-for-step-by-step-clarity-the-three-operations-on-made-up-data"> Worked Example (added for step-by-step clarity) — the three operations on made-up data</h4>
 <p><strong>Product X, 2026 — revenue (R millions) from the join:</strong></p>
 <table>
 <thead>

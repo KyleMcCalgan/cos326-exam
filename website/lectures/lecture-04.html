@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>XQuery and FLWOR Expressions — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>XQuery and FLWOR Expressions — Comprehensive Notes</h1><p>From S1_L11.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-04.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-04.html">☆ Bookmark</button></div><article class="prose"><h1 id="xquery-and-flwor-expressions-comprehensive-notes">XQuery and FLWOR Expressions — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-11-chapter-13-7th-edition">COS 326 Database Systems | Lecture 11 | Chapter 13 (7th Edition)</h3>
-<blockquote>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>XQuery and FLWOR Expressions — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>XQuery and FLWOR</h1><p>Lecture 11 &middot; Course notes</p></div><button class="study" data-id="lecture-04.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-04.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview-and-recap">1. Lecture Overview and Recap</a></li><li><a href="#2-xquery-flwor-expressions">2. XQuery — FLWOR Expressions</a></li><li><a href="#3-flwor-clauses-in-detail">3. FLWOR Clauses in Detail</a></li><li><a href="#4-examples-15-flwor-in-basex-124">4. Examples 1–5 — FLWOR in BaseX 12.4</a></li><li><a href="#5-example-6-aggregates-and-constructed-xml">5. Example 6 — Aggregates and Constructed XML</a></li><li><a href="#6-example-7-quantifiers-some-every">6. Example 7 — Quantifiers (some / every)</a></li><li><a href="#7-joining-two-documents">7. Joining Two Documents</a></li><li><a href="#8-user-defined-functions">8. User-Defined Functions</a></li><li><a href="#9-homework-summary-takeaways">9. Homework &amp; Summary Takeaways</a></li><li><a href="#10-questions-memo">10. Questions &amp; Memo</a></li></ol></details><article class="prose"><blockquote>
 <p>Lecture 11 is titled <strong>"Semi-Structured Data and XML (3)"</strong> (slide date: Tuesday 01 September 2026). It continues the XML notes from Lectures 9 &amp; 10 (XML data model, XSD, XPath, BaseX). Where those notes introduced XQuery and FLWOR only briefly, this lecture covers FLWOR properly, with BaseX demonstrations, joins over two documents and user-defined functions.</p>
 </blockquote>
 <hr />
@@ -33,7 +31,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>A one-line recap using the module's running file: the XPath <code>//STAFFLIST/STAFF[1]/STAFFNO</code> (Lecture 10) <em>selects</em> one node. In this lecture the same path is used <strong>inside</strong> a FLWOR expression, e.g. <code>for $S in //STAFF return $S/STAFFNO</code>, which <em>loops</em> over every <code>STAFF</code> and returns each <code>STAFFNO</code>.</p>
 <h3 id="13-the-two-data-files-used-in-this-lecture">1.3 The Two Data Files Used in This Lecture</h3>
 <table>
@@ -143,7 +141,7 @@ RETURN    expression
 <li>The <strong><code>RETURN</code> clause</strong> is evaluated for each remaining tuple, in that order. Its output is an <strong>instance of the XML query data model</strong> (a sequence of nodes and/or values).</li>
 <li>Because <code>WHERE</code> and <code>ORDER BY</code> are optional, the shortest legal FLWOR is <code>for … return …</code> or <code>let … return …</code> (see Section 4.3).</li>
 </ol>
-<h4 id="example-added-for-clarity-the-pipeline-as-a-conveyor-belt">📌 Example (added for clarity) — the pipeline as a conveyor belt</h4>
+<h4 id="example-added-for-clarity-the-pipeline-as-a-conveyor-belt"> Example (added for clarity) — the pipeline as a conveyor belt</h4>
 <p>Think of a factory line at a bakery. <code>FOR</code> puts every loaf on the belt, <code>WHERE</code> removes the burnt ones, <code>ORDER BY</code> arranges the rest by size, and <code>RETURN</code> wraps each remaining loaf in a box. The "tuple stream" is the belt.</p>
 <h3 id="23-comparison-flwor-vs-sql-added-for-clarity">2.3 Comparison — FLWOR vs SQL (added for clarity)</h3>
 <table>
@@ -190,7 +188,7 @@ RETURN    expression
 <li><strong>Iteration:</strong> <strong>associates variable <code>$S</code> with each expression value.</strong></li>
 <li>The <strong>result is a tuple stream.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
 <p><code>for $S in //STAFF</code> binds <code>$S</code> to the first <code>&lt;STAFF&gt;</code> node, then to the second, and so on. With the four staff of Lecture 11 the tuple stream has <strong>4 tuples</strong>: <code>$S = SL20</code>, <code>$S = SL21</code>, <code>$S = SL22</code>, <code>$S = SL23</code>. Everything after <code>for</code> (<code>where</code>, <code>order by</code>, <code>return</code>) is applied <strong>once per tuple</strong>.</p>
 <h3 id="32-the-let-clause-from-the-slides">3.2 The <code>LET</code> Clause (from the slides)</h3>
 <ul>
@@ -198,7 +196,7 @@ RETURN    expression
 <li><strong>Binds one or more variables to one or more expressions.</strong></li>
 <li><strong>Without iteration (single binding for each variable).</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
 <p><code>let $S := //STAFF</code> binds <code>$S</code> to the <strong>entire sequence</strong> of four <code>STAFF</code> nodes in a single tuple. Then <code>count($S)</code> returns <strong>4</strong>, whereas <code>for $S in //STAFF return count($S)</code> returns <strong>1 1 1 1</strong> (one count per staff, each of a single node).</p>
 <h3 id="33-for-vs-let-comparison-added-for-clarity">3.3 <code>FOR</code> vs <code>LET</code> — Comparison (added for clarity)</h3>
 <table>
@@ -242,7 +240,7 @@ RETURN    expression
 <li><strong>Example:</strong> <code>where $S/SALARY &gt; 10000</code></li>
 <li><strong>One or more conditions to restrict tuples generated by <code>FOR</code> and <code>LET</code></strong> (<strong>optional</strong>).</li>
 </ul>
-<h4 id="example-added-for-clarity_3">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_3"> Example (added for clarity)</h4>
 <p><code>where $S/SALARY &gt; 10000 and $S/@branchNo = "B002"</code> keeps only the tuples where <strong>both</strong> conditions hold. Conditions are combined with <code>and</code> / <code>or</code>, exactly as in SQL.</p>
 <h3 id="35-the-order-by-clause-from-the-slides">3.5 The <code>ORDER BY</code> Clause (from the slides)</h3>
 <ul>
@@ -250,7 +248,7 @@ RETURN    expression
 <li><strong>Order of the tuple stream.</strong></li>
 <li><strong>Determines the order in which the <code>RETURN</code> clause is evaluated.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_4">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_4"> Example (added for clarity)</h4>
 <p><code>order by $S/STAFFNO descending</code> makes the tuple for <code>SL23</code> first and <code>SL20</code> last. Because <code>return</code> is evaluated in that order, the <strong>result also appears in that order</strong>. <code>ascending</code> is the default direction.</p>
 <h3 id="36-the-return-clause-from-the-slides">3.6 The <code>RETURN</code> Clause (from the slides)</h3>
 <ul>
@@ -258,7 +256,7 @@ RETURN    expression
 <li><strong>Evaluated once for each tuple in the tuple stream.</strong></li>
 <li><strong>Results concatenated to form the final result.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_5">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_5"> Example (added for clarity)</h4>
 <p>If four tuples survive and <code>return $S/STAFFNO</code> is used, <code>return</code> runs four times, producing four <code>&lt;STAFFNO&gt;</code> elements that are <strong>concatenated</strong> into one result sequence of four items. (In BaseX this appears as "4 Results".)</p>
 <h3 id="37-summary-of-clause-rules">3.7 Summary of Clause Rules</h3>
 <ol>
@@ -305,7 +303,7 @@ RETURN    expression
 <li><strong>Equivalence:</strong> this FLWOR returns exactly what the XPath <code>//STAFF/NAME</code> returns. FLWOR is not needed here, but the form is the starting point for the later examples.</li>
 </ol>
 <p><strong>Note for students:</strong> in the Lecture 9–10 notes the example FLWOR keywords were written in capitals (<code>FOR</code>, <code>WHERE</code>, …) following the textbook. In BaseX 12.4 use the <strong>lowercase</strong> forms stated on this slide.</p>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-names-of-all-modules">📌 Coding Example 2 (added for step-by-step clarity) — Names of all modules</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-names-of-all-modules"> Coding Example 2 (added for step-by-step clarity) — Names of all modules</h4>
 <p>Using a small university file <code>modules.xml</code> (added for clarity; used for all added examples in this lecture):</p>
 <pre><code class="language-xml">&lt;UNI&gt;
   &lt;MODULES&gt;
@@ -351,7 +349,7 @@ Luke
 <li><code>return $N</code> outputs the four surnames, one per line.</li>
 <li><strong>Contrast with Example 1:</strong> the result is <strong>30 b</strong> instead of 346 b because no tags or whitespace-indentation are returned — only the values.</li>
 </ol>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-credits-of-all-modules-as-plain-values">📌 Coding Example 2 (added for step-by-step clarity) — Credits of all modules as plain values</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-credits-of-all-modules-as-plain-values"> Coding Example 2 (added for step-by-step clarity) — Credits of all modules as plain values</h4>
 <pre><code class="language-xquery">for $C in //MODULE/CREDITS/text()
 return $C
 </code></pre>
@@ -403,7 +401,7 @@ return //STAFF[SALARY = $SAL]
 <li><strong>Value comparison operators:</strong> <code>eq</code>, <code>ne</code>, <code>lt</code>, <code>le</code>, <code>gt</code>, <code>ge</code> mean equal, not equal, less than, less than or equal, greater than, greater than or equal. They are the <strong>value-comparison</strong> versions of <code>=</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code> (the latter are <em>general</em> comparisons).</li>
 </ol>
 <p><strong>Note for students:</strong> this screenshot shows the surname <strong>Mpho</strong> for <code>SL22</code>, while the other Lecture 11 screenshots show <strong>Bakwena</strong> for the third staff member (see Section 1.3). Reproduced exactly as shown.</p>
-<h4 id="comparison-general-vs-value-comparison-operators-added-for-clarity">📌 Comparison — General vs Value Comparison Operators (added for clarity)</h4>
+<h4 id="comparison-general-vs-value-comparison-operators-added-for-clarity"> Comparison — General vs Value Comparison Operators (added for clarity)</h4>
 <table>
 <thead>
 <tr>
@@ -430,7 +428,7 @@ return //STAFF[SALARY = $SAL]
 </tr>
 </tbody>
 </table>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-let-with-a-constant">📌 Coding Example 2 (added for step-by-step clarity) — <code>let</code> with a constant</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-let-with-a-constant"> Coding Example 2 (added for step-by-step clarity) — <code>let</code> with a constant</h4>
 <pre><code class="language-xquery">let $C := 16
 return //MODULE[CREDITS = $C]/NAME/text()
 </code></pre>
@@ -440,7 +438,7 @@ return //MODULE[CREDITS = $C]/NAME/text()
 <li><code>//MODULE[CREDITS = $C]</code> keeps the modules whose <code>CREDITS</code> equals 16.</li>
 <li><code>/NAME/text()</code> extracts the names. <strong>Result (verified):</strong> <code>Database Systems</code>, <code>Computer Organisation</code>.</li>
 </ol>
-<h4 id="coding-example-3-added-for-step-by-step-clarity-what-goes-wrong-with-eq-on-untyped-data">📌 Coding Example 3 (added for step-by-step clarity) — What goes wrong with <code>eq</code> on untyped data</h4>
+<h4 id="coding-example-3-added-for-step-by-step-clarity-what-goes-wrong-with-eq-on-untyped-data"> Coding Example 3 (added for step-by-step clarity) — What goes wrong with <code>eq</code> on untyped data</h4>
 <pre><code class="language-xquery">for $M in //MODULE
 where $M/CREDITS eq 16
 return string($M/@code)
@@ -476,7 +474,7 @@ return $S/NAME
 <li><strong><code>return $S/NAME</code></strong> — returns the <code>NAME</code> element (with <code>FNAME</code> and <code>LNAME</code>) of each surviving staff member.</li>
 <li><strong>Result:</strong> <strong>2 Results, 170 b</strong> — <strong>Lerato Bakwena</strong> and <strong>James Luke</strong>, the two staff at branch <code>B004</code> who earn more than R15,000.</li>
 </ol>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-two-conditions-on-modules">📌 Coding Example 2 (added for step-by-step clarity) — Two conditions on modules</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-two-conditions-on-modules"> Coding Example 2 (added for step-by-step clarity) — Two conditions on modules</h4>
 <pre><code class="language-xquery">for $M in //MODULE
 where $M/CREDITS &gt; 12 and $M/@dept = &quot;CS&quot;
 order by $M/CREDITS
@@ -509,7 +507,7 @@ order by $S/STAFFNO ascending return $S/STAFFNO
 <li><strong>Result:</strong> <strong>4 Results, 98 b</strong>, i.e. <code>SL20, SL21, SL22, SL23</code>.</li>
 <li>Replacing <code>ascending</code> by <code>descending</code> gives <code>SL23, SL22, SL21, SL20</code>.</li>
 </ol>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-sorting-by-two-keys-descending">📌 Coding Example 2 (added for step-by-step clarity) — Sorting by two keys, descending</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-sorting-by-two-keys-descending"> Coding Example 2 (added for step-by-step clarity) — Sorting by two keys, descending</h4>
 <pre><code class="language-xquery">for $M in //MODULE
 order by $M/CREDITS descending, $M/@code ascending
 return string($M/@code)
@@ -555,7 +553,7 @@ return
 <li><strong>Why <code>B004</code> is not a round number:</strong> <code>29333.333333333332</code> is <code>88000 ÷ 3</code>. This means the average at <code>B004</code> was taken over <strong>three <code>SALARY</code> values</strong>, even though only two staff (Lerato and James) are visible at <code>B004</code> in the Lecture 11 results. That is consistent with some <code>STAFF</code> elements holding more than one <code>SALARY</code> element, the irregular (semi-structured) structure seen in the Lecture 9–10 sample file. The individual salaries are not visible on the slide, so this is an inference.</li>
 <li><strong>Why the output has no line breaks between the child elements:</strong> <code>BRANCH</code> is constructed by the query, so BaseX prints it as written.</li>
 </ol>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-total-and-average-credits-per-department">📌 Coding Example 2 (added for step-by-step clarity) — Total and average credits per department</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-total-and-average-credits-per-department"> Coding Example 2 (added for step-by-step clarity) — Total and average credits per department</h4>
 <pre><code class="language-xquery">for $D in distinct-values(//@dept)
 let $total := sum(//MODULE[@dept = $D]/CREDITS)
 return
@@ -572,7 +570,7 @@ return
 <li><strong>Result (verified):</strong> <code>&lt;DEPT&gt;&lt;NAME&gt;CS&lt;/NAME&gt;&lt;TOTAL&gt;64&lt;/TOTAL&gt;&lt;/DEPT&gt;</code> and <code>&lt;DEPT&gt;&lt;NAME&gt;STA&lt;/NAME&gt;&lt;TOTAL&gt;12&lt;/TOTAL&gt;&lt;/DEPT&gt;</code>.</li>
 <li>Replacing <code>sum</code> by <code>avg</code> gives <strong>21.333333333333332</strong> for <code>CS</code> (64 ÷ 3) and <strong>12</strong> for <code>STA</code> (verified), another example of a non-round average like the slide's <code>B004</code>.</li>
 </ol>
-<h4 id="coding-example-3-added-for-step-by-step-clarity-several-aggregates-in-one-query">📌 Coding Example 3 (added for step-by-step clarity) — Several aggregates in one query</h4>
+<h4 id="coding-example-3-added-for-step-by-step-clarity-several-aggregates-in-one-query"> Coding Example 3 (added for step-by-step clarity) — Several aggregates in one query</h4>
 <pre><code class="language-xquery">for $D in distinct-values(//@dept)
 return
     &lt;DEPT&gt;
@@ -618,7 +616,7 @@ let $S := //STAFF[@branchNo = $B]
 <li><strong><code>some</code> vs <code>every</code>:</strong> <code>every $sal in $S/SALARY satisfies ($sal &gt; 15000)</code> is the <strong>universal qualifier</strong> — it would be true only if <strong>all</strong> salaries at the branch exceeded 15000.</li>
 <li><strong>Link to Example 4:</strong> the general comparison <code>$S/SALARY &gt; 15000</code> is also existential, so <code>where $S/SALARY &gt; 15000</code> has the same effect as the explicit <code>some … satisfies …</code>. The explicit form makes the quantifier visible and is the only way to write <code>every</code>.</li>
 </ol>
-<h4 id="comparison-some-vs-every-added-for-clarity">📌 Comparison — <code>some</code> vs <code>every</code> (added for clarity)</h4>
+<h4 id="comparison-some-vs-every-added-for-clarity"> Comparison — <code>some</code> vs <code>every</code> (added for clarity)</h4>
 <table>
 <thead>
 <tr>
@@ -650,7 +648,7 @@ let $S := //STAFF[@branchNo = $B]
 </tr>
 </tbody>
 </table>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-departments-where-every-module-has-at-least-16-credits">📌 Coding Example 2 (added for step-by-step clarity) — Departments where every module has at least 16 credits</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-departments-where-every-module-has-at-least-16-credits"> Coding Example 2 (added for step-by-step clarity) — Departments where every module has at least 16 credits</h4>
 <pre><code class="language-xquery">for $D in distinct-values(//@dept)
 let $M := //MODULE[@dept = $D]
 where every $C in $M/CREDITS satisfies ($C &gt;= 16)
@@ -728,7 +726,7 @@ return $NOK/NAME }
 <li><strong>Result:</strong> the same output as Example 1.</li>
 </ol>
 <p><strong>Note for students:</strong> Examples 1 and 2 give the same result <strong>on this data</strong> but are not equivalent in general. If a staff member has <strong>no</strong> next of kin, Example 1 <strong>drops</strong> that staff member, whereas Example 2 still returns a <code>STAFFNOK</code> containing the staff <code>NAME</code> only (like a relational <strong>outer join</strong>). This is verified below on <code>modules.xml</code>.</p>
-<h4 id="comparison-example-1-vs-example-2-added-for-clarity">📌 Comparison — Example 1 vs Example 2 (added for clarity)</h4>
+<h4 id="comparison-example-1-vs-example-2-added-for-clarity"> Comparison — Example 1 vs Example 2 (added for clarity)</h4>
 <table>
 <thead>
 <tr>
@@ -760,7 +758,7 @@ return $NOK/NAME }
 </tr>
 </tbody>
 </table>
-<h4 id="coding-example-3-added-for-step-by-step-clarity-joining-modules-to-lecturers-both-styles">📌 Coding Example 3 (added for step-by-step clarity) — Joining modules to lecturers (both styles)</h4>
+<h4 id="coding-example-3-added-for-step-by-step-clarity-joining-modules-to-lecturers-both-styles"> Coding Example 3 (added for step-by-step clarity) — Joining modules to lecturers (both styles)</h4>
 <p><strong>Style 1 — two <code>for</code> variables:</strong></p>
 <pre><code class="language-xquery">for $M in //MODULE, $L in //LECTURER
 where $M/@code = $L/@module
@@ -809,7 +807,7 @@ return $mult(10,10)
 <li><strong>Evaluation:</strong> <code>$x = 10</code>, <code>$y = 10</code>, so <code>10 * 10</code> = <strong>100</strong>.</li>
 <li><strong>Result:</strong> <strong>1 Result, 3 b</strong>, the text <code>100</code> (three characters = 3 bytes).</li>
 </ol>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-a-function-used-in-a-query">📌 Coding Example 2 (added for step-by-step clarity) — A function used in a query</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-a-function-used-in-a-query"> Coding Example 2 (added for step-by-step clarity) — A function used in a query</h4>
 <pre><code class="language-xquery">let $sq := function($n) { $n * $n }
 return $sq(7)
 </code></pre>
@@ -818,7 +816,7 @@ return $sq(7)
 <li>One parameter <code>$n</code>; the body returns <code>$n * $n</code>.</li>
 <li><code>$sq(7)</code> → <code>7 * 7</code> = <strong>49</strong> (verified).</li>
 </ol>
-<h4 id="coding-example-3-added-for-step-by-step-clarity-a-named-function-with-declare-function">📌 Coding Example 3 (added for step-by-step clarity) — A named function with <code>declare function</code></h4>
+<h4 id="coding-example-3-added-for-step-by-step-clarity-a-named-function-with-declare-function"> Coding Example 3 (added for step-by-step clarity) — A named function with <code>declare function</code></h4>
 <pre><code class="language-xquery">declare function local:mult($x, $y) { $x * $y };
 local:mult(10, 10)
 </code></pre>
@@ -847,7 +845,7 @@ return $f(5, 2)
 <blockquote>
 <p><strong>Built-in functions:</strong> the slide states <strong>"Reading for the student."</strong> The slide gives no further list, so the notes do not invent one; the functions met in this lecture are <code>distinct-values</code>, <code>avg</code>, <code>text()</code> and <code>math:pow</code>.</p>
 </blockquote>
-<h4 id="additional-example-added-for-clarity-another-built-in-as-a-function-reference">📌 Additional Example (added for clarity) — another built-in as a function reference</h4>
+<h4 id="additional-example-added-for-clarity-another-built-in-as-a-function-reference"> Additional Example (added for clarity) — another built-in as a function reference</h4>
 <pre><code class="language-xquery">let $f := upper-case#1
 return $f(&quot;thabo&quot;)
 </code></pre>
@@ -856,7 +854,7 @@ return $f(&quot;thabo&quot;)
 <li><code>upper-case#1</code> references the built-in <code>upper-case</code> that takes <strong>1</strong> argument.</li>
 <li><code>$f("thabo")</code> returns <strong>THABO</strong> (verified).</li>
 </ol>
-<h4 id="comparison-the-three-ways-of-obtaining-a-function-added-for-clarity">📌 Comparison — the three ways of obtaining a function (added for clarity)</h4>
+<h4 id="comparison-the-three-ways-of-obtaining-a-function-added-for-clarity"> Comparison — the three ways of obtaining a function (added for clarity)</h4>
 <table>
 <thead>
 <tr>
@@ -893,7 +891,7 @@ return $f(&quot;thabo&quot;)
 <ul>
 <li>On the slide for <strong>Example 6</strong> (average salary per branch), the box beside the query ends with the single word <strong>"Homework"</strong> (flagged as Homework). <strong>No question text is given on the slide.</strong> It is placed directly under the note <em>"Functions for aggregates are: <code>avg</code>, etc."</em>, so it is reasonable to treat it as an invitation to <strong>practise Example 6 and the other aggregate functions yourself</strong>. The slide does not say more, so no further task is assumed.</li>
 </ul>
-<h4 id="example-added-to-support-the-homework-a-variation-on-example-6">📌 Example (added to support the homework) — a variation on Example 6</h4>
+<h4 id="example-added-to-support-the-homework-a-variation-on-example-6"> Example (added to support the homework) — a variation on Example 6</h4>
 <p>Practise by changing the aggregate and the grouping, for instance "for each branch, the number of staff and the highest salary":</p>
 <pre><code class="language-xquery">for $B in distinct-values(//@branchNo)
 return

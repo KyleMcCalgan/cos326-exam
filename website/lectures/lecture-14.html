@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Big Data Technologies (1): Hadoop, Spark, Cloud-Native Tools &amp; Governance — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Big Data Technologies (1): Hadoop, Spark, Cloud-Native Tools &amp; Governance — Comprehensive Notes</h1><p>From S1_L21_Big_Data_Technologies_1_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-14.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-14.html">☆ Bookmark</button></div><article class="prose"><h1 id="big-data-technologies-1-hadoop-spark-cloud-native-tools-governance-comprehensive-notes">Big Data Technologies (1): Hadoop, Spark, Cloud-Native Tools &amp; Governance — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-21-chapter-25-7th-edition-section-251-is-the-examinable-part-of-the-chapter">COS 326 Database Systems | Lecture 21 | Chapter 25 (7th Edition — Section 25.1 is the examinable part of the chapter)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Big Data Technologies (1): Hadoop, Spark, Cloud-Native Tools &amp; Governance — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Big data technologies</h1><p>Lecture 21 &middot; Course notes</p></div><button class="study" data-id="lecture-14.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-14.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-introduction-what-is-big-data">2. Introduction — What Is Big Data?</a></li><li><a href="#3-evolution-of-big-data-architectures">3. Evolution of Big Data Architectures</a></li><li><a href="#4-hadoop-legacy-components-and-lessons">4. Hadoop — Legacy Components and Lessons</a></li><li><a href="#5-apache-spark-the-modern-alternative">5. Apache Spark — The Modern Alternative</a></li><li><a href="#6-storage-hdfs-vs-cloud-object-stores">6. Storage — HDFS vs Cloud Object Stores</a></li><li><a href="#7-ecosystem-tools-then-vs-now">7. Ecosystem Tools — Then vs Now</a></li><li><a href="#8-apache-flink-stateful-stream-processing">8. Apache Flink — Stateful Stream Processing</a></li><li><a href="#9-cloud-native-platforms">9. Cloud-Native Platforms</a></li><li><a href="#10-modern-file-formats">10. Modern File Formats</a></li><li><a href="#11-workflow-orchestration">11. Workflow Orchestration</a></li><li><a href="#12-streaming-real-time-analytics">12. Streaming &amp; Real-Time Analytics</a></li><li><a href="#13-query-engines-analytics-machine-learning">13. Query Engines, Analytics &amp; Machine Learning</a></li><li><a href="#14-data-governance-security-ethics-legal-considerations">14. Data Governance, Security, Ethics &amp; Legal Considerations</a></li><li><a href="#15-applications-of-big-data-slide-list">15. Applications of Big Data (slide list)</a></li><li><a href="#16-summary-from-the-slides">16. Summary (from the slides)</a></li><li><a href="#17-homework-telecom-case-study">17. Homework — Telecom Case Study</a></li><li><a href="#18-questions-memo">18. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>This lecture covers:</strong><ol>
 <li><strong>What is Big Data?</strong> (the <strong>V5 model</strong>).</li>
@@ -14,7 +12,7 @@
 </ol>
 </li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>Lecture 13 introduced <strong>big data and NoSQL storage</strong>. Lecture 21 turns to the <strong>processing technologies</strong> that sit around that storage: <em>how</em> do you actually compute over terabytes of data? The answer has evolved — <strong>MapReduce/Hadoop (batch) → Spark (in-memory, faster) → cloud-native services and streaming (real-time).</strong></p>
 <hr />
 <h2 id="2-introduction-what-is-big-data">2. Introduction — What Is Big Data?</h2>
@@ -62,7 +60,7 @@
 <blockquote>
 <p><strong>Note:</strong> Lecture 13 listed volume as "terabytes to petabytes (now even yottabytes)"; this lecture says "terabytes to <strong>zettabytes</strong>." The point is the same — <strong>enormous scale.</strong></p>
 </blockquote>
-<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
 <p>A <strong>telecom operator</strong> illustrates all five Vs: <strong>billions of call/data records</strong> (volume); <strong>events arriving every second</strong> that must be screened for fraud (velocity); <strong>call logs, SMS, app telemetry, customer-service text</strong> (variety); <strong>duplicate or corrupted records</strong> that must be cleaned (veracity); and <strong>churn prediction</strong> that retains customers (value).</p>
 <h3 id="22-data-generation-points-slide-examples">2.2 Data Generation Points (slide examples)</h3>
 <ul>
@@ -134,7 +132,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="mapreduce-a-short-worked-example-added-for-step-by-step-clarity-not-detailed-on-the-slides">📌 MapReduce — a short worked example (added for step-by-step clarity; not detailed on the slides)</h4>
+<h4 id="mapreduce-a-short-worked-example-added-for-step-by-step-clarity-not-detailed-on-the-slides"> MapReduce — a short worked example (added for step-by-step clarity; not detailed on the slides)</h4>
 <p><strong>Task:</strong> count how often each word appears in a very large set of text files.</p>
 <ol>
 <li><strong>Map phase:</strong> each node reads its <strong>part of the data</strong> and emits <strong>(word, 1)</strong> pairs — e.g., "to be or not to be" → (to,1), (be,1), (or,1), (not,1), (to,1), (be,1).</li>
@@ -150,9 +148,9 @@
 <li>These limitations <strong>encouraged the adoption of engines such as Apache Spark</strong> and <strong>specialised stream-processing frameworks.</strong></li>
 </ol>
 <blockquote>
-<p><strong>⚠️ Note from the slide:</strong> <strong>Hadoop is an <em>ecosystem</em> of technologies.</strong> Its <strong>limitations should not be attributed equally</strong> to HDFS, YARN and every Hadoop-related tool (the disk-write limitation is about <strong>MapReduce</strong>, not HDFS itself).</p>
+<p><strong> Note from the slide:</strong> <strong>Hadoop is an <em>ecosystem</em> of technologies.</strong> Its <strong>limitations should not be attributed equally</strong> to HDFS, YARN and every Hadoop-related tool (the disk-write limitation is about <strong>MapReduce</strong>, not HDFS itself).</p>
 </blockquote>
-<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
 <p>A <strong>machine-learning algorithm</strong> that repeats 50 passes over the same dataset would, under MapReduce, <strong>read from and write to disk 50 times</strong>; an engine that <strong>keeps the data in memory</strong> between passes (Spark) avoids most of that overhead.</p>
 <hr />
 <h2 id="5-apache-spark-the-modern-alternative">5. Apache Spark — The Modern Alternative</h2>
@@ -171,7 +169,7 @@
 <li>Can process data stored in <strong>HDFS</strong> and supported <strong>cloud object stores:</strong> <strong>Amazon S3, Azure Blob Storage, Google Cloud Storage.</strong></li>
 <li><strong>Key advantage:</strong> Spark can <strong>reduce processing overhead for many iterative and interactive workloads</strong> compared with traditional <strong>disk-intensive MapReduce</strong> jobs.</li>
 </ul>
-<h4 id="example-added-for-clarity_3">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_3"> Example (added for clarity)</h4>
 <p><strong>DAG:</strong> a job such as <em>read logs → filter errors → group by server → count → write results</em> is represented as a <strong>graph of stages</strong> (nodes) with <strong>one-way dependencies</strong> (edges), <strong>no cycles.</strong> Spark can schedule and optimise the stages together, rather than treating each step as a separate disk-to-disk job.</p>
 <h3 id="51-mapreducehadoop-vs-spark-added-comparison">5.1 MapReduce/Hadoop vs Spark (added comparison)</h3>
 <table>
@@ -299,7 +297,7 @@
 <li><strong>Related technologies:</strong> <strong>Kafka Streams</strong>, <strong>Spark Structured Streaming</strong> (architectures and capabilities <strong>differ</strong>).</li>
 <li><strong>Example (slide):</strong> a <strong>bank uses Flink</strong> to analyse incoming transactions and <strong>flag suspicious activity within seconds.</strong></li>
 </ul>
-<h4 id="terms-explained-added">📌 Terms explained (added)</h4>
+<h4 id="terms-explained-added"> Terms explained (added)</h4>
 <ul>
 <li><strong>Stateful:</strong> the engine <strong>remembers information between events</strong> (e.g., "how many transactions has this card made in the last 5 minutes?").</li>
 <li><strong>Event time:</strong> the time the event <strong>actually happened</strong>, not the time it <strong>arrived</strong> — important when events arrive late or out of order.</li>
@@ -364,7 +362,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="example-why-columnar-added">📌 Example — why columnar? (added)</h4>
+<h4 id="example-why-columnar-added"> Example — why columnar? (added)</h4>
 <p>A table of 100 columns and 1 billion rows: a query that only needs <strong><code>amount</code></strong> and <strong><code>date</code></strong> reads <strong>just those two columns</strong> from a <strong>columnar</strong> file (Parquet/ORC); a <strong>row-oriented</strong> file would force reading <strong>all 100 columns</strong> of every row. Conversely, <strong>Avro</strong> (row-oriented) suits <strong>writing/exchanging whole records</strong>, e.g., messages between systems.</p>
 <hr />
 <h2 id="11-workflow-orchestration">11. Workflow Orchestration</h2>
@@ -372,7 +370,7 @@
 <li><strong>Tools:</strong> <strong>Airflow, Prefect, Dagster.</strong></li>
 <li><strong>Purpose:</strong> manage <strong>ETL, dependencies, scheduling and monitoring</strong> of data pipelines.</li>
 </ul>
-<h4 id="example-added">📌 Example (added)</h4>
+<h4 id="example-added"> Example (added)</h4>
 <p>A nightly pipeline: <em>extract sales → clean → load into warehouse → refresh report</em>. An orchestrator runs the steps <strong>in order</strong>, <strong>retries failures</strong>, <strong>waits for dependencies</strong> and <strong>alerts</strong> you if a step fails.</p>
 <hr />
 <h2 id="12-streaming-real-time-analytics">12. Streaming &amp; Real-Time Analytics</h2>
@@ -405,7 +403,7 @@
 <ul>
 <li>Streaming systems can support <strong>event replay, continuous processing and event-driven applications</strong>; the processing model <strong>depends on the platform and application design.</strong></li>
 </ul>
-<h4 id="division-of-labour-added">📌 Division of labour (added)</h4>
+<h4 id="division-of-labour-added"> Division of labour (added)</h4>
 <p><strong>Kafka</strong> <em>moves and stores</em> the events (the "pipe"); <strong>Flink / Spark Structured Streaming</strong> <em>compute</em> on them (the "brain"). A typical pipeline: <strong>sensors → Kafka → Flink → alert/dashboard.</strong></p>
 <hr />
 <h2 id="13-query-engines-analytics-machine-learning">13. Query Engines, Analytics &amp; Machine Learning</h2>
@@ -456,7 +454,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="examples-added-for-clarity">📌 Examples (added for clarity)</h4>
+<h4 id="examples-added-for-clarity"> Examples (added for clarity)</h4>
 <ul>
 <li><strong>RBAC:</strong> a "call-centre agent" role may view a customer's name and plan, but <strong>not</strong> their full location history; a "fraud analyst" role may.</li>
 <li><strong>Least privilege:</strong> give each user/service <strong>only the permissions it needs</strong>, nothing more.</li>

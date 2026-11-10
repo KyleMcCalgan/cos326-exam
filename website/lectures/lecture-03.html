@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Semi-Structured Data and XML — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Semi-Structured Data and XML — Comprehensive Notes</h1><p>From S1 L9, 10.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-03.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-03.html">☆ Bookmark</button></div><article class="prose"><h1 id="semi-structured-data-and-xml-comprehensive-notes">Semi-Structured Data and XML — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lectures-9-10-chapter-13-7th-edition">COS 326 Database Systems | Lectures 9 &amp; 10 | Chapter 13 (7th Edition)</h3>
-<h2 id="2-introduction-databases-as-data-sources-for-web-applications">2. Introduction — Databases as Data Sources for Web Applications</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Semi-Structured Data and XML — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Semi-structured data and XML</h1><p>Lectures 9&ndash;10 &middot; Course notes</p></div><button class="study" data-id="lecture-03.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-03.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#2-introduction-databases-as-data-sources-for-web-applications">2. Introduction — Databases as Data Sources for Web Applications</a></li><li><a href="#3-structured-semi-structured-and-unstructured-data">3. Structured, Semi-Structured, and Unstructured Data</a></li><li><a href="#4-semi-structured-data-in-detail">4. Semi-Structured Data in Detail</a></li><li><a href="#5-the-directed-graph-model-for-semi-structured-data">5. The Directed Graph Model for Semi-Structured Data</a></li><li><a href="#6-xml-extensible-markup-language">6. XML (eXtensible Markup Language)</a></li><li><a href="#7-xml-what-you-already-know-revision">7. XML: What You Already Know (Revision)</a></li><li><a href="#8-further-reading-student-self-study">8. Further Reading (Student Self-Study)</a></li><li><a href="#9-xml-vs-json">9. XML vs JSON</a></li><li><a href="#10-xml-hierarchical-tree-data-model">10. XML Hierarchical (Tree) Data Model</a></li><li><a href="#11-xml-schema-xsd">11. XML Schema (XSD)</a></li><li><a href="#12-xml-schema-definition-types">12. XML Schema Definition Types</a></li><li><a href="#13-storing-and-extracting-xml-documents-from-databases">13. Storing and Extracting XML Documents from Databases</a></li><li><a href="#14-xml-languages-overview-xpath-and-xquery">14. XML Languages Overview — XPath and XQuery</a></li><li><a href="#15-xml-path-language-xpath">15. XML Path Language (XPath)</a></li><li><a href="#16-xpath-query-examples-working-through-staff_listxml">16. XPath Query Examples — Working Through staff_list.xml</a></li><li><a href="#17-xml-query-languages-and-xquery">17. XML Query Languages and XQuery</a></li><li><a href="#18-xquery-flwor-expressions">18. XQuery FLWOR Expressions</a></li><li><a href="#19-introduction-to-basex">19. Introduction to BaseX</a></li><li><a href="#20-using-basex-practical-setup-and-queries">20. Using BaseX — Practical Setup and Queries</a></li><li><a href="#21-questions-memo">21. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="2-introduction-databases-as-data-sources-for-web-applications">2. Introduction — Databases as Data Sources for Web Applications</h2>
 <ul>
 <li><strong>Databases function as data sources for Web applications.</strong></li>
 <li><strong>HTML:</strong><ul>
@@ -15,7 +13,7 @@
 <li><strong>Chapter focus:</strong> the <strong>XML data model and languages.</strong></li>
 <li><strong>Note:</strong> <strong>While XML remains foundational, JSON and YAML are now more common in RESTful APIs and microservices.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>A static company "About Us" page is typically hand-written or template-generated <strong>HTML</strong> with fixed content. A dynamic e-commerce product page, by contrast, might be generated on-the-fly by a web server that fetches <strong>XML</strong> or <strong>JSON</strong> data (e.g., current price, stock level, reviews) from a database and injects it into an HTML template at request time — illustrating why XML/JSON (self-describing, structured data formats) are needed <strong>in addition to</strong> plain HTML for dynamic content.</p>
 <hr />
 <h2 id="3-structured-semi-structured-and-unstructured-data">3. Structured, Semi-Structured, and Unstructured Data</h2>
@@ -38,7 +36,7 @@
 <li><strong>Limited data type indication.</strong></li>
 <li><strong>Example:</strong> Web pages in <strong>HTML.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
 <p>A <code>Staff</code> <strong>relational table</strong> with fixed columns <code>staffNo</code>, <code>fName</code>, <code>lName</code>, <code>salary</code> is <strong>structured data</strong> — every row must conform to exactly that schema. A <code>staff_list.xml</code> file (explored throughout this module) where each <code>&lt;STAFF&gt;</code> element may or may not include every possible sub-element, and where the structure is described inline via tags, is <strong>semi-structured data</strong>. A raw scanned <code>.txt</code> transcript of a phone call, with no tags, fields, or type indicators at all, is <strong>unstructured data</strong>.</p>
 <hr />
 <h2 id="4-semi-structured-data-in-detail">4. Semi-Structured Data in Detail</h2>
@@ -57,7 +55,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="worked-example-staff_listxml-from-the-slides">📌 Worked Example — <code>staff_list.xml</code> (from the slides)</h3>
+<h3 id="worked-example-staff_listxml-from-the-slides"> Worked Example — <code>staff_list.xml</code> (from the slides)</h3>
 <p>This is the actual sample XML file referenced throughout Lecture 10 (<code>staff_list.xml</code>, available on ClickUP), and it is used here to illustrate exactly what "self-describing, schema-flexible" data looks like in practice:</p>
 <pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;STAFFLIST&gt;
@@ -111,7 +109,7 @@
 <ul>
 <li>Semi-structured data (including XML) can be represented conceptually as a <strong>directed graph.</strong></li>
 </ul>
-<h3 id="worked-example-figure-131-representing-semistructured-data-as-a-graph-from-the-slides">📌 Worked Example — Figure 13.1: Representing Semistructured Data as a Graph (from the slides)</h3>
+<h3 id="worked-example-figure-131-representing-semistructured-data-as-a-graph-from-the-slides"> Worked Example — Figure 13.1: Representing Semistructured Data as a Graph (from the slides)</h3>
 <pre><code>                     Company projects
                     /                \
               Project              Project
@@ -151,7 +149,7 @@
 </li>
 <li>XML is the <strong>de facto standard for data communication</strong>, <strong>replacing EDI (Electronic Data Interchange).</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
 <p>A modern <code>.docx</code> Word document is, internally, a <strong>ZIP archive full of XML files</strong> (this directly illustrates "XML remains widely used in ... document formats like Microsoft's DOCX and XLSX") — e.g., <code>document.xml</code> inside a <code>.docx</code> file uses custom XML tags (like <code>&lt;w:p&gt;</code> for a paragraph, <code>&lt;w:t&gt;</code> for text runs) defined by Microsoft's Office Open XML schema, demonstrating XML's role as a <strong>meta-language</strong> that lets an organisation define its own tag vocabulary for a specific purpose.</p>
 <hr />
 <h2 id="7-xml-what-you-already-know-revision">7. XML: What You Already Know (Revision)</h2>
@@ -219,7 +217,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="example-added-for-clarity_3">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_3"> Example (added for clarity)</h4>
 <p>The same staff record could be represented in <strong>XML</strong> (verbose, tag-based, as seen in <code>staff_list.xml</code> in Section 4) or in <strong>JSON</strong>:</p>
 <pre><code class="language-json">{
   &quot;staffNo&quot;: &quot;SL20&quot;,
@@ -246,7 +244,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity_4">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_4"> Example (added for clarity)</h4>
 <p><code>staff_list.xml</code> (Section 4) is a clear example of a <strong>data-centric</strong> document — it exists purely to represent structured staff records for machine processing (e.g., by BaseX queries), with no free-form prose. A user manual marked up in XML with <code>&lt;chapter&gt;</code>, <code>&lt;paragraph&gt;</code>, and <code>&lt;emphasis&gt;</code> tags would be <strong>document-centric</strong> — meant primarily for human reading, with the XML structure mainly supporting presentation/semantics of prose. A patient medical record combining rigid fields (<code>&lt;patientID&gt;</code>, <code>&lt;bloodType&gt;</code>) <strong>and</strong> a long free-text <code>&lt;doctorNotes&gt;</code> narrative would be a <strong>hybrid</strong> document.</p>
 <hr />
 <h2 id="11-xml-schema-xsd">11. XML Schema (XSD)</h2>
@@ -349,7 +347,7 @@
 <li><strong>Composite (compound) attributes</strong> — attributes made up of multiple sub-parts.</li>
 <li><strong>XSD allows for strong typing, constraints, and extensibility in XML documents</strong> (repeated emphasis from the slides).</li>
 </ul>
-<h4 id="example-added-for-clarity_5">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_5"> Example (added for clarity)</h4>
 <p>XSD's <strong>key/keyref</strong> mechanism lets a schema enforce that every <code>branchNo</code> attribute value used inside a <code>&lt;STAFF&gt;</code> element must correspond to an actual <code>branchNo</code> declared elsewhere in a <code>&lt;BRANCH&gt;</code> element — directly mirroring a relational <strong>foreign key constraint</strong>, but expressed in XML Schema terms (<code>&lt;xs:key&gt;</code> and <code>&lt;xs:keyref&gt;</code> elements, referencing XPath selectors).</p>
 <hr />
 <h2 id="12-xml-schema-definition-types">12. XML Schema Definition Types</h2>
@@ -366,13 +364,13 @@
 <li>A <strong>simple type element is used only in the context of the text</strong> (i.e., it holds only a plain text/scalar value, no child elements or attributes).</li>
 <li><strong>Some predefined simple types:</strong> <code>xs:integer</code>, <code>xs:boolean</code>, <code>xs:string</code>, <code>xs:date</code>.</li>
 </ul>
-<h4 id="coding-example-1-a-simple-type-element-from-the-slides">📌 Coding Example 1 — A Simple Type Element (from the slides)</h4>
+<h4 id="coding-example-1-a-simple-type-element-from-the-slides"> Coding Example 1 — A Simple Type Element (from the slides)</h4>
 <pre><code class="language-xml">&lt;xs:element name = &quot;phone_number&quot; type = &quot;xs:int&quot; /&gt;
 </code></pre>
 <ul>
 <li>This declares an element named <code>phone_number</code> whose content must be a valid <code>xs:int</code> — nothing more (no children, no attributes).</li>
 </ul>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-additional-simple-type-elements">📌 Coding Example 2 (added for step-by-step clarity) — Additional Simple Type Elements</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-additional-simple-type-elements"> Coding Example 2 (added for step-by-step clarity) — Additional Simple Type Elements</h4>
 <pre><code class="language-xml">&lt;xs:element name = &quot;isManager&quot;  type = &quot;xs:boolean&quot; /&gt;
 &lt;xs:element name = &quot;dateOfBirth&quot; type = &quot;xs:date&quot; /&gt;
 &lt;xs:element name = &quot;staffName&quot;   type = &quot;xs:string&quot; /&gt;
@@ -388,7 +386,7 @@
 <li>A <strong>complex type is a container for other element definitions.</strong></li>
 <li>This allows you to <strong>specify which child elements an element can contain</strong>, and to <strong>provide some structure within your XML documents.</strong></li>
 </ul>
-<h4 id="coding-example-1-a-complex-type-element-from-the-slides">📌 Coding Example 1 — A Complex Type Element (from the slides)</h4>
+<h4 id="coding-example-1-a-complex-type-element-from-the-slides"> Coding Example 1 — A Complex Type Element (from the slides)</h4>
 <pre><code class="language-xml">&lt;!-- Only &lt;Address&gt; can use this structure --&gt;
 &lt;xs:element name = &quot;Address&quot;&gt;
    &lt;xs:complexType&gt;
@@ -403,7 +401,7 @@
 <ul>
 <li>Note the slide's comment: <strong>"Only <code>&lt;Address&gt;</code> can use this structure"</strong> — i.e., this complex type is declared <strong>anonymously, locally inside</strong> the <code>Address</code> element definition, so it <strong>cannot be reused</strong> by any other element (this limitation motivates Global Types, <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#123-global-type">Section 12.3</a>).</li>
 </ul>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-a-complex-type-for-staff-attributes-children">📌 Coding Example 2 (added for step-by-step clarity) — A Complex Type for <code>STAFF</code> (Attributes + Children)</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-a-complex-type-for-staff-attributes-children"> Coding Example 2 (added for step-by-step clarity) — A Complex Type for <code>STAFF</code> (Attributes + Children)</h4>
 <pre><code class="language-xml">&lt;xs:element name = &quot;STAFF&quot;&gt;
    &lt;xs:complexType&gt;
       &lt;xs:sequence&gt;
@@ -426,7 +424,7 @@
 <li>It is <strong>designed to avoid repeating structure definitions across different elements.</strong></li>
 <li><strong>How:</strong> define it <strong>immediately under <code>&lt;xs:schema&gt;</code></strong>, and give it a <strong><code>name</code></strong> attribute so it can be <strong>referenced by name</strong> elsewhere.</li>
 </ul>
-<h4 id="coding-example-1-a-reusable-addresstype-global-type-from-the-slides">📌 Coding Example 1 — A Reusable <code>AddressType</code> Global Type (from the slides)</h4>
+<h4 id="coding-example-1-a-reusable-addresstype-global-type-from-the-slides"> Coding Example 1 — A Reusable <code>AddressType</code> Global Type (from the slides)</h4>
 <pre><code class="language-xml">&lt;!-- Defined globally once --&gt;
 &lt;xs:complexType name=&quot;AddressType&quot;&gt;
     &lt;xs:sequence&gt;
@@ -444,7 +442,7 @@
 <li><strong><code>&lt;xs:element name="BillingAddress" type="AddressType" /&gt;</code></strong> and <strong><code>&lt;xs:element name="ShippingAddress" type="AddressType" /&gt;</code></strong> — both elements <strong>reference</strong> the same <code>AddressType</code> <strong>by name</strong>, rather than each needing to redeclare the full <code>&lt;xs:sequence&gt;</code> structure independently.</li>
 <li><strong>Benefit:</strong> if the address structure ever needs to change (e.g., adding a <code>postcode</code> field), it only needs to be edited <strong>once</strong>, in the single global <code>AddressType</code> definition, and both <code>BillingAddress</code> and <code>ShippingAddress</code> automatically inherit the change.</li>
 </ol>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-a-reusable-nametype-for-staff_listxml-style-data">📌 Coding Example 2 (added for step-by-step clarity) — A Reusable <code>NameType</code> for <code>staff_list.xml</code>-style Data</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-a-reusable-nametype-for-staff_listxml-style-data"> Coding Example 2 (added for step-by-step clarity) — A Reusable <code>NameType</code> for <code>staff_list.xml</code>-style Data</h4>
 <pre><code class="language-xml">&lt;xs:complexType name=&quot;NameType&quot;&gt;
     &lt;xs:sequence&gt;
         &lt;xs:element name=&quot;FNAME&quot; type=&quot;xs:string&quot; /&gt;
@@ -499,7 +497,7 @@
 <blockquote>
 <p>This approach is <strong>explored further in section 13.6</strong> of the recommended textbook.</p>
 </blockquote>
-<h4 id="example-added-for-clarity_6">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_6"> Example (added for clarity)</h4>
 <p>Approach 1 ("store documents as text") is what a simple file server does when it saves <code>staff_list.xml</code> as a flat file on disk with no XML-aware indexing. Approach 3 ("specialized system") is exactly what <strong>BaseX</strong> provides (<a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#19-introduction-to-basex">Section 19</a>) — a database engine purpose-built to store, index, and query XML natively (rather than treating it as an opaque blob of text), enabling efficient XPath/XQuery queries like those explored in <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#16-xpath-query-examples--working-through-staff_listxml">Section 16</a>.</p>
 <hr />
 <h2 id="14-xml-languages-overview-xpath-and-xquery">14. XML Languages Overview — XPath and XQuery</h2>
@@ -522,7 +520,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity_7">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_7"> Example (added for clarity)</h4>
 <p>Just as a Windows/Unix file path like <code>C:\Users\Thabo\Documents\report.docx</code> (or <code>/home/thabo/report.docx</code>) navigates a <strong>directory tree</strong> to locate one specific file, an XPath expression like <code>//STAFFLIST/STAFF[1]/STAFFNO</code> navigates an <strong>XML element tree</strong> to locate one specific node — this is precisely the "functions similarly to local file paths" comparison made in the slides.</p>
 <hr />
 <h2 id="15-xml-path-language-xpath">15. XML Path Language (XPath)</h2>
@@ -643,7 +641,7 @@ child::STAFF [1]
 </tr>
 </tbody>
 </table>
-<h4 id="coding-example-1-combining-a-predicate-with-an-attribute-filter-from-the-table-above">📌 Coding Example 1 — Combining a Predicate with an Attribute Filter (from the table above)</h4>
+<h4 id="coding-example-1-combining-a-predicate-with-an-attribute-filter-from-the-table-above"> Coding Example 1 — Combining a Predicate with an Attribute Filter (from the table above)</h4>
 <pre><code>/child::STAFF[@branchNo=&quot;B005&quot;][position()=1]
 </code></pre>
 <p><strong>Step-by-step walkthrough:</strong></p>
@@ -653,7 +651,7 @@ child::STAFF [1]
 <li><strong><code>[position()=1]</code></strong> — a <strong>second, chained predicate</strong>, further filtering to just the <strong>first</strong> element remaining after the first filter was applied.</li>
 <li><strong>Result:</strong> the very first <code>STAFF</code> element (in document order) belonging to branch <code>B005</code>.</li>
 </ol>
-<h4 id="coding-example-2-added-for-step-by-step-clarity-selecting-all-attributes-of-a-node">📌 Coding Example 2 (added for step-by-step clarity) — Selecting All Attributes of a Node</h4>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-selecting-all-attributes-of-a-node"> Coding Example 2 (added for step-by-step clarity) — Selecting All Attributes of a Node</h4>
 <pre><code>//STAFFLIST/STAFF[1]/attribute::*
 </code></pre>
 <p><strong>Step-by-step walkthrough:</strong></p>
@@ -738,7 +736,7 @@ child::STAFF [1]
 </li>
 <li><strong>Note:</strong> <strong>SQL alone is not designed specifically for hierarchical XML data; XQuery provides XML-oriented querying capabilities.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_8">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_8"> Example (added for clarity)</h4>
 <p>This "SQL alone is not designed for hierarchical XML data" note directly connects back to the ORDBMS lectures: while PostgreSQL supports storing XML/JSON data (recall JSONB from the ORDBMS notes), plain SQL's <code>SELECT</code>/<code>WHERE</code>/<code>JOIN</code> syntax is fundamentally built around flat relational tables — it has no native concept of "navigate down three levels of nesting, then across to a sibling," which is exactly the kind of hierarchical navigation XPath/XQuery are purpose-built for.</p>
 <h3 id="171-xquery-characteristics">17.1 XQuery Characteristics</h3>
 <ul>
@@ -778,7 +776,7 @@ RETURN &lt;query result specification&gt;
 <li><strong><code>RETURN</code></strong> — specifies the <strong>elements for retrieval.</strong></li>
 <li>(<code>LET</code>, per the syntax box, binds a variable to a <strong>collection</strong> of nodes, rather than iterating one at a time like <code>FOR</code>.)</li>
 </ul>
-<h3 id="coding-example-1-added-for-step-by-step-clarity-a-flwor-query-over-staff_listxml">📌 Coding Example 1 (added for step-by-step clarity) — A FLWOR Query Over <code>staff_list.xml</code></h3>
+<h3 id="coding-example-1-added-for-step-by-step-clarity-a-flwor-query-over-staff_listxml"> Coding Example 1 (added for step-by-step clarity) — A FLWOR Query Over <code>staff_list.xml</code></h3>
 <pre><code class="language-xquery">FOR $s IN //STAFFLIST/STAFF
 WHERE $s/SALARY &gt; 20000
 ORDER BY $s/SALARY DESCENDING
@@ -792,7 +790,7 @@ RETURN $s/NAME/FNAME
 <li><strong><code>RETURN $s/NAME/FNAME</code></strong> — for each remaining, sorted <code>$s</code>, returns just that staff member's first name.</li>
 <li><strong>Applied to the sample data from Section 4</strong> (Thando: 30000; Marlize: 27000 [second <code>&lt;SALARY&gt;</code>]; Lerato: 30000): all three would pass the <code>WHERE</code> filter (<code>&gt;20000</code>), and would be returned in descending salary order.</li>
 </ol>
-<h3 id="coding-example-2-added-for-step-by-step-clarity-a-flwor-query-using-let">📌 Coding Example 2 (added for step-by-step clarity) — A FLWOR Query Using <code>LET</code></h3>
+<h3 id="coding-example-2-added-for-step-by-step-clarity-a-flwor-query-using-let"> Coding Example 2 (added for step-by-step clarity) — A FLWOR Query Using <code>LET</code></h3>
 <pre><code class="language-xquery">FOR $s IN //STAFFLIST/STAFF
 LET $fullname := concat($s/NAME/FNAME, &quot; &quot;, $s/NAME/LNAME)
 WHERE $s/@branchNo = &quot;B003&quot;
@@ -816,7 +814,7 @@ RETURN $fullname
 <li>It <strong>comes with interactive user interfaces (desktop, web-based)</strong>, giving <strong>great insight into semi-structured data.</strong></li>
 <li>It <strong>supports both the XPath and XQuery languages.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_9">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_9"> Example (added for clarity)</h4>
 <p>BaseX is a concrete, practical instance of the <strong>"specialized system to store XML data"</strong> approach mentioned in <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#13-storing-and-extracting-xml-documents-from-databases">Section 13</a> — rather than treating <code>staff_list.xml</code> as a flat text file, BaseX imports it into an internally indexed database structure, allowing fast, repeated XPath/XQuery lookups (like all the examples in Section 20) without needing to re-parse the entire XML file from scratch on every query.</p>
 <hr />
 <h2 id="20-using-basex-practical-setup-and-queries">20. Using BaseX — Practical Setup and Queries</h2>
@@ -842,7 +840,7 @@ RETURN $fullname
 <li><strong>Click on the Execute query button.</strong></li>
 <li>View results in the <strong>Query results pane.</strong></li>
 </ol>
-<h4 id="example-added-for-clarity_10">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_10"> Example (added for clarity)</h4>
 <p>Following these steps in order to reproduce the module's demo: a student would (1) copy <code>staff_list.xml</code> into the BaseX <code>Data</code> folder and launch BaseX, (2) use <code>Database | New</code> to create, e.g., a database also named <code>staff_list</code>, importing the XML file, (3) later reopen that same database via <code>Database | Open &amp; Manage...</code> in a new session, and (4) type an XPath query such as <code>//STAFFLIST/STAFF[1]/STAFFNO</code> into the Query Editor and click Execute to see results in the results pane — exactly the workflow demonstrated in Section 20.2 below.</p>
 <h3 id="202-coding-example-1-find-the-staff-number-of-the-first-staff-member-from-the-slides">20.2 Coding Example 1 — Find the Staff Number of the First Staff Member (from the slides)</h3>
 <p><strong>Query:</strong></p>

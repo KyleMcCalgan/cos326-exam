@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Object-Relational Database Systems (ORDBMS) — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Object-Relational Database Systems (ORDBMS) — Comprehensive Notes</h1><p>From S1 L5,6,7, 8.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-02.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-02.html">☆ Bookmark</button></div><article class="prose"><h1 id="object-relational-database-systems-ordbms-comprehensive-notes">Object-Relational Database Systems (ORDBMS) — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lectures-5-6-7-8-chapters-12-26-7th-edition">COS 326 Database Systems | Lectures 5, 6, 7 &amp; 8 | Chapters 12 &amp; 26 (7th Edition)</h3>
-<h2 id="1-why-object-relational-arguments-for-and-against-the-relational-model">1. Why Object-Relational? Arguments For and Against the Relational Model</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Object-Relational Database Systems (ORDBMS) — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Object-relational databases</h1><p>Lectures 5&ndash;8 &middot; Course notes</p></div><button class="study" data-id="lecture-02.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-02.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-why-object-relational-arguments-for-and-against-the-relational-model">1. Why Object-Relational? Arguments For and Against the Relational Model</a></li><li><a href="#2-introduction-to-ordbms">2. Introduction to ORDBMS</a></li><li><a href="#3-further-reading-student-self-study">3. Further Reading (Student Self-Study)</a></li><li><a href="#4-postgres-the-historical-ordbms">4. Postgres — the Historical ORDBMS</a></li><li><a href="#5-sql2016-new-object-oriented-features-overview">5. SQL:2016 — New Object-Oriented Features (Overview)</a></li><li><a href="#6-sql2016-row-types">6. SQL:2016 Row Types</a></li><li><a href="#7-sql2016-user-defined-types-udts">7. SQL:2016 User-Defined Types (UDTs)</a></li><li><a href="#8-sql2016-supertypes-subtypes-inheritance">8. SQL:2016 Supertypes &amp; Subtypes (Inheritance)</a></li><li><a href="#9-sql2016-reference-types-object-identity">9. SQL:2016 Reference Types &amp; Object Identity</a></li><li><a href="#10-from-postgres-to-postgresql">10. From Postgres to PostgreSQL</a></li><li><a href="#11-installing-and-using-postgresql-pgadmin-4">11. Installing and Using PostgreSQL (pgAdmin 4)</a></li><li><a href="#12-postgresql-data-types-overview">12. PostgreSQL Data Types — Overview</a></li><li><a href="#13-postgresql-user-defined-types-enumerated-types">13. PostgreSQL User-Defined Types: Enumerated Types</a></li><li><a href="#14-postgresql-user-defined-types-composite-types">14. PostgreSQL User-Defined Types: Composite Types</a></li><li><a href="#15-postgresql-arrays">15. PostgreSQL Arrays</a></li><li><a href="#16-postgresql-oop-features-table-inheritance">16. PostgreSQL OOP Features: Table Inheritance</a></li><li><a href="#17-postgresql-user-defined-functions">17. PostgreSQL User-Defined Functions</a></li><li><a href="#18-postgresql-plpgsql-programming-constructs">18. PostgreSQL PL/pgSQL Programming Constructs</a></li><li><a href="#19-postgresql-json-and-jsonb-support">19. PostgreSQL JSON and JSONB Support</a></li><li><a href="#20-postgresql-triggers">20. PostgreSQL Triggers</a></li><li><a href="#21-homework-summary-takeaways">21. Homework &amp; Summary Takeaways</a></li><li><a href="#22-questions-memo">22. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-why-object-relational-arguments-for-and-against-the-relational-model">1. Why Object-Relational? Arguments For and Against the Relational Model</h2>
 <h3 id="11-arguments-against-the-relational-data-model">1.1 Arguments <em>Against</em> the Relational Data Model</h3>
 <ul>
 <li><strong>Relational DBMSs are satisfactory for normal/standard business applications</strong> — i.e., storing &amp; querying <strong>business transactions data.</strong></li>
@@ -11,7 +9,7 @@
 </li>
 <li><strong>Illustration (from the slides):</strong> A simple <strong>Business invoice</strong> is easy for an RDBMS to represent (flat rows/columns), but CAD/GIS data (e.g., a spatial road network map, or an engineering design with thousands of interlinked parts) does not fit naturally into flat relational tables.</li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>A GIS application must store a road's <strong>shape as a sequence of connected geographic coordinates</strong>, plus <strong>topological relationships</strong> to intersecting roads, all of which must be <strong>queried spatially</strong> ("which roads pass within 2 km of this point?"). Representing this purely relationally would require extremely complex, join-heavy schemas and cannot naturally express spatial operators (e.g., "intersects," "within") the way an extended, object-aware DBMS type system can.</p>
 <h3 id="12-arguments-for-the-relational-data-model">1.2 Arguments <em>For</em> the Relational Data Model</h3>
 <ul>
@@ -25,7 +23,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
 <p>A bank with decades of RDBMS-based transaction-processing infrastructure can <strong>upgrade to PostgreSQL</strong> (an ORDBMS) and continue running all existing relational SQL and applications unchanged, while <strong>gradually adopting</strong> new object-relational features (e.g., JSONB columns for flexible transaction metadata) only where genuinely useful — this "smooth transition" is a key argument for the object-relational approach over building a brand-new, incompatible OODBMS from scratch.</p>
 <hr />
 <h2 id="2-introduction-to-ordbms">2. Introduction to ORDBMS</h2>
@@ -42,7 +40,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
 <p>A Java application using JPA-style objects (<code>Country</code>, <code>City</code>) can map those classes almost directly onto ORDBMS structures — e.g., a PostgreSQL <code>CREATE TYPE</code> structured type or table inheritance hierarchy — rather than needing to flatten the object graph entirely into plain relational tables, reducing the object-relational impedance mismatch (recall this concept from the OODBMS lectures).</p>
 <hr />
 <h2 id="3-further-reading-student-self-study">3. Further Reading (Student Self-Study)</h2>
@@ -60,7 +58,7 @@
 <li><strong>Big Data Manifesto</strong></li>
 <li><strong>AI-Native Data Management Manifesto</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_3">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_3"> Example (added for clarity)</h4>
 <p>The <strong>"Third Manifesto"</strong> (by Chris Date and Hugh Darwen) is a well-known position paper arguing that database systems should remain strictly grounded in relational theory even while adding object-oriented features — it is often contrasted with the more OO-permissive "Third-generation database manifesto," making these two documents a useful pair to compare when reading about database design philosophy debates.</p>
 <hr />
 <h2 id="4-postgres-the-historical-ordbms">4. Postgres — the Historical ORDBMS</h2>
@@ -80,7 +78,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity_4">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_4"> Example (added for clarity)</h4>
 <p>Using <code>DEFINE TYPE</code>, an early Postgres user might have defined a custom <code>point</code> ADT, and using <code>DEFINE OPERATOR</code>, could then define a custom <code>##</code> operator meaning "distance between two points," so that queries could write <code>p1 ## p2</code> — this is directly analogous to how modern PostgreSQL still supports geometric types and operators today (see <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#12-postgresql-data-types--overview">Section 12</a>), showing a direct lineage from Postgres's original ADT design to the modern product.</p>
 <hr />
 <h2 id="5-sql2016-new-object-oriented-features-overview">5. SQL:2016 — New Object-Oriented Features (Overview)</h2>
@@ -107,7 +105,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="conceptual-example-branch-with-a-row-typed-address-column-from-the-slides">📌 Conceptual Example — <code>Branch</code> with a Row-Typed <code>Address</code> Column (from the slides)</h4>
+<h4 id="conceptual-example-branch-with-a-row-typed-address-column-from-the-slides"> Conceptual Example — <code>Branch</code> with a Row-Typed <code>Address</code> Column (from the slides)</h4>
 <table>
 <thead>
 <tr>
@@ -461,7 +459,7 @@ FROM   PropertyForRent P;
 </li>
 <li>PostgreSQL <strong>uses SQL + extensions for OOP as defined in SQL:2016 + other Postgres-specific features.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_5">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_5"> Example (added for clarity)</h4>
 <p>When a user opens <strong>pgAdmin 4</strong> (a client application, see <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#11-installing-and-using-postgresql-pgadmin-4">Section 11</a>) and runs a query, pgAdmin sends the SQL text over a network connection to the running <strong><code>postgres</code> server process</strong>, which parses, plans, and executes the query against the actual database files on disk, then sends the results back to pgAdmin for display — a direct illustration of the client/server session model described above.</p>
 <hr />
 <h2 id="11-installing-and-using-postgresql-pgadmin-4">11. Installing and Using PostgreSQL (pgAdmin 4)</h2>
@@ -483,7 +481,7 @@ FROM   PropertyForRent P;
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity_6">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_6"> Example (added for clarity)</h4>
 <p>A student installing PostgreSQL for the first time would: (1) run the Windows installer executable, (2) set a password for the default <code>postgres</code> superuser during setup, (3) launch <strong>pgAdmin 4</strong> from the Windows Start Menu, (4) connect to the local PostgreSQL server instance, and (5) open the <strong>Query Tool</strong> against a chosen database to begin executing <code>CREATE TABLE</code>/<code>SELECT</code> statements exactly like those shown in Sections 13–20 of these notes.</p>
 <hr />
 <h2 id="12-postgresql-data-types-overview">12. PostgreSQL Data Types — Overview</h2>
@@ -510,7 +508,7 @@ FROM   PropertyForRent P;
 <li><strong>Object Identifier Types</strong></li>
 <li><strong>JSON Types</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_7">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_7"> Example (added for clarity)</h4>
 <p>A geospatial application storing delivery zones might use the <strong>Geometric <code>polygon</code> type</strong> to represent each zone's boundary directly as a column value, then use PostgreSQL's built-in geometric operators (e.g., checking whether a <code>point</code> falls <code>&lt;@</code> inside a <code>polygon</code>) to answer "which delivery zone is this customer's address in?" — entirely within SQL, without needing a separate GIS extension or complex join logic — directly addressing the "RDBMS cannot support GIS" weakness described in <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#11-arguments-against-the-relational-data-model">Section 1.1</a>.</p>
 <hr />
 <h2 id="13-postgresql-user-defined-types-enumerated-types">13. PostgreSQL User-Defined Types: Enumerated Types</h2>
@@ -1460,7 +1458,7 @@ SELECT * FROM DeletedCities;
 </tr>
 </tbody>
 </table>
-<h4 id="example-for-each-statement-trigger-from-the-slides">📌 Example — <code>FOR EACH STATEMENT</code> Trigger (from the slides)</h4>
+<h4 id="example-for-each-statement-trigger-from-the-slides"> Example — <code>FOR EACH STATEMENT</code> Trigger (from the slides)</h4>
 <pre><code class="language-sql">CREATE OR REPLACE FUNCTION audit_staff_insert()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -1498,7 +1496,7 @@ EXECUTE FUNCTION audit_staff_insert();
 <li><strong>The behaviour belongs in application/business logic.</strong></li>
 <li><strong>The trigger would make the database behaviour difficult to understand.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_8">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_8"> Example (added for clarity)</h4>
 <p>Enforcing "an employee's salary must be positive" is better done with a simple <strong><code>CHECK (salary &gt; 0)</code></strong> constraint directly on the column — using a full trigger for this would be unnecessary overhead. In contrast, "automatically log every change to a <code>Staff</code> row, including who made it and when, into an audit table" (as in Section 20.8) is a <strong>good</strong> use of a trigger, since a <code>CHECK</code> constraint cannot express that kind of cross-table, timestamped side-effect logic.</p>
 <hr />
 <h2 id="21-homework-summary-takeaways">21. Homework &amp; Summary Takeaways</h2>
@@ -1521,7 +1519,7 @@ EXECUTE FUNCTION audit_staff_insert();
 <blockquote>
 <p><em>"How do ORDBMS overcome the limitations (weaknesses) of the RDBMS?"</em> — explicitly assigned as <strong>homework</strong> rather than covered directly on the slides.</p>
 </blockquote>
-<h4 id="example-added-to-support-the-homework-question">📌 Example (added to support the homework question)</h4>
+<h4 id="example-added-to-support-the-homework-question"> Example (added to support the homework question)</h4>
 <p>Mapping the classic RDBMS weaknesses (from the OODBMS lectures) onto what has been covered in Lectures 5–8:</p>
 <ul>
 <li><strong>Weakness 1 (poor real-world representation) &amp; Weakness 4 (homogeneous/atomic data):</strong> solved via <strong>row types, composite types, and arrays</strong> (<a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#6-sql2016-row-types">Sections 6, 14, 15</a>) — a single column/attribute can now hold structured, decomposable, or multi-valued data.</li>

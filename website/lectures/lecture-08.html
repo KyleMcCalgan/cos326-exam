@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — MongoDB (3): Cursors, Embedded Documents, Arrays, Aggregation &amp; Data Model Design — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NoSQL Databases — MongoDB (3): Cursors, Embedded Documents, Arrays, Aggregation &amp; Data Model Design — Comprehensive Notes</h1><p>From S1_L15_MongoDB_3_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-08.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-08.html">☆ Bookmark</button></div><article class="prose"><h1 id="nosql-databases-mongodb-3-cursors-embedded-documents-arrays-aggregation-data-model-design-comprehensive-notes">NoSQL Databases — MongoDB (3): Cursors, Embedded Documents, Arrays, Aggregation &amp; Data Model Design — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-15-chapter-24-7th-edition">COS 326 Database Systems | Lecture 15 | Chapter 24 (7th Edition)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — MongoDB (3): Cursors, Embedded Documents, Arrays, Aggregation &amp; Data Model Design — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>MongoDB: documents and aggregation</h1><p>Lecture 15 &middot; Course notes</p></div><button class="study" data-id="lecture-08.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-08.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-cursors-iteration">2. Cursors &amp; Iteration</a></li><li><a href="#3-embedded-nested-documents">3. Embedded (Nested) Documents</a></li><li><a href="#4-operations-on-arrays">4. Operations on Arrays</a></li><li><a href="#5-aggregation">5. Aggregation</a></li><li><a href="#6-data-model-design-refer-to-the-mongodb-manual">6. Data Model Design (refer to the MongoDB manual)</a></li><li><a href="#7-questions-memo">7. Questions &amp; Memo</a></li><li><a href="#1-database-and-collection-management">1. Database and collection management</a></li><li><a href="#2-crud-operations">2. CRUD operations</a></li><li><a href="#3-comparison-operators">3. Comparison operators</a></li><li><a href="#4-logical-operators">4. Logical operators</a></li><li><a href="#5-projection-and-sorting">5. Projection and sorting</a></li><li><a href="#6-arrays-and-embedded-documents">6. Arrays and embedded documents</a></li><li><a href="#7-aggregation-functions-and-operators">7. Aggregation functions and operators</a></li><li><a href="#8-cursors-and-iteration">8. Cursors and iteration</a></li><li><a href="#9-indexing-and-query-performance">9. Indexing and query performance</a></li><li><a href="#10-full-text-search">10. Full-text search</a></li><li><a href="#11-mongodb-shell-functions">11. MongoDB shell functions</a></li><li><a href="#most-important-distinctions-for-your-test">Most important distinctions for your test</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>This lecture covers (MongoDB):</strong><ol>
 <li><strong>Cursors and iteration.</strong></li>
@@ -13,7 +11,7 @@
 <li><strong>Reference:</strong> the <strong>MongoDB manual (documentation).</strong></li>
 <li><strong>Recap (previous lecture):</strong> MongoDB document database, <strong>CRUD operations</strong>, <strong>MongoDB data types</strong>, <strong>indexing.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>Lecture 13 introduced MongoDB's building blocks (database → collection → document) and basic <code>insertOne</code> / <code>find</code>. This lecture builds on <code>find</code>: how to <strong>loop through</strong> its results (cursors), how to <strong>search inside nested documents and arrays</strong>, how to <strong>summarise data</strong> (aggregation — MongoDB's counterpart to SQL <code>GROUP BY</code>), and finally <strong>how to structure data</strong> (embed vs reference).</p>
 <hr />
 <h2 id="2-cursors-iteration">2. Cursors &amp; Iteration</h2>
@@ -79,7 +77,7 @@
 <li><strong><code>c.toArray()</code></strong> — pulls the <strong>remaining</strong> documents into a normal JavaScript array so they can be accessed by index (<code>documents[4]</code> is the <strong>5th</strong> document, since indexes start at 0).</li>
 <li><strong>Important:</strong> a cursor is <strong>consumed</strong> as you iterate. After the <code>while</code> loop in step 2, the cursor is <strong>exhausted</strong>, so calling <code>toArray()</code> on the same <code>c</code> would return an <strong>empty</strong> array — re-run <code>find()</code> to get a fresh cursor.</li>
 </ol>
-<h4 id="note-from-the-slides">📌 Note from the slides</h4>
+<h4 id="note-from-the-slides"> Note from the slides</h4>
 <p><strong>Use explicit cursor iteration when you need to process or display returned documents individually.</strong></p>
 <hr />
 <h2 id="3-embedded-nested-documents">3. Embedded (Nested) Documents</h2>
@@ -210,7 +208,7 @@ while ( c.hasNext() ) printjson( c.next() )
 <ul>
 <li>Matches if the array contains <strong>at least one element that is BOTH greater than 5 AND less than 9</strong> (i.e., a <strong>single element</strong> must meet <strong>all</strong> conditions).</li>
 </ul>
-<h4 id="worked-example-added-for-step-by-step-clarity-gt-5-lt-9-vs-elemmatch">📌 Worked Example (added for step-by-step clarity) — <code>{ $gt: 5, $lt: 9 }</code> vs <code>$elemMatch</code></h4>
+<h4 id="worked-example-added-for-step-by-step-clarity-gt-5-lt-9-vs-elemmatch"> Worked Example (added for step-by-step clarity) — <code>{ $gt: 5, $lt: 9 }</code> vs <code>$elemMatch</code></h4>
 <p>Test two documents: <strong>A</strong> <code>ratings: [5, 8, 9]</code> and <strong>B</strong> <code>ratings: [5, 9]</code>.</p>
 <table>
 <thead>
@@ -490,7 +488,7 @@ while ( c.hasNext() ) printjson( c.next() )
 <li><strong><code>$sort</code> ascending:</strong> NoSQL (400) then Neo4j (450).</li>
 <li><strong>Why the stage order matters:</strong> this <code>$match</code> comes <strong>after</strong> <code>$group</code>, so it filters on the <strong>computed total</strong>, not on individual documents. Placed <strong>before</strong> <code>$group</code>, it could only filter on the original fields (<code>title</code>, <code>likes</code>).</li>
 </ol>
-<h4 id="highlighted-on-the-slide">📌 Highlighted on the slide</h4>
+<h4 id="highlighted-on-the-slide"> Highlighted on the slide</h4>
 <blockquote>
 <p><strong>"The <code>$match</code> [after <code>$group</code>] is equivalent to the SQL <code>HAVING</code>."</strong></p>
 </blockquote>
@@ -577,7 +575,7 @@ ORDER  BY num_likes ASC;
 <li>You have <strong>one-to-many</strong> relationships where the <strong>"many" (child) documents always appear with / are viewed in the context of the "one" (parent) document.</strong></li>
 <li><strong>Avoid embedding unbounded or continually growing arrays</strong> — MongoDB documents have a <strong>16 MiB size limit.</strong></li>
 </ul>
-<h4 id="worked-example-slide-figure-43-embedded-model-user">📌 Worked Example — Slide figure 4.3: Embedded model (user)</h4>
+<h4 id="worked-example-slide-figure-43-embedded-model-user"> Worked Example — Slide figure 4.3: Embedded model (user)</h4>
 <pre><code class="language-js">{
   _id: &lt;ObjectId1&gt;,
   username: &quot;123xyz&quot;,
@@ -596,7 +594,7 @@ ORDER  BY num_likes ASC;
 <li><strong>To represent more complex many-to-many relationships.</strong></li>
 <li><strong>To model large hierarchical data sets.</strong></li>
 </ol>
-<h4 id="worked-example-slide-figure-normalised-model-user-contact-access">📌 Worked Example — Slide figure: Normalised model (user, contact, access)</h4>
+<h4 id="worked-example-slide-figure-normalised-model-user-contact-access"> Worked Example — Slide figure: Normalised model (user, contact, access)</h4>
 <pre><code class="language-js">// user document
 { _id: &lt;ObjectId1&gt;, username: &quot;123xyz&quot; }
 

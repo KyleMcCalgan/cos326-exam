@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NewSQL Databases — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NewSQL Databases — Comprehensive Notes</h1><p>From S1_L20_NewSQL_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-13.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-13.html">☆ Bookmark</button></div><article class="prose"><h1 id="newsql-databases-comprehensive-notes">NewSQL Databases — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-20-reference-lecture-notes-no-textbook-chapter-given-on-the-slides">COS 326 Database Systems | Lecture 20 | Reference: lecture notes (no textbook chapter given on the slides)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NewSQL Databases — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NewSQL databases</h1><p>Lecture 20 &middot; Course notes</p></div><button class="study" data-id="lecture-13.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-13.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-introduction-to-newsql">2. Introduction to NewSQL</a></li><li><a href="#3-acid-transactions-and-oltp">3. ACID Transactions and OLTP</a></li><li><a href="#4-why-do-we-need-newsql-scaling">4. Why Do We Need NewSQL? — Scaling</a></li><li><a href="#5-key-features-of-newsql-databases">5. Key Features of NewSQL Databases</a></li><li><a href="#6-comparison-sql-vs-nosql-vs-newsql">6. Comparison — SQL vs NoSQL vs NewSQL</a></li><li><a href="#7-advantages-and-limitations-of-newsql">7. Advantages and Limitations of NewSQL</a></li><li><a href="#8-examples-of-newsql-distributed-sql-databases">8. Examples of NewSQL / Distributed SQL Databases</a></li><li><a href="#9-case-study-database-selection-for-an-online-banking-system">9. Case Study — Database Selection for an Online Banking System</a></li><li><a href="#10-summary-from-the-slides">10. Summary (from the slides)</a></li><li><a href="#11-homework-suggested-answers-added">11. Homework — Suggested Answers (added)</a></li><li><a href="#12-questions-memo">12. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>This lecture covers:</strong><ol>
 <li><strong>Introduction</strong> to NewSQL databases.</li>
@@ -14,7 +12,7 @@
 </ol>
 </li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>This lecture closes the story of the module's data models: <strong>relational/object-relational</strong> (Lectures 5–8), <strong>semi-structured/XML</strong> (9–10), <strong>NoSQL</strong> — document (MongoDB) and graph (Neo4j) (13–19) — and now <strong>NewSQL</strong>, which asks: <em>"can we keep SQL and ACID transactions <strong>and</strong> scale out across many servers like NoSQL?"</em></p>
 <hr />
 <h2 id="2-introduction-to-newsql">2. Introduction to NewSQL</h2>
@@ -30,7 +28,7 @@
 <li><strong>NewSQL aims to combine</strong> the strengths of relational databases with the <strong>scalability and distributed processing</strong> needed by modern applications.</li>
 <li><strong>The central idea:</strong> NewSQL seeks to provide <strong>relational data management, SQL support, ACID transactions and improved horizontal scalability</strong> within a <strong>modern database architecture.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
 <p>Think of a <strong>bank</strong>. A traditional relational DBMS on one big server gives you SQL and safe transfers, but one server eventually can't keep up with millions of customers. A typical NoSQL store scales out easily but may offer weaker transaction guarantees. <strong>NewSQL</strong> is the attempt to get <strong>both</strong> — safe SQL transactions <strong>spread over many servers.</strong></p>
 <hr />
 <h2 id="3-acid-transactions-and-oltp">3. ACID Transactions and OLTP</h2>
@@ -61,7 +59,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="worked-example-added-transferring-r500-from-account-a-to-account-b">📌 Worked Example (added) — Transferring R500 from Account A to Account B</h4>
+<h4 id="worked-example-added-transferring-r500-from-account-a-to-account-b"> Worked Example (added) — Transferring R500 from Account A to Account B</h4>
 <pre><code class="language-sql">BEGIN;
 UPDATE Account SET balance = balance - 500 WHERE accNo = 'A';
 UPDATE Account SET balance = balance + 500 WHERE accNo = 'B';
@@ -91,7 +89,7 @@ COMMIT;
 <ul>
 <li>NewSQL systems aim to <strong>support demanding transactional workloads</strong> while <strong>preserving reliable transaction processing across distributed database infrastructure.</strong></li>
 </ul>
-<h4 id="oltp-vs-olap-added-for-clarity">📌 OLTP vs OLAP (added for clarity)</h4>
+<h4 id="oltp-vs-olap-added-for-clarity"> OLTP vs OLAP (added for clarity)</h4>
 <table>
 <thead>
 <tr>
@@ -167,9 +165,9 @@ COMMIT;
 <h3 id="43-the-newsql-objective-and-a-warning">4.3 The NewSQL Objective — and a Warning</h3>
 <ul>
 <li><strong>Objective:</strong> <strong>retain SQL and reliable relational transactions</strong> while supporting <strong>distributed architectures that scale across multiple servers.</strong></li>
-<li>⚠️ <strong>"Horizontal scaling does not automatically guarantee linear performance improvements."</strong> Results depend on the <strong>workload, data distribution, network latency and coordination required between nodes.</strong></li>
+<li> <strong>"Horizontal scaling does not automatically guarantee linear performance improvements."</strong> Results depend on the <strong>workload, data distribution, network latency and coordination required between nodes.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
 <p>Doubling from 4 to 8 nodes does <strong>not</strong> double throughput if most transactions touch data on <strong>several</strong> nodes: each such transaction needs <strong>network round-trips</strong> to coordinate, so part of the extra capacity is spent on <strong>coordination.</strong></p>
 <hr />
 <h2 id="5-key-features-of-newsql-databases">5. Key Features of NewSQL Databases</h2>
@@ -269,7 +267,7 @@ COMMIT;
 </tr>
 </tbody>
 </table>
-<h4 id="worked-example-added-a-banking-table-across-3-nodes">📌 Worked Example (added) — A banking table across 3 nodes</h4>
+<h4 id="worked-example-added-a-banking-table-across-3-nodes"> Worked Example (added) — A banking table across 3 nodes</h4>
 <ul>
 <li><strong>Partition</strong> the <code>Account</code> table by account number: accounts 1–1M on Node 1, 1M–2M on Node 2, 2M–3M on Node 3 → each node handles <strong>a third</strong> of the load.</li>
 <li><strong>Replicate</strong> each partition on two other nodes → if Node 1 fails, its data is still available from a copy.</li>
@@ -331,7 +329,7 @@ COMMIT;
 </tr>
 </tbody>
 </table>
-<h4 id="link-to-earlier-lectures-added">📌 Link to earlier lectures (added)</h4>
+<h4 id="link-to-earlier-lectures-added"> Link to earlier lectures (added)</h4>
 <ul>
 <li><strong>MongoDB</strong> (document) and <strong>Neo4j</strong> (graph) from Lectures 13–19 are <strong>NoSQL</strong> examples — different data models, different query languages (<code>find</code>/aggregation pipeline; Cypher).</li>
 <li>Lecture 13's <strong>CAP theorem</strong> trade-off (consistency vs availability under partition) is exactly the tension NewSQL systems must manage when they promise <strong>ACID across nodes</strong> (e.g., CockroachDB favours <strong>strong consistency</strong>).</li>
@@ -445,7 +443,7 @@ COMMIT;
 <li><strong>Features:</strong> SQL and relational management; <strong>in-memory tables</strong> for rapid-access data; <strong>disk-based tables</strong> for persistent storage and larger datasets; both <strong>within one hybrid architecture</strong>; transaction, logging and recovery mechanisms; replication and high-availability configurations.</li>
 <li><strong>Advantages of hybrid storage:</strong> <strong>frequently accessed data in memory</strong> (lower latency); <strong>larger/less-used data on disk</strong>; balances <strong>performance, capacity and cost.</strong></li>
 <li><strong>Scenario:</strong> a <strong>telecom</strong> needs rapid access to <strong>current operational data</strong> while retaining <strong>large volumes of historical records.</strong></li>
-<li>⚠️ <strong>Important distinction (slide):</strong> Altibase <strong>illustrates hybrid in-memory/disk architecture</strong> — this <strong>does not mean all NewSQL systems share the same storage design.</strong></li>
+<li> <strong>Important distinction (slide):</strong> Altibase <strong>illustrates hybrid in-memory/disk architecture</strong> — this <strong>does not mean all NewSQL systems share the same storage design.</strong></li>
 </ul>
 <h3 id="86-summary-table-of-examples-added-for-clarity">8.6 Summary Table of Examples (added for clarity)</h3>
 <table>

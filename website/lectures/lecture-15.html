@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Big Data Technologies (2): Data Mining Concepts — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Big Data Technologies (2): Data Mining Concepts — Comprehensive Notes</h1><p>From S1_L22_Data_Mining_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-15.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-15.html">☆ Bookmark</button></div><article class="prose"><h1 id="big-data-technologies-2-data-mining-concepts-comprehensive-notes">Big Data Technologies (2): Data Mining Concepts — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-22-chapter-28-7th-edition">COS 326 Database Systems | Lecture 22 | Chapter 28 (7th Edition)</h3>
-<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Big Data Technologies (2): Data Mining Concepts — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Data mining</h1><p>Lecture 22 &middot; Course notes</p></div><button class="study" data-id="lecture-15.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-15.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-data-mining-definition">2. Data Mining — Definition</a></li><li><a href="#3-association-rules">3. Association Rules</a></li><li><a href="#4-algorithms-for-finding-frequent-itemsets">4. Algorithms for Finding Frequent Itemsets</a></li><li><a href="#5-association-rules-among-hierarchies-multi-dimensional-and-negative-rules">5. Association Rules Among Hierarchies, Multi-dimensional and Negative Rules</a></li><li><a href="#6-classification">6. Classification</a></li><li><a href="#7-clustering">7. Clustering</a></li><li><a href="#8-additional-data-mining-approaches">8. Additional Data Mining Approaches</a></li><li><a href="#9-data-mining-business-analytics-bi-applications">9. Data Mining / Business Analytics (B.I.) Applications</a></li><li><a href="#10-data-mining-tools-and-the-future">10. Data Mining Tools and the Future</a></li><li><a href="#11-questions-memo">11. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
 <ul>
 <li><strong>This lecture covers:</strong><ol>
 <li><strong>Data mining:</strong> vs data warehousing; <strong>Knowledge Discovery in Databases (KDD)</strong>; goals; types of knowledge discovered.</li>
@@ -13,7 +11,7 @@
 </ol>
 </li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>Lectures 13–21 were about <strong>storing and processing</strong> big data. This lecture asks: <strong>what do we do with it?</strong> Data mining is the step that turns stored data into <strong>knowledge</strong> — e.g., "customers who buy bread and cookies also buy coffee", "this transaction looks fraudulent", "these customers behave alike."</p>
 <hr />
 <h2 id="2-data-mining-definition">2. Data Mining — Definition</h2>
@@ -104,7 +102,7 @@
 <ul>
 <li>The workflow <strong>may return to earlier stages</strong> when data-quality problems, unsuitable models or unexpected results appear (it is <strong>iterative</strong>).</li>
 </ul>
-<h4 id="worked-example-added-kdd-for-a-supermarket">📌 Worked Example (added) — KDD for a supermarket</h4>
+<h4 id="worked-example-added-kdd-for-a-supermarket"> Worked Example (added) — KDD for a supermarket</h4>
 <ol>
 <li><strong>Select:</strong> till transactions and loyalty-card data for 2025.</li>
 <li><strong>Cleanse:</strong> remove duplicate scans, fix missing product codes.</li>
@@ -296,7 +294,7 @@
 </ol>
 </li>
 </ol>
-<h4 id="worked-example-added-for-step-by-step-clarity-apriori-on-the-slides-four-transactions-mins-50-2-transactions">📌 Worked Example (added for step-by-step clarity) — Apriori on the slide's four transactions, <code>mins</code> = 50% (≥ 2 transactions)</h4>
+<h4 id="worked-example-added-for-step-by-step-clarity-apriori-on-the-slides-four-transactions-mins-50-2-transactions"> Worked Example (added for step-by-step clarity) — Apriori on the slide's four transactions, <code>mins</code> = 50% (≥ 2 transactions)</h4>
 <p><strong>Pass 1 — single items (m = 4):</strong></p>
 <table>
 <thead>
@@ -466,7 +464,7 @@
 <li><strong>If the tree is a single path:</strong> for each <strong>combination β of the path's nodes</strong>, generate pattern (β ∪ α) with <strong>support = minimum support of nodes in β.</strong></li>
 <li><strong>Otherwise:</strong> for each item i in the tree's <strong>header:</strong> generate pattern β = (i ∪ α) with support = i.support; build <strong>β's conditional pattern base</strong> and <strong>conditional FP-tree</strong>; if non-empty, <strong>recursively call</strong> FP-growth(β_tree, β).</li>
 </ul>
-<h4 id="worked-example-added-building-the-fp-tree-for-the-slides-data-min-support-2">📌 Worked Example (added) — Building the FP-tree for the slide's data, min support = 2</h4>
+<h4 id="worked-example-added-building-the-fp-tree-for-the-slides-data-min-support-2"> Worked Example (added) — Building the FP-tree for the slide's data, min support = 2</h4>
 <ol>
 <li><strong>Frequent items (sorted by count):</strong> milk (3), then bread (2), cookies (2), juice (2) <em>(ties may be ordered arbitrarily but consistently).</em></li>
 <li><strong>Each transaction with frequent items in that order:</strong><ul>
@@ -680,7 +678,7 @@
 <li><strong>Results depend on:</strong> the <strong>initialisation</strong>, the <strong>choice of k</strong>, <strong>feature scaling</strong> and <strong>outliers.</strong></li>
 <li><strong>Limitation:</strong> standard k-means suits <strong>numerical data</strong> and can perform <strong>poorly when clusters have very different sizes, densities or non-spherical shapes.</strong></li>
 </ul>
-<h4 id="worked-example-added-k-2-on-the-values-1-2-10-11">📌 Worked Example (added) — k = 2 on the values 1, 2, 10, 11</h4>
+<h4 id="worked-example-added-k-2-on-the-values-1-2-10-11"> Worked Example (added) — k = 2 on the values 1, 2, 10, 11</h4>
 <ol>
 <li><strong>Initialise</strong> centroids: c₁ = 1, c₂ = 10.</li>
 <li><strong>Assign:</strong> 1 → c₁ (distance 0); 2 → c₁ (1 vs 8); 10 → c₂; 11 → c₂. Clusters: <strong>{1, 2}</strong> and <strong>{10, 11}.</strong></li>

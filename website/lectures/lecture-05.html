@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Semi-Structured Data and XML (4) — XML in Relational/Object-Relational Databases — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Semi-Structured Data and XML (4) — XML in Relational/Object-Relational Databases — Comprehensive Notes</h1><p>From S1_L12_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-05.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-05.html">☆ Bookmark</button></div><article class="prose"><h1 id="semi-structured-data-and-xml-4-xml-in-relationalobject-relational-databases-comprehensive-notes">Semi-Structured Data and XML (4) — XML in Relational/Object-Relational Databases — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-12-chapter-13-7th-edition">COS 326 Database Systems | Lecture 12 | Chapter 13 (7th Edition)</h3>
-<h2 id="1-lecture-overview-and-where-this-fits">1. Lecture Overview and Where This Fits</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Semi-Structured Data and XML (4) — XML in Relational/Object-Relational Databases — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>XML in relational databases</h1><p>Lecture 12 &middot; Course notes</p></div><button class="study" data-id="lecture-05.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-05.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview-and-where-this-fits">1. Lecture Overview and Where This Fits</a></li><li><a href="#2-storing-xml-data-in-an-rdb-or-ordb-four-general-approaches">2. Storing XML Data in an RDB or ORDB — Four General Approaches</a></li><li><a href="#3-xml-and-sql-standards">3. XML and SQL Standards</a></li><li><a href="#4-creating-a-table-using-the-xml-data-type">4. Creating a Table Using the XML Data Type</a></li><li><a href="#5-sqlxml-functions-reading-for-the-student">5. SQL/XML Functions (Reading for the Student)</a></li><li><a href="#6-sqlxml-operators-generating-xml-from-relational-data">6. SQL/XML Operators — Generating XML from Relational Data</a></li><li><a href="#7-sqlxml-mapping-functions">7. SQL/XML Mapping Functions</a></li><li><a href="#8-postgresql-and-xml-sql-xpath-queries">8. PostgreSQL and XML — SQL + XPath Queries</a></li><li><a href="#9-postgresql-server-side-file-access">9. PostgreSQL Server-Side File Access</a></li><li><a href="#10-importing-xml-data-into-a-postgresql-database">10. Importing XML Data into a PostgreSQL Database</a></li><li><a href="#11-further-reading">11. Further Reading</a></li><li><a href="#12-quick-reference-direction-of-conversion">12. Quick Reference — Direction of Conversion</a></li><li><a href="#13-questions-memo">13. Questions &amp; Memo</a></li><li><a href="#sqlxml-functions-cheat-sheet-cos-326-lecture-12">SQL/XML Functions Cheat Sheet — COS 326 Lecture 12</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview-and-where-this-fits">1. Lecture Overview and Where This Fits</h2>
 <ul>
 <li><strong>Lectures 9–10</strong> introduced XML itself: the data model, XSD, XPath, XQuery/FLWOR and a <strong>native XML database (BaseX)</strong>.</li>
 <li><strong>Lecture 12</strong> asks a different question: <strong>what if our data lives in a relational (RDB) or object-relational (ORDB) database such as PostgreSQL, and we need to store, produce and query XML there?</strong></li>
@@ -15,7 +13,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>Contrast the two worlds. In <strong>BaseX</strong> (Lectures 9–10) the <em>whole database</em> is XML and you query it with <code>//STAFFLIST/STAFF[1]/STAFFNO</code>. In <strong>PostgreSQL</strong> (this lecture) the database is relational, XML is just <em>one column type</em> among others, and you must combine <strong>SQL</strong> with <strong>XPath</strong>: <code>SELECT xpath('/STAFF/STAFFNO', staffData) FROM XMLStaff;</code>.</p>
 <hr />
 <h2 id="2-storing-xml-data-in-an-rdb-or-ordb-four-general-approaches">2. Storing XML Data in an RDB or ORDB — Four General Approaches</h2>
@@ -29,7 +27,7 @@
 <p>The slides give detail for approaches 1–3. Approach 4 is only listed (the DBMS keeps its own internal parsed representation).</p>
 </blockquote>
 <h3 id="21-approach-1-storing-xml-in-a-table-column">2.1 Approach 1 — Storing XML in a Table Column</h3>
-<h4 id="conceptual-example-from-the-slides">📌 Conceptual Example (from the slides)</h4>
+<h4 id="conceptual-example-from-the-slides"> Conceptual Example (from the slides)</h4>
 <table>
 <thead>
 <tr>
@@ -76,22 +74,22 @@
 </tr>
 </tbody>
 </table>
-<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
 <p>An archive of <strong>invoices received as XML</strong> (never edited, always fetched whole by invoice number) suits Approach 1 perfectly — fast to insert, fast to retrieve. If staff later asked "total salary across all documents", every document would have to be parsed again to dig the <code>&lt;SALARY&gt;</code> values out, which is exactly the poor-query-performance weakness.</p>
 <h3 id="22-approach-2-storing-xml-in-shredded-form">2.2 Approach 2 — Storing XML in Shredded Form</h3>
 <ul>
 <li>The XML is <strong>decomposed ("shredded") into its constituent elements.</strong></li>
 <li>The <strong>data is distributed over a number of attributes (columns)</strong> in <strong>one or more relations.</strong></li>
 <li><strong>Pros / cons:</strong><ul>
-<li>✅ <strong>Easier to index</strong> the values of individual elements.</li>
-<li>⚠️ Need <strong>additional data capturing the hierarchical nature</strong> of the XML so the <strong>original document can be recomposed.</strong></li>
-<li>⚠️ <strong>XML updates</strong> are more involved.</li>
-<li>⚠️ You have to <strong>create an appropriate database structure from the schema</strong> (relational or object-relational).</li>
+<li> <strong>Easier to index</strong> the values of individual elements.</li>
+<li> Need <strong>additional data capturing the hierarchical nature</strong> of the XML so the <strong>original document can be recomposed.</strong></li>
+<li> <strong>XML updates</strong> are more involved.</li>
+<li> You have to <strong>create an appropriate database structure from the schema</strong> (relational or object-relational).</li>
 </ul>
 </li>
 <li><em>(Reading for the student: Chapter 13.6.)</em></li>
 </ul>
-<h4 id="example-from-the-slides-staff_listxml-shredded-into-a-table">📌 Example (from the slides) — <code>staff_list.xml</code> shredded into a table</h4>
+<h4 id="example-from-the-slides-staff_listxml-shredded-into-a-table"> Example (from the slides) — <code>staff_list.xml</code> shredded into a table</h4>
 <table>
 <thead>
 <tr>
@@ -144,7 +142,7 @@
     &lt;SALARY&gt;30000&lt;/SALARY&gt;
   &lt;/STAFF&gt;
 </code></pre>
-<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
 <p>A generic <strong>node table</strong> could look like this (node, parent, type, name, value) for the record above:</p>
 <table>
 <thead>
@@ -263,7 +261,7 @@
 </ul>
 </li>
 </ul>
-<h4 id="example-added-for-clarity_3">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_3"> Example (added for clarity)</h4>
 <p>Because SQL/XML is part of the SQL standard, a function such as <code>XMLELEMENT</code> is available (with small dialect differences) in PostgreSQL, Oracle and SQL Server-style systems — the same idea of "build XML from table rows" carries across vendors.</p>
 <hr />
 <h2 id="4-creating-a-table-using-the-xml-data-type">4. Creating a Table Using the XML Data Type</h2>
@@ -367,7 +365,7 @@ SELECT * FROM XMLStaff;
 </tr>
 </tbody>
 </table>
-<h4 id="examples-added-for-clarity-not-on-the-slides">📌 Examples (added for clarity — not on the slides)</h4>
+<h4 id="examples-added-for-clarity-not-on-the-slides"> Examples (added for clarity — not on the slides)</h4>
 <pre><code class="language-sql">-- XMLFOREST: one element per supplied value, element name = alias
 SELECT XMLFOREST(staffNo AS id, lName AS surname) FROM staff;
 -- → &lt;id&gt;SL20&lt;/id&gt;&lt;surname&gt;Mandela&lt;/surname&gt;
@@ -515,7 +513,7 @@ FROM Staff;
 <li><code>staffNo</code> is selected as a <strong>normal relational column</strong> beside the generated XML column, and the XML column is named with <code>AS staffXMLCol</code>.</li>
 <li>This is the <strong>table → XML</strong> direction: every row becomes one XML element.</li>
 </ol>
-<h4 id="additional-example-added-for-clarity-nesting-elements">📌 Additional Example (added for clarity) — Nesting Elements</h4>
+<h4 id="additional-example-added-for-clarity-nesting-elements"> Additional Example (added for clarity) — Nesting Elements</h4>
 <p><code>XMLELEMENT</code> calls can be <strong>nested</strong> to build a hierarchy like the <code>staff_list.xml</code> structure:</p>
 <pre><code class="language-sql">SELECT xmlelement( NAME &quot;STAFF&quot;,
            xmlattributes( branchNo AS &quot;branchNo&quot; ),
@@ -738,7 +736,7 @@ FROM XMLStaff;
 <li>Here each array has <strong>one</strong> element, so the row count stays at 2. If a document had <strong>several matches</strong> (e.g., a <code>&lt;STAFFLIST&gt;</code> with 4 <code>&lt;STAFF&gt;</code> children), <code>unnest</code> would produce <strong>4 rows</strong> instead.</li>
 <li><strong>Caution:</strong> several <code>unnest</code> calls in the same <code>SELECT</code> list expand <strong>in parallel</strong> (PostgreSQL 10+), so they only line up correctly when every array has the <strong>same length</strong>.</li>
 </ol>
-<h4 id="additional-example-added-for-clarity">📌 Additional Example (added for clarity)</h4>
+<h4 id="additional-example-added-for-clarity"> Additional Example (added for clarity)</h4>
 <p>To get only the <strong>names of staff earning more than 28000</strong>, combine SQL's <code>WHERE</code> with a cast:</p>
 <pre><code class="language-sql">SELECT (xpath('/STAFF/STAFFNO/text()', staffData))[1]::text AS staffNo
 FROM XMLStaff
@@ -754,9 +752,9 @@ WHERE ((xpath('/STAFF/SALARY/text()', staffData))[1]::text)::int &gt; 28000;
 <li>PostgreSQL <strong>restricts these functions by default</strong>, and they <strong>can expose files accessible to the database server.</strong></li>
 </ul>
 <blockquote>
-<p>⚠️ <strong>Security note (from the slides):</strong> these are <strong>server-side file access functions restricted by PostgreSQL privileges. They should not be granted casually</strong> because they can expose files accessible to the database server.</p>
+<p> <strong>Security note (from the slides):</strong> these are <strong>server-side file access functions restricted by PostgreSQL privileges. They should not be granted casually</strong> because they can expose files accessible to the database server.</p>
 </blockquote>
-<h4 id="example-added-for-clarity_4">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_4"> Example (added for clarity)</h4>
 <p>If a normal user could run <code>SELECT pg_read_file('postgresql.conf');</code>, they could read the server's configuration (and with absolute paths, other files the server process can read). That is why access is limited to superusers or roles explicitly granted it (e.g., the built-in <code>pg_read_server_files</code> role).</p>
 <hr />
 <h2 id="10-importing-xml-data-into-a-postgresql-database">10. Importing XML Data into a PostgreSQL Database</h2>
@@ -822,9 +820,9 @@ FROM NewXMLtable;
 <li>This is the stepping-stone to <strong>shredding</strong> (Approach 2): the array still sits in one cell and must be spread out into rows.</li>
 </ol>
 <blockquote>
-<p>📝 <strong>HOMEWORK (from the slides):</strong> <em>Write a PL/pgSQL function to store the array elements into a table, with one element per row.</em></p>
+<p> <strong>HOMEWORK (from the slides):</strong> <em>Write a PL/pgSQL function to store the array elements into a table, with one element per row.</em></p>
 </blockquote>
-<h4 id="hint-sketch-for-the-homework-added-for-clarity-not-a-memo">📌 Hint / Sketch for the Homework (added for clarity — not a memo)</h4>
+<h4 id="hint-sketch-for-the-homework-added-for-clarity-not-a-memo"> Hint / Sketch for the Homework (added for clarity — not a memo)</h4>
 <pre><code class="language-sql">CREATE TABLE StaffRows ( staffXML xml );
 
 CREATE OR REPLACE FUNCTION split_staff() RETURNS void AS $$
@@ -845,7 +843,7 @@ $$ LANGUAGE plpgsql;
 <ul>
 <li>PostgreSQL also provides <strong><code>XMLTABLE</code></strong> for <strong>converting XML content into relational rows and columns.</strong></li>
 </ul>
-<h4 id="example-added-for-clarity_5">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_5"> Example (added for clarity)</h4>
 <p><code>XMLTABLE</code> does in one step what Section 8.3/8.4 did with several <code>xpath</code>/<code>unnest</code> calls:</p>
 <pre><code class="language-sql">SELECT x.*
 FROM NewXMLtable,

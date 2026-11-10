@@ -1,6 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — MongoDB (2) — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NoSQL Databases — MongoDB (2) — Comprehensive Notes</h1><p>From S1_L14_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-07.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-07.html">☆ Bookmark</button></div><article class="prose"><h1 id="nosql-databases-mongodb-2-comprehensive-notes">NoSQL Databases — MongoDB (2) — Comprehensive Notes</h1>
-<h3 id="cos-326-database-systems-lecture-14-chapter-24-7th-edition">COS 326 Database Systems | Lecture 14 | Chapter 24 (7th Edition)</h3>
-<h2 id="1-lecture-overview-and-recap">1. Lecture Overview and Recap</h2>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — MongoDB (2) — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu </button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>MongoDB: fundamentals</h1><p>Lecture 14 &middot; Course notes</p></div><button class="study" data-id="lecture-07.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-07.html"> Bookmark</button></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview-and-recap">1. Lecture Overview and Recap</a></li><li><a href="#2-mongodb-document-database">2. MongoDB Document Database</a></li><li><a href="#3-mongodb-data-types">3. MongoDB Data Types</a></li><li><a href="#4-crud-operations">4. CRUD Operations</a></li><li><a href="#5-querying-read-find">5. Querying (READ) — find()</a></li><li><a href="#6-crud-operations-update">6. CRUD Operations: UPDATE</a></li><li><a href="#7-crud-operations-delete">7. CRUD Operations: DELETE</a></li><li><a href="#8-indexing">8. Indexing</a></li><li><a href="#9-quick-reference">9. Quick Reference</a></li><li><a href="#10-questions-memo">10. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview-and-recap">1. Lecture Overview and Recap</h2>
 <ul>
 <li><strong>In this lecture:</strong><ul>
 <li>The <strong>MongoDB document database.</strong></li>
@@ -18,7 +16,7 @@
 </li>
 <li><strong>Reference (ClickUP):</strong> Moniruzzaman, A.B.M. &amp; Hossain, S.A. (2013). <em>NoSQL database: new era of databases for big data analytics – classification, characteristics and comparison.</em> International Journal of Database Theory and Application, 6(4).</li>
 </ul>
-<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
 <p>Compare with the previous module: in Lectures 9–12 the "flexible" data was <strong>XML</strong> (queried with XPath/XQuery or <code>xpath()</code> in PostgreSQL). MongoDB stores flexible data as <strong>JSON-like documents</strong> and queries it with its own method-style language (<code>find</code>, <code>insertOne</code>, ...) — no XPath and no SQL.</p>
 <hr />
 <h2 id="2-mongodb-document-database">2. MongoDB Document Database</h2>
@@ -44,7 +42,7 @@
 </ul>
 </li>
 </ol>
-<h4 id="example-from-the-slides-a-collection-of-documents">📌 Example (from the slides) — A Collection of Documents</h4>
+<h4 id="example-from-the-slides-a-collection-of-documents"> Example (from the slides) — A Collection of Documents</h4>
 <p>Each document is a set of <strong>field: value</strong> pairs; values can be strings, numbers, <strong>arrays</strong>, etc.:</p>
 <pre><code class="language-js">{
   name:   &quot;al&quot;,
@@ -93,7 +91,7 @@
 </tr>
 </tbody>
 </table>
-<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
 <p>In one <code>students</code> collection these two documents are both valid — the second has an extra field and the first does not:</p>
 <pre><code class="language-js">{ name: &quot;Thando&quot;, age: 20 }
 { name: &quot;Marlize&quot;, age: 21, modules: [&quot;COS326&quot;, &quot;COS332&quot;] }
@@ -174,7 +172,7 @@ newmine
 <li><code>show dbs</code> lists the databases: <code>admin</code>, <code>config</code>, <code>local</code> are <strong>system databases</strong>; <code>test1</code> is the user's database.</li>
 <li><code>use test1</code> switches to it; <code>show collections</code> lists its two collections, <code>mine</code> and <code>newmine</code>.</li>
 </ol>
-<h4 id="mongosh-helpers-vs-javascript-equivalents-from-the-slides">📌 mongosh Helpers vs. JavaScript Equivalents (from the slides)</h4>
+<h4 id="mongosh-helpers-vs-javascript-equivalents-from-the-slides"> mongosh Helpers vs. JavaScript Equivalents (from the slides)</h4>
 <table>
 <thead>
 <tr>
@@ -277,9 +275,9 @@ newmine
 </tbody>
 </table>
 <blockquote>
-<p>⚠️ <strong>Note on the slide:</strong> the slide's description of ObjectID reads "used to store a document nested inside another document" — that is actually the definition of an <strong>embedded document</strong> (the line above it). <strong>ObjectId</strong> is the <strong>12-byte unique identifier</strong> MongoDB generates for <code>_id</code> (e.g., <code>ObjectId("64f77f99cf3b7de1d4d48756")</code>, as seen in the demo output). Know the correct meaning for the exam.</p>
+<p> <strong>Note on the slide:</strong> the slide's description of ObjectID reads "used to store a document nested inside another document" — that is actually the definition of an <strong>embedded document</strong> (the line above it). <strong>ObjectId</strong> is the <strong>12-byte unique identifier</strong> MongoDB generates for <code>_id</code> (e.g., <code>ObjectId("64f77f99cf3b7de1d4d48756")</code>, as seen in the demo output). Know the correct meaning for the exam.</p>
 </blockquote>
-<h4 id="example-added-for-clarity-one-document-using-many-types">📌 Example (added for clarity) — One Document Using Many Types</h4>
+<h4 id="example-added-for-clarity-one-document-using-many-types"> Example (added for clarity) — One Document Using Many Types</h4>
 <pre><code class="language-js">{
   _id:      ObjectId(&quot;507f1f77bcf86cd799439011&quot;),   // ObjectId
   name:     &quot;Thando Mandela&quot;,                        // String
@@ -372,7 +370,7 @@ newmine
 <li><code>createCollection</code> is <strong>optional</strong> — inserting into a collection that does not exist <strong>creates it automatically.</strong></li>
 <li><code>drop()</code> removes the <strong>whole collection</strong> (all its documents).</li>
 </ol>
-<h4 id="demo-output-from-the-slide-screenshot">📌 Demo Output (from the slide screenshot)</h4>
+<h4 id="demo-output-from-the-slide-screenshot"> Demo Output (from the slide screenshot)</h4>
 <pre><code>db&gt; db.myCollection.insertOne({name: &quot;mongo&quot;, x:3})
 { acknowledged: true,
   insertedId: ObjectId(&quot;64f77f99cf3b7de1d4d48756&quot;) }
@@ -409,7 +407,7 @@ db.myCollection.insertMany( [
 <li><em>(Slide tip: in the shell, placing the cursor on a bracket highlights its matching bracket — useful for spotting mismatched <code>{ }</code> and <code>[ ]</code> in longer inserts.)</em></li>
 <li><strong>Slide typo:</strong> the second slide example is missing a comma after the <code>_id</code> line. Fields in a document must be <strong>comma-separated.</strong></li>
 </ol>
-<h4 id="demo-result-what-the-collection-holds-after-the-lecture-inserts">📌 Demo Result — what the collection holds after the lecture inserts</h4>
+<h4 id="demo-result-what-the-collection-holds-after-the-lecture-inserts"> Demo Result — what the collection holds after the lecture inserts</h4>
 <pre><code>db&gt; db.myCollection.find()
 [
   { _id: ObjectId(&quot;64f77f32cf3b7de1d4d48755&quot;), name: 'value', x: 3 },
@@ -540,7 +538,7 @@ db.myCollection.insertMany( [
 <li><code>$or</code> example → <code>name</code> is <code>"mongo"</code> <strong>or</strong> <code>"Neo4j"</code> → returns two documents.</li>
 <li><strong><code>$in</code></strong> is a shorthand for an OR over <strong>one field</strong> with a list of allowed values — equivalent to the <code>$or</code> above, and shorter.</li>
 </ol>
-<h4 id="additional-example-added-for-clarity">📌 Additional Example (added for clarity)</h4>
+<h4 id="additional-example-added-for-clarity"> Additional Example (added for clarity)</h4>
 <p>A comma-separated filter is an <strong>implicit AND</strong>: <code>find({ name: "mongo", x: 3 })</code> does the same as the <code>$and</code> example. <code>$and</code> is needed mainly when you must <strong>repeat the same field</strong>, e.g. <code>{ $and: [ { x: { $gt: 1 } }, { x: { $lt: 4 } } ] }</code>.</p>
 <h3 id="54-projection-choosing-which-fields-to-return">5.4 Projection — Choosing Which Fields to Return</h3>
 <p><strong>Syntax:</strong></p>
@@ -616,9 +614,9 @@ db.myCollection.deleteOne( { x: 3 } )
 db.myCollection.deleteMany( { } )
 </code></pre>
 <blockquote>
-<p>⚠️ <strong>Don't confuse:</strong> <code>deleteMany({})</code> <strong>empties</strong> the collection but keeps it; <strong><code>drop()</code></strong> (Section 4.2) <strong>removes the collection itself.</strong> Relational analogy: <code>DELETE FROM t;</code> vs <code>DROP TABLE t;</code>.</p>
+<p> <strong>Don't confuse:</strong> <code>deleteMany({})</code> <strong>empties</strong> the collection but keeps it; <strong><code>drop()</code></strong> (Section 4.2) <strong>removes the collection itself.</strong> Relational analogy: <code>DELETE FROM t;</code> vs <code>DROP TABLE t;</code>.</p>
 </blockquote>
-<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
 <p><code>db.myCollection.deleteMany( { x: { $lt: 4 } } )</code> — deletes every document with <code>x &lt; 4</code> (here both <code>x: 3</code> documents), leaving <code>Neo4j</code>.</p>
 <hr />
 <h2 id="8-indexing">8. Indexing</h2>
@@ -666,7 +664,7 @@ db.myCollection.deleteMany( { } )
 <li><strong><code>explain()</code></strong> shows the <strong>query plan</strong> and <strong>whether an index is being used.</strong></li>
 <li>Recommended to check whether a query performs an <strong>index scan</strong> (<code>IXSCAN</code>) rather than a <strong>collection scan</strong> (<code>COLLSCAN</code> — reads every document).</li>
 </ul>
-<h4 id="example-added-for-clarity_3">📌 Example (added for clarity)</h4>
+<h4 id="example-added-for-clarity_3"> Example (added for clarity)</h4>
 <p>With 1 000 000 documents, <code>find({ name: "mongo" })</code> <strong>without</strong> an index must examine all 1 000 000 documents (collection scan). After <code>createIndex({ name: 1 })</code>, MongoDB jumps straight to the matching entries (index scan) and <code>explain("executionStats")</code> shows a tiny number of documents examined. The cost: the index takes extra disk space, and each insert/update/delete must also update it.</p>
 <hr />
 <h2 id="9-quick-reference">9. Quick Reference</h2>
