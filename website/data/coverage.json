@@ -1,0 +1,87 @@
+[
+  {
+    "title": "Object-Oriented Database Systems (OODBMS) \u2014 Comprehensive Notes",
+    "file": "lecture-01.html",
+    "source": "S1 L1,2,3,4.md"
+  },
+  {
+    "title": "Object-Relational Database Systems (ORDBMS) \u2014 Comprehensive Notes",
+    "file": "lecture-02.html",
+    "source": "S1 L5,6,7, 8.md"
+  },
+  {
+    "title": "Semi-Structured Data and XML \u2014 Comprehensive Notes",
+    "file": "lecture-03.html",
+    "source": "S1 L9, 10.md"
+  },
+  {
+    "title": "XQuery and FLWOR Expressions \u2014 Comprehensive Notes",
+    "file": "lecture-04.html",
+    "source": "S1_L11.md"
+  },
+  {
+    "title": "Semi-Structured Data and XML (4) \u2014 XML in Relational/Object-Relational Databases \u2014 Comprehensive Notes",
+    "file": "lecture-05.html",
+    "source": "S1_L12_Notes.md"
+  },
+  {
+    "title": "Big Data, NoSQL Databases & MongoDB (Part 1) \u2014 Comprehensive Notes",
+    "file": "lecture-06.html",
+    "source": "S1_L13_Big_Data_NoSQL_MongoDB_Notes (1).md"
+  },
+  {
+    "title": "NoSQL Databases \u2014 MongoDB (2) \u2014 Comprehensive Notes",
+    "file": "lecture-07.html",
+    "source": "S1_L14_Notes.md"
+  },
+  {
+    "title": "NoSQL Databases \u2014 MongoDB (3): Cursors, Embedded Documents, Arrays, Aggregation & Data Model Design \u2014 Comprehensive Notes",
+    "file": "lecture-08.html",
+    "source": "S1_L15_MongoDB_3_Notes.md"
+  },
+  {
+    "title": "NoSQL Databases \u2014 MongoDB (4): Text Search, Shell Functions and Java Applications \u2014 Comprehensive Notes",
+    "file": "lecture-09.html",
+    "source": "S1_L16_Search_ShellFunctions.md"
+  },
+  {
+    "title": "NoSQL Databases \u2014 Neo4j (1): Graph Theory, Graph Database Concepts & Basic Cypher \u2014 Comprehensive Notes",
+    "file": "lecture-10.html",
+    "source": "S1_L17_Neo4j_1_Notes.md"
+  },
+  {
+    "title": "NoSQL Databases \u2014 Neo4j (2): Cypher CRUD Operations & Aggregation \u2014 Comprehensive Notes",
+    "file": "lecture-11.html",
+    "source": "S1_L18_Neo4j_2_Notes.md"
+  },
+  {
+    "title": "NoSQL Databases \u2014 Neo4j (3): Functions, Paths, Importing Data & Graph Data Modelling \u2014 Comprehensive Notes",
+    "file": "lecture-12.html",
+    "source": "S1_L19_Neo4j_3_Notes.md"
+  },
+  {
+    "title": "NewSQL Databases \u2014 Comprehensive Notes",
+    "file": "lecture-13.html",
+    "source": "S1_L20_NewSQL_Notes.md"
+  },
+  {
+    "title": "Big Data Technologies (1): Hadoop, Spark, Cloud-Native Tools & Governance \u2014 Comprehensive Notes",
+    "file": "lecture-14.html",
+    "source": "S1_L21_Big_Data_Technologies_1_Notes.md"
+  },
+  {
+    "title": "Big Data Technologies (2): Data Mining Concepts \u2014 Comprehensive Notes",
+    "file": "lecture-15.html",
+    "source": "S1_L22_Data_Mining_Notes.md"
+  },
+  {
+    "title": "Data Warehousing & OLAP (1): Business Intelligence, Warehouse Architecture & the Star Schema \u2014 Comprehensive Notes",
+    "file": "lecture-16.html",
+    "source": "S1_L23_Data_Warehousing_OLAP_1_Notes.md"
+  },
+  {
+    "title": "Data Warehousing & OLAP (2): Implementing ROLAP, Slowly Changing Dimensions & SQL OLAP Extensions \u2014 Comprehensive Notes",
+    "file": "lecture-17.html",
+    "source": "S1_L24_Data_Warehousing_OLAP_2_Notes.md"
+  }
+]

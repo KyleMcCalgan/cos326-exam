@@ -1,0 +1,610 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NewSQL Databases — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NewSQL Databases — Comprehensive Notes</h1><p>From S1_L20_NewSQL_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-13.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-13.html">☆ Bookmark</button></div><article class="prose"><h1 id="newsql-databases-comprehensive-notes">NewSQL Databases — Comprehensive Notes</h1>
+<h3 id="cos-326-database-systems-lecture-20-reference-lecture-notes-no-textbook-chapter-given-on-the-slides">COS 326 Database Systems | Lecture 20 | Reference: lecture notes (no textbook chapter given on the slides)</h3>
+<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<ul>
+<li><strong>This lecture covers:</strong><ol>
+<li><strong>Introduction</strong> to NewSQL databases.</li>
+<li><strong>Motivation</strong> for the development of NewSQL.</li>
+<li><strong>ACID transactions</strong> and <strong>Online Transaction Processing (OLTP).</strong></li>
+<li><strong>Key features and architecture</strong> of NewSQL databases.</li>
+<li><strong>Comparison</strong> of SQL, NoSQL and NewSQL databases.</li>
+<li><strong>Advantages, limitations and trade-offs</strong> of NewSQL.</li>
+<li><strong>Examples</strong> of NewSQL and distributed SQL databases.</li>
+<li><strong>Applications</strong> and <strong>database selection</strong> considerations.</li>
+</ol>
+</li>
+</ul>
+<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<p>This lecture closes the story of the module's data models: <strong>relational/object-relational</strong> (Lectures 5–8), <strong>semi-structured/XML</strong> (9–10), <strong>NoSQL</strong> — document (MongoDB) and graph (Neo4j) (13–19) — and now <strong>NewSQL</strong>, which asks: <em>"can we keep SQL and ACID transactions <strong>and</strong> scale out across many servers like NoSQL?"</em></p>
+<hr />
+<h2 id="2-introduction-to-newsql">2. Introduction to NewSQL</h2>
+<ul>
+<li><strong>NewSQL</strong> is a term for a <strong>class of modern database management systems</strong> designed to support <strong>high-performance OLTP</strong> while <strong>retaining:</strong><ul>
+<li>the <strong>relational data model</strong>,</li>
+<li><strong>SQL querying</strong>, and</li>
+<li><strong>strong transactional guarantees</strong> (ACID) associated with traditional relational systems.</li>
+</ul>
+</li>
+<li><strong>The problem with traditional relational DBs:</strong> mature SQL support and reliable transactions, <strong>but scaling very large transactional workloads across multiple servers</strong> introduces <strong>architectural and operational challenges.</strong></li>
+<li><strong>The NoSQL response:</strong> emerged to address <strong>flexible data models, distributed storage and horizontal scalability</strong> — <strong>but</strong> NoSQL systems <strong>differ considerably</strong> in their <strong>query languages, data models and transaction guarantees.</strong></li>
+<li><strong>NewSQL aims to combine</strong> the strengths of relational databases with the <strong>scalability and distributed processing</strong> needed by modern applications.</li>
+<li><strong>The central idea:</strong> NewSQL seeks to provide <strong>relational data management, SQL support, ACID transactions and improved horizontal scalability</strong> within a <strong>modern database architecture.</strong></li>
+</ul>
+<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<p>Think of a <strong>bank</strong>. A traditional relational DBMS on one big server gives you SQL and safe transfers, but one server eventually can't keep up with millions of customers. A typical NoSQL store scales out easily but may offer weaker transaction guarantees. <strong>NewSQL</strong> is the attempt to get <strong>both</strong> — safe SQL transactions <strong>spread over many servers.</strong></p>
+<hr />
+<h2 id="3-acid-transactions-and-oltp">3. ACID Transactions and OLTP</h2>
+<h3 id="31-the-acid-properties">3.1 The ACID Properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Meaning (from the slides)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A — Atomicity</strong></td>
+<td>A transaction is <strong>completed entirely, or its changes are rolled back.</strong></td>
+</tr>
+<tr>
+<td><strong>C — Consistency</strong></td>
+<td>A transaction <strong>preserves the database's defined integrity constraints</strong> and consistency rules.</td>
+</tr>
+<tr>
+<td><strong>I — Isolation</strong></td>
+<td><strong>Concurrent transactions</strong> behave according to the database's <strong>specified isolation guarantees.</strong></td>
+</tr>
+<tr>
+<td><strong>D — Durability</strong></td>
+<td>Once <strong>committed</strong>, changes <strong>persist despite failures</strong> covered by the system's durability guarantees.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="worked-example-added-transferring-r500-from-account-a-to-account-b">📌 Worked Example (added) — Transferring R500 from Account A to Account B</h4>
+<pre><code class="language-sql">BEGIN;
+UPDATE Account SET balance = balance - 500 WHERE accNo = 'A';
+UPDATE Account SET balance = balance + 500 WHERE accNo = 'B';
+COMMIT;
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong>Atomicity:</strong> if the server crashes <strong>after</strong> the debit but <strong>before</strong> the credit, the whole transaction is <strong>rolled back</strong> — the R500 does not vanish.</li>
+<li><strong>Consistency:</strong> rules such as <strong>"balance ≥ 0"</strong> or <strong>"total money in the system is unchanged"</strong> must hold after the transaction.</li>
+<li><strong>Isolation:</strong> while the transfer runs, another transaction reading A's and B's balances must <strong>not see</strong> the half-finished state (debited but not yet credited).</li>
+<li><strong>Durability:</strong> after <code>COMMIT</code>, the transfer <strong>survives a power failure</strong> (via logging/replication).</li>
+</ol>
+<h3 id="32-online-transaction-processing-oltp">3.2 Online Transaction Processing (OLTP)</h3>
+<ul>
+<li><strong>OLTP</strong> = processing <strong>operational transactions</strong> generated by <strong>applications and users.</strong></li>
+<li>These transactions are typically <strong>short, frequent and executed concurrently.</strong></li>
+<li><strong>Examples (from the slides):</strong><ul>
+<li><strong>Transferring money</strong> between bank accounts.</li>
+<li><strong>Registering students</strong> for university courses.</li>
+<li><strong>Processing online shopping orders.</strong></li>
+<li><strong>Updating inventory</strong> after a purchase.</li>
+<li><strong>Recording payments and bookings.</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="33-why-acid-and-oltp-matter-to-newsql">3.3 Why ACID and OLTP Matter to NewSQL</h3>
+<ul>
+<li>NewSQL systems aim to <strong>support demanding transactional workloads</strong> while <strong>preserving reliable transaction processing across distributed database infrastructure.</strong></li>
+</ul>
+<h4 id="oltp-vs-olap-added-for-clarity">📌 OLTP vs OLAP (added for clarity)</h4>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th><strong>OLTP</strong> (this lecture's focus)</th>
+<th><strong>OLAP</strong> (analytical processing)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Workload</td>
+<td><strong>Many short</strong> read/write transactions</td>
+<td><strong>Fewer, long</strong> complex read queries</td>
+</tr>
+<tr>
+<td>Example</td>
+<td>"Process this order"</td>
+<td>"Total sales per region over 5 years"</td>
+</tr>
+<tr>
+<td>Priority</td>
+<td>Correctness + <strong>speed per transaction</strong></td>
+<td>Throughput over large data volumes</td>
+</tr>
+</tbody>
+</table>
+<p><em>(TiDB's <strong>HTAP</strong>, Section 7.4, tries to serve both.)</em></p>
+<hr />
+<h2 id="4-why-do-we-need-newsql-scaling">4. Why Do We Need NewSQL? — Scaling</h2>
+<h3 id="41-vertical-scaling-scale-up">4.1 Vertical Scaling ("scale up")</h3>
+<ul>
+<li>Increasing the <strong>resources of an existing server</strong> — <strong>processing power, memory or storage.</strong></li>
+<li><strong>Can improve performance</strong> without distributing the database over more servers.</li>
+<li><strong>Limited by</strong> hardware capacity, <strong>cost</strong>, and the <strong>architecture</strong> of the database system.</li>
+</ul>
+<h3 id="42-horizontal-scaling-scale-out">4.2 Horizontal Scaling ("scale out")</h3>
+<ul>
+<li><strong>Adding more servers/nodes</strong> and <strong>distributing data or processing across them.</strong></li>
+<li><strong>Increases total capacity</strong> of a deployment; supports <strong>larger workloads and distributed applications.</strong></li>
+<li><strong>Introduces challenges:</strong> <strong>data distribution, transaction coordination, network communication and consistency.</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th><strong>Vertical scaling</strong></th>
+<th><strong>Horizontal scaling</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Method</td>
+<td><strong>Bigger</strong> server</td>
+<td><strong>More</strong> servers</td>
+</tr>
+<tr>
+<td>Limit</td>
+<td>Hardware ceiling &amp; cost</td>
+<td>Coordination &amp; network overhead</td>
+</tr>
+<tr>
+<td>Complexity</td>
+<td>Lower (still one machine)</td>
+<td>Higher (distributed system)</td>
+</tr>
+<tr>
+<td>Failure</td>
+<td>Single point of failure</td>
+<td>Can tolerate node failures (with replication)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="43-the-newsql-objective-and-a-warning">4.3 The NewSQL Objective — and a Warning</h3>
+<ul>
+<li><strong>Objective:</strong> <strong>retain SQL and reliable relational transactions</strong> while supporting <strong>distributed architectures that scale across multiple servers.</strong></li>
+<li>⚠️ <strong>"Horizontal scaling does not automatically guarantee linear performance improvements."</strong> Results depend on the <strong>workload, data distribution, network latency and coordination required between nodes.</strong></li>
+</ul>
+<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<p>Doubling from 4 to 8 nodes does <strong>not</strong> double throughput if most transactions touch data on <strong>several</strong> nodes: each such transaction needs <strong>network round-trips</strong> to coordinate, so part of the extra capacity is spent on <strong>coordination.</strong></p>
+<hr />
+<h2 id="5-key-features-of-newsql-databases">5. Key Features of NewSQL Databases</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>SQL &amp; relational data management</strong></td>
+<td>SQL access to <strong>tables, relationships, constraints, queries.</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>ACID transactions</strong></td>
+<td>Aim to preserve <strong>A, C, I, D</strong> — <strong>including in distributed environments.</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Horizontal scalability</strong></td>
+<td>Distribute <strong>data and processing across multiple nodes</strong> for growing workloads.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Distributed transaction processing</strong></td>
+<td>A transaction may involve data on <strong>more than one node</strong>; the DB <strong>coordinates</strong> the operations to preserve guarantees.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Partitioning &amp; data distribution</strong></td>
+<td>Data <strong>divided into partitions</strong> spread across nodes; supports <strong>parallel processing</strong> and <strong>workload distribution.</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Replication &amp; high availability</strong></td>
+<td>Data <strong>copied across nodes/locations</strong> for <strong>fault tolerance and recovery.</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Concurrency control</strong></td>
+<td>Mechanisms <strong>coordinate simultaneous transactions</strong> to protect integrity and enforce <strong>isolation.</strong></td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Indexing &amp; query optimisation</strong></td>
+<td>Indexes + <strong>query optimisers</strong> locate and process data efficiently. <strong>Indexes need extra storage and may increase update cost.</strong></td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Crash recovery &amp; durability</strong></td>
+<td><strong>Logging, replication and recovery</strong> mechanisms restore a <strong>consistent state</strong> after failures.</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Distributed deployment</strong></td>
+<td>Deployment across <strong>multiple servers, data centres or geographic regions.</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Important consideration (slide):</strong> <strong>not every NewSQL product implements these features in the same way</strong> — architecture, consistency guarantees, replication mechanisms and scaling behaviour <strong>depend on the specific system.</strong></p>
+</blockquote>
+<h3 id="51-partitioning-vs-replication-added-for-clarity">5.1 Partitioning vs Replication (added for clarity)</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th><strong>Partitioning</strong> (sharding)</th>
+<th><strong>Replication</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What happens</td>
+<td>Data <strong>split</strong> into pieces; each piece lives on <strong>different</strong> node(s)</td>
+<td>The <strong>same</strong> data <strong>copied</strong> onto several nodes</td>
+</tr>
+<tr>
+<td>Main goal</td>
+<td><strong>Scalability</strong> — spread load &amp; storage, enable parallelism</td>
+<td><strong>Availability / fault tolerance</strong> — survive node failure; recovery</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Queries/transactions spanning partitions need <strong>coordination</strong></td>
+<td>Copies must be <strong>kept consistent</strong>; extra storage</td>
+</tr>
+<tr>
+<td>Together</td>
+<td>Each partition is usually <strong>also replicated</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="worked-example-added-a-banking-table-across-3-nodes">📌 Worked Example (added) — A banking table across 3 nodes</h4>
+<ul>
+<li><strong>Partition</strong> the <code>Account</code> table by account number: accounts 1–1M on Node 1, 1M–2M on Node 2, 2M–3M on Node 3 → each node handles <strong>a third</strong> of the load.</li>
+<li><strong>Replicate</strong> each partition on two other nodes → if Node 1 fails, its data is still available from a copy.</li>
+<li>A <strong>transfer from account 500 (Node 1) to account 1,500,000 (Node 2)</strong> is a <strong>distributed transaction:</strong> both nodes must <strong>commit together or both roll back</strong> (atomicity across nodes) — this coordination is the main cost of horizontal scaling.</li>
+</ul>
+<hr />
+<h2 id="6-comparison-sql-vs-nosql-vs-newsql">6. Comparison — SQL vs NoSQL vs NewSQL</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th><strong>Traditional relational SQL</strong></th>
+<th><strong>NoSQL</strong></th>
+<th><strong>NewSQL / distributed SQL</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Data model</strong></td>
+<td><strong>Relational tables</strong></td>
+<td><strong>Key-value, document, graph, wide-column</strong> and others</td>
+<td>Usually <strong>relational tables</strong></td>
+</tr>
+<tr>
+<td><strong>Query interface</strong></td>
+<td><strong>SQL</strong></td>
+<td>Depends on the system; may include <strong>SQL-like languages or APIs</strong></td>
+<td><strong>SQL</strong></td>
+</tr>
+<tr>
+<td><strong>Schema</strong></td>
+<td>Typically <strong>structured and defined</strong></td>
+<td><strong>Flexible</strong> or schema-dependent</td>
+<td>Typically <strong>structured and defined</strong></td>
+</tr>
+<tr>
+<td><strong>Transactions</strong></td>
+<td><strong>ACID</strong> support is common</td>
+<td><strong>Varies</strong> by product and transaction scope</td>
+<td>Designed to <strong>retain ACID</strong> guarantees</td>
+</tr>
+<tr>
+<td><strong>Scaling</strong></td>
+<td><strong>Vertical</strong> common; some also scale horizontally</td>
+<td><strong>Horizontal</strong> scaling common in distributed systems</td>
+<td><strong>Horizontal scaling is a key design goal</strong></td>
+</tr>
+<tr>
+<td><strong>Distribution</strong></td>
+<td>Depends on architecture/deployment</td>
+<td>Common in distributed NoSQL systems</td>
+<td><strong>Designed for distributed deployment</strong></td>
+</tr>
+<tr>
+<td><strong>Typical use cases</strong></td>
+<td>Enterprise applications, reporting, transactional systems</td>
+<td>Applications needing <strong>particular data models</strong> or distributed access patterns</td>
+<td><strong>Transaction-intensive</strong> applications needing <strong>SQL + distributed scalability</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="link-to-earlier-lectures-added">📌 Link to earlier lectures (added)</h4>
+<ul>
+<li><strong>MongoDB</strong> (document) and <strong>Neo4j</strong> (graph) from Lectures 13–19 are <strong>NoSQL</strong> examples — different data models, different query languages (<code>find</code>/aggregation pipeline; Cypher).</li>
+<li>Lecture 13's <strong>CAP theorem</strong> trade-off (consistency vs availability under partition) is exactly the tension NewSQL systems must manage when they promise <strong>ACID across nodes</strong> (e.g., CockroachDB favours <strong>strong consistency</strong>).</li>
+<li><strong>Slide 16 reminder:</strong> NoSQL databases <strong>vary</strong> in data models, query interfaces and transaction guarantees — they <strong>should not be treated as one uniform category.</strong></li>
+</ul>
+<hr />
+<h2 id="7-advantages-and-limitations-of-newsql">7. Advantages and Limitations of NewSQL</h2>
+<h3 id="71-advantages">7.1 Advantages</h3>
+<table>
+<thead>
+<tr>
+<th>Advantage</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SQL support</strong></td>
+<td>Developers use <strong>familiar SQL</strong> and relational structures.</td>
+</tr>
+<tr>
+<td><strong>Transactional reliability</strong></td>
+<td><strong>ACID</strong> transactions maintain data integrity (banking, order processing).</td>
+</tr>
+<tr>
+<td><strong>Horizontal scalability</strong></td>
+<td>Distributed architectures <strong>increase capacity by adding nodes.</strong></td>
+</tr>
+<tr>
+<td><strong>High availability</strong></td>
+<td><strong>Replication and fault-tolerance</strong> reduce the impact of certain failures.</td>
+</tr>
+<tr>
+<td><strong>Relational integrity</strong></td>
+<td><strong>Tables, keys, constraints and relationships</strong> support structured data management.</td>
+</tr>
+<tr>
+<td><strong>Distributed processing</strong></td>
+<td>Workloads <strong>spread across nodes</strong>, depending on architecture.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-limitations-and-challenges">7.2 Limitations and Challenges</h3>
+<table>
+<thead>
+<tr>
+<th>Limitation</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Operational complexity</strong></td>
+<td>Distributed deployments need <strong>monitoring, configuration, backup planning and failure management.</strong></td>
+</tr>
+<tr>
+<td><strong>Coordination overhead</strong></td>
+<td>Distributed transactions need <strong>communication between nodes</strong>, <strong>increasing latency.</strong></td>
+</tr>
+<tr>
+<td><strong>Network dependency</strong></td>
+<td><strong>Network failures and delays</strong> affect distributed operations.</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td><strong>Infrastructure, licensing, networking and expertise</strong> may be expensive.</td>
+</tr>
+<tr>
+<td><strong>Migration effort</strong></td>
+<td>Moving from an existing DB may require changes to <strong>schemas, queries, applications and operational processes.</strong></td>
+</tr>
+<tr>
+<td><strong>Workload dependence</strong></td>
+<td>Performance depends on <strong>architecture and workload</strong>; NewSQL is <strong>not necessarily faster</strong> than every traditional SQL or NoSQL system.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-examples-of-newsql-distributed-sql-databases">8. Examples of NewSQL / Distributed SQL Databases</h2>
+<h3 id="81-voltdb">8.1 VoltDB</h3>
+<ul>
+<li>Designed for <strong>high-throughput transactional applications</strong>; <strong>in-memory, distributed architecture</strong> for rapid transaction processing.</li>
+<li><strong>Features:</strong> <strong>high-speed</strong> transactional workloads; <strong>in-memory</strong> processing to reduce access latency; <strong>distributed transaction processing &amp; partitioned data</strong>; reliable updates; <strong>integration with streaming platforms (e.g., Apache Kafka)</strong>; <strong>replication and recovery</strong> (depending on configuration).</li>
+<li><strong>Applications:</strong> <strong>financial transaction processing</strong>, <strong>telecommunications event processing</strong>, real-time operational applications, high volumes of incoming events.</li>
+<li><strong>Scenario:</strong> a <strong>telecom provider</strong> processes a high volume of <strong>customer usage events</strong> and must process them quickly while keeping <strong>reliable records for billing.</strong></li>
+</ul>
+<h3 id="82-cockroachdb">8.2 CockroachDB</h3>
+<ul>
+<li>A <strong>distributed SQL database</strong> providing <strong>relational data management, SQL, ACID transactions and horizontal scalability.</strong></li>
+<li><strong>Features:</strong> SQL + relational structures; <strong>distributes and replicates</strong> data across a cluster; <strong>ACID and strong consistency</strong>; replication + distributed coordination <strong>tolerate certain failures</strong>; <strong>scales by adding nodes</strong> (<strong>data distribution and rebalancing managed by the system</strong>); <strong>serializable isolation</strong> (the strongest standard isolation level).</li>
+<li><strong>Applications:</strong> <strong>financial/payment systems, e-commerce</strong>, business applications needing distributed transactions, <strong>multi-server/multi-region</strong> deployments.</li>
+<li><strong>Scenario:</strong> an <strong>online retailer</strong> serving customers in <strong>multiple regions</strong> must process orders and update inventory reliably while transaction volume grows.</li>
+</ul>
+<h3 id="83-nuodb">8.3 NuoDB</h3>
+<ul>
+<li>A <strong>distributed SQL DBMS</strong> supporting <strong>relational data, SQL and ACID</strong> across distributed deployments.</li>
+<li><strong>Features:</strong> SQL relational data management; ACID; <strong>scale-out across multiple database processes and hosts</strong>; <strong>continuous availability and resilience</strong>; <strong>cloud and on-premises</strong> deployment; <strong>geographically distributed</strong> deployments.</li>
+<li><strong>Applications:</strong> enterprise transactional systems; applications needing <strong>relational consistency</strong> plus <strong>distributed deployment / scale-out.</strong></li>
+<li><strong>Scenario:</strong> a company runs one business application <strong>across several sites</strong>, needing <strong>SQL access to shared data</strong> and reliable transactions as it grows.</li>
+</ul>
+<h3 id="84-tidb">8.4 TiDB</h3>
+<ul>
+<li>An <strong>open-source distributed SQL database</strong> for <strong>large-scale transactional and analytical workloads</strong>; <strong>compatible with the MySQL protocol</strong> and many MySQL features.</li>
+<li><strong>Features:</strong> SQL + relational; <strong>horizontal scalability</strong>; <strong>strong consistency and distributed transactions</strong>; <strong>high availability</strong> via replication; supports <strong>HTAP — Hybrid Transactional and Analytical Processing</strong>; <strong>separates key functions across components</strong> (distributed storage, query processing, cluster management).</li>
+<li><strong>Applications:</strong> high-volume OLTP; e-commerce/financial apps; <strong>distributed SQL + strong consistency</strong>; workloads combining <strong>operational transactions with analytics.</strong></li>
+<li><strong>Scenario:</strong> a retailer <strong>processes orders while analysing recent sales</strong> in the same broader architecture.</li>
+</ul>
+<h3 id="85-altibase">8.5 Altibase</h3>
+<ul>
+<li>An RDBMS known for a <strong>hybrid architecture</strong> combining <strong>in-memory processing with disk-based storage.</strong></li>
+<li><strong>Features:</strong> SQL and relational management; <strong>in-memory tables</strong> for rapid-access data; <strong>disk-based tables</strong> for persistent storage and larger datasets; both <strong>within one hybrid architecture</strong>; transaction, logging and recovery mechanisms; replication and high-availability configurations.</li>
+<li><strong>Advantages of hybrid storage:</strong> <strong>frequently accessed data in memory</strong> (lower latency); <strong>larger/less-used data on disk</strong>; balances <strong>performance, capacity and cost.</strong></li>
+<li><strong>Scenario:</strong> a <strong>telecom</strong> needs rapid access to <strong>current operational data</strong> while retaining <strong>large volumes of historical records.</strong></li>
+<li>⚠️ <strong>Important distinction (slide):</strong> Altibase <strong>illustrates hybrid in-memory/disk architecture</strong> — this <strong>does not mean all NewSQL systems share the same storage design.</strong></li>
+</ul>
+<h3 id="86-summary-table-of-examples-added-for-clarity">8.6 Summary Table of Examples (added for clarity)</h3>
+<table>
+<thead>
+<tr>
+<th>System</th>
+<th>Standout characteristic</th>
+<th>Typical application</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>VoltDB</strong></td>
+<td><strong>In-memory</strong>, distributed, <strong>very high throughput</strong>; Kafka integration</td>
+<td>Telecom events, financial transactions</td>
+</tr>
+<tr>
+<td><strong>CockroachDB</strong></td>
+<td>Distributed SQL, <strong>strong consistency, serializable isolation</strong>, auto-rebalancing, multi-region</td>
+<td>Payments, e-commerce</td>
+</tr>
+<tr>
+<td><strong>NuoDB</strong></td>
+<td><strong>Scale-out</strong> across processes/hosts; cloud + on-premises; geo-distributed</td>
+<td>Enterprise transactional systems</td>
+</tr>
+<tr>
+<td><strong>TiDB</strong></td>
+<td><strong>MySQL-compatible</strong>, open source, <strong>HTAP</strong>, separated components</td>
+<td>OLTP + analytics (retail, finance)</td>
+</tr>
+<tr>
+<td><strong>Altibase</strong></td>
+<td><strong>Hybrid in-memory + disk</strong> storage</td>
+<td>Telecom (hot + historical data)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-case-study-database-selection-for-an-online-banking-system">9. Case Study — Database Selection for an Online Banking System</h2>
+<p><strong>Scenario:</strong> a bank is building an online banking platform for <strong>millions of accounts</strong> and a <strong>growing number of transactions.</strong> It must:</p>
+<ul>
+<li><strong>Process transfers reliably</strong>; <strong>prevent inconsistent balances</strong>; support <strong>many concurrent transactions</strong>;</li>
+<li><strong>Stay available when certain servers fail</strong>; <strong>scale</strong> as customers/transactions grow;</li>
+<li>Support <strong>SQL queries and relational integrity constraints.</strong></li>
+</ul>
+<h3 id="91-suggested-answers-to-the-slides-questions-added-check-against-your-own-reasoning">9.1 Suggested Answers to the Slide's Questions (added — check against your own reasoning)</h3>
+<ol>
+<li><strong>Why are ACID transactions important?</strong><ul>
+<li><strong>Atomicity:</strong> a transfer's debit and credit happen <strong>together or not at all.</strong></li>
+<li><strong>Consistency:</strong> balances respect constraints (e.g., no overdraft beyond limit; money is conserved).</li>
+<li><strong>Isolation:</strong> concurrent transactions don't see/overwrite each other's partial work (<strong>prevents inconsistent balances</strong>).</li>
+<li><strong>Durability:</strong> a <strong>committed</strong> transfer <strong>survives failures.</strong></li>
+</ul>
+</li>
+<li><strong>Vertical vs horizontal scaling here?</strong> <strong>Vertical:</strong> buy a <strong>bigger server</strong> for the bank's database — simple, but limited by hardware/cost and a single point of failure. <strong>Horizontal:</strong> <strong>add more servers</strong> and spread accounts/processing across them — handles millions of customers, but needs <strong>partitioning, coordination and consistency management.</strong></li>
+<li><strong>How could partitioning and replication help?</strong> <strong>Partitioning</strong> (e.g., by account number/region) spreads <strong>load and storage</strong> and enables <strong>parallel processing.</strong> <strong>Replication</strong> keeps <strong>copies</strong> of each partition on other nodes, so the system stays <strong>available</strong> when a server fails and can <strong>recover.</strong></li>
+<li><strong>Challenges when a transaction spans nodes?</strong> Needs <strong>coordination</strong> between nodes (all commit or all roll back); <strong>added latency</strong> from network communication; <strong>network failures/delays</strong> may leave a transaction in doubt; <strong>concurrency control</strong> across nodes; keeping <strong>replicas consistent.</strong></li>
+<li><strong>Why a distributed SQL DB might be suitable?</strong> It aims to combine <strong>SQL + relational integrity constraints + ACID transactions + horizontal scalability + replication-based availability</strong> — matching <strong>every requirement</strong> on the list.</li>
+<li><strong>Two factors to evaluate before choosing a product (any two):</strong> <strong>consistency requirements/guarantees; transaction latency; recovery mechanisms; security; cost; operational complexity; migration effort.</strong></li>
+</ol>
+<blockquote>
+<p><strong>Discussion point (slide):</strong> a distributed SQL DB <strong>may be suitable</strong> because it aims to combine relational data management, transactional guarantees and horizontal scalability — <strong>but</strong> the bank must still evaluate <strong>consistency requirements, transaction latency, recovery mechanisms, security, cost and operational complexity.</strong></p>
+</blockquote>
+<hr />
+<h2 id="10-summary-from-the-slides">10. Summary (from the slides)</h2>
+<ul>
+<li><strong>NewSQL</strong> = database systems supporting <strong>relational data management and SQL</strong> while addressing the <strong>scalability</strong> needs of demanding transactional workloads.</li>
+<li><strong>ACID</strong> properties matter for applications needing <strong>reliable transaction processing.</strong></li>
+<li><strong>Horizontal scaling</strong> distributes data/processing across servers; <strong>vertical scaling</strong> increases a single server's resources.</li>
+<li><strong>Partitioning, replication, concurrency control and recovery</strong> help distributed databases manage workloads and failures.</li>
+<li><strong>NoSQL</strong> databases <strong>vary</strong> in data models, query interfaces and transaction guarantees — <strong>not a single uniform category.</strong></li>
+<li>NewSQL/distributed SQL can <strong>benefit transactional applications</strong> but add <strong>coordination, network and operational challenges.</strong></li>
+<li><strong>Database selection</strong> should rest on <strong>workload requirements, transaction guarantees, scalability, availability, cost and operational needs.</strong></li>
+</ul>
+<hr />
+<h2 id="11-homework-suggested-answers-added">11. Homework — Suggested Answers (added)</h2>
+<blockquote>
+<p>The slides pose four homework tasks; the answers below are suggested outlines drawn from the lecture content.</p>
+</blockquote>
+<p><strong>H1. Discuss at least four advantages and three limitations of NewSQL.</strong></p>
+<ul>
+<li><strong>Advantages:</strong> (1) <strong>familiar SQL</strong> and relational structures; (2) <strong>ACID</strong> reliability for banking/orders; (3) <strong>horizontal scalability</strong> by adding nodes; (4) <strong>high availability</strong> through replication; (5) relational integrity (keys, constraints); (6) distributed processing of workloads.</li>
+<li><strong>Limitations:</strong> (1) <strong>operational complexity</strong> (monitoring, backup, failure management); (2) <strong>coordination overhead/latency</strong> for distributed transactions; (3) <strong>network dependency</strong>; (4) <strong>cost</strong>; (5) <strong>migration effort</strong>; (6) <strong>workload dependence</strong> — not always faster than SQL or NoSQL.</li>
+</ul>
+<p><strong>H2. Compare SQL, NoSQL and NewSQL (data models, query interfaces, transactions, scalability)</strong> — answer with the <strong>Section 6 table:</strong> relational tables / varied models (key-value, document, graph, wide-column) / relational tables; SQL / system-specific APIs or languages / SQL; ACID common / varies / ACID retained; vertical (some horizontal) / horizontal common / horizontal a key goal.</p>
+<p><strong>H3. Explain how horizontal scaling, partitioning and replication support a distributed transactional database.</strong></p>
+<ul>
+<li><strong>Horizontal scaling</strong> adds nodes so total <strong>capacity and throughput</strong> grow.</li>
+<li><strong>Partitioning</strong> divides data across nodes so each handles part of the load (<strong>parallel processing</strong>); transactions touching one partition stay cheap.</li>
+<li><strong>Replication</strong> keeps copies across nodes → <strong>fault tolerance, availability and recovery.</strong></li>
+<li><strong>Together</strong> with <strong>concurrency control and distributed transaction coordination</strong>, they keep <strong>ACID</strong> guarantees while spreading the workload; the <strong>price</strong> is coordination overhead and network dependency (Section 4.3).</li>
+</ul>
+<p><strong>H4. Justify whether a distributed SQL DB suits the banking case study; identify two challenges.</strong></p>
+<ul>
+<li><strong>Suitable:</strong> it offers <strong>SQL + relational integrity + ACID + horizontal scalability + replication</strong> — matching the bank's requirements (Section 9.1, Q5).</li>
+<li><strong>Challenges (any two):</strong> <strong>cross-node transaction latency/coordination</strong>; <strong>network failures/delays</strong>; <strong>operational complexity</strong>; <strong>cost</strong>; <strong>migration</strong> from existing systems; ensuring <strong>security</strong> and <strong>consistency</strong> requirements are met.</li>
+</ul>
+<hr />
+<h2 id="12-questions-memo">12. Questions &amp; Memo</h2>
+<p><strong>Q1:</strong> Define NewSQL and state its central idea.</p>
+<p><strong>A1:</strong> A class of modern DBMSs for <strong>high-performance OLTP</strong> that <strong>retain the relational model, SQL and strong (ACID) transactional guarantees.</strong> Central idea: provide <strong>relational data management, SQL, ACID transactions and improved horizontal scalability</strong> in a modern architecture.</p>
+<hr />
+<p><strong>Q2:</strong> What problem do traditional relational DBs face that motivated NewSQL, and what weakness of NoSQL does NewSQL address?</p>
+<p><strong>A2:</strong> Scaling <strong>very large transactional workloads across multiple servers</strong> is architecturally/operationally difficult for traditional relational systems. NoSQL scales out but systems <strong>differ widely in query languages, data models and transaction guarantees</strong> — NewSQL keeps <strong>SQL and ACID</strong> while scaling out.</p>
+<hr />
+<p><strong>Q3:</strong> State the four ACID properties and give an example of each in a funds transfer.</p>
+<p><strong>A3:</strong> <strong>Atomicity</strong> — debit and credit both happen or neither. <strong>Consistency</strong> — integrity rules (e.g., no negative balance) still hold. <strong>Isolation</strong> — other transactions don't see the half-done transfer. <strong>Durability</strong> — a committed transfer survives a crash.</p>
+<hr />
+<p><strong>Q4:</strong> What is OLTP? Give three examples.</p>
+<p><strong>A4:</strong> Processing of <strong>operational transactions</strong> from applications/users — <strong>short, frequent, concurrent.</strong> Examples: bank transfers, course registration, online orders, inventory updates, payments/bookings.</p>
+<hr />
+<p><strong>Q5:</strong> Distinguish vertical and horizontal scaling, with one limitation of each.</p>
+<p><strong>A5:</strong> <strong>Vertical</strong> — add resources (CPU, memory, storage) to <strong>one server</strong>; limited by <strong>hardware, cost and architecture.</strong> <strong>Horizontal</strong> — add <strong>more servers/nodes</strong> and distribute work; brings <strong>data distribution, coordination, network and consistency challenges.</strong></p>
+<hr />
+<p><strong>Q6:</strong> Why does horizontal scaling not guarantee linear performance gains?</p>
+<p><strong>A6:</strong> Gains depend on <strong>workload, data distribution, network latency and the coordination required between nodes</strong> — distributed transactions spend part of the extra capacity on coordination.</p>
+<hr />
+<p><strong>Q7:</strong> Differentiate partitioning from replication and state the main benefit of each.</p>
+<p><strong>A7:</strong> <strong>Partitioning</strong> splits data across nodes → <strong>scalability and parallelism.</strong> <strong>Replication</strong> copies data to several nodes → <strong>availability, fault tolerance and recovery.</strong></p>
+<hr />
+<p><strong>Q8:</strong> What is a distributed transaction and why is it a challenge?</p>
+<p><strong>A8:</strong> A transaction that involves <strong>data on more than one node</strong>; the DB must <strong>coordinate</strong> the operations so ACID is preserved (all commit or all roll back), which adds <strong>latency, network dependency and complexity.</strong></p>
+<hr />
+<p><strong>Q9:</strong> List five key features of NewSQL systems.</p>
+<p><strong>A9:</strong> Any five of: SQL/relational management; ACID transactions; horizontal scalability; distributed transaction processing; partitioning; replication/high availability; concurrency control; indexing/query optimisation; crash recovery/durability; distributed deployment.</p>
+<hr />
+<p><strong>Q10:</strong> Why can indexes be a trade-off?</p>
+<p><strong>A10:</strong> They help locate/process data efficiently but need <strong>additional storage</strong> and may <strong>increase the cost of updates.</strong></p>
+<hr />
+<p><strong>Q11:</strong> Compare SQL, NoSQL and NewSQL on data model and transactions.</p>
+<p><strong>A11:</strong> <strong>SQL:</strong> relational tables; ACID common. <strong>NoSQL:</strong> many models (key-value, document, graph, wide-column); transactions <strong>vary</strong> by product. <strong>NewSQL:</strong> usually relational tables; designed to <strong>retain ACID</strong> while scaling horizontally.</p>
+<hr />
+<p><strong>Q12:</strong> State three advantages and three limitations of NewSQL.</p>
+<p><strong>A12:</strong> <strong>Advantages:</strong> SQL support; ACID reliability; horizontal scalability (also availability, relational integrity). <strong>Limitations:</strong> operational complexity; coordination overhead/latency; network dependency (also cost, migration effort, workload dependence).</p>
+<hr />
+<p><strong>Q13:</strong> Is NewSQL always faster than traditional SQL or NoSQL? Explain.</p>
+<p><strong>A13:</strong> <strong>No</strong> — performance <strong>depends on architecture and workload</strong>; coordination overhead can reduce speed for some workloads.</p>
+<hr />
+<p><strong>Q14:</strong> Match each system to its distinguishing feature: VoltDB, CockroachDB, NuoDB, TiDB, Altibase.</p>
+<p><strong>A14:</strong> <strong>VoltDB</strong> — in-memory, high-throughput, Kafka integration. <strong>CockroachDB</strong> — distributed SQL with strong consistency/serializable isolation. <strong>NuoDB</strong> — scale-out across processes/hosts, cloud &amp; on-premises. <strong>TiDB</strong> — MySQL-compatible, HTAP. <strong>Altibase</strong> — hybrid in-memory + disk storage.</p>
+<hr />
+<p><strong>Q15:</strong> What does HTAP stand for and why is it useful?</p>
+<p><strong>A15:</strong> <strong>Hybrid Transactional and Analytical Processing</strong> — it lets one platform handle <strong>operational transactions and analytics</strong> (e.g., processing orders while analysing recent sales).</p>
+<hr />
+<p><strong>Q16:</strong> Why is Altibase's design not representative of all NewSQL systems?</p>
+<p><strong>A16:</strong> It illustrates <strong>hybrid in-memory/disk storage</strong>, but NewSQL systems <strong>differ in storage design, consistency guarantees, replication and scaling behaviour.</strong></p>
+<hr />
+<p><strong>Q17 (Scenario):</strong> A telecom must process millions of usage events per minute with reliable billing records. Which example system fits best and why?</p>
+<p><strong>A17:</strong> <strong>VoltDB</strong> — designed for <strong>high-throughput transactional workloads</strong> with <strong>in-memory, distributed processing</strong>, partitioned data, <strong>transaction guarantees</strong>, and <strong>streaming (Kafka) integration</strong> — matching the telecom scenario on the slides. <em>(Altibase's hybrid design is an alternative if historical data must also be retained.)</em></p>
+<hr />
+<p><strong>Q18 (Scenario):</strong> An online retailer sells in several regions, needs reliable order/inventory updates and growth in volume. Which system illustrates this and which features matter?</p>
+<p><strong>A18:</strong> <strong>CockroachDB</strong> (slide scenario) — <strong>SQL, ACID with strong consistency/serializable isolation, replication across a cluster, scale by adding nodes with automatic rebalancing, multi-region deployment.</strong></p>
+<hr />
+<p><strong>Q19 (Scenario):</strong> List four factors a bank should evaluate before choosing a distributed SQL product.</p>
+<p><strong>A19:</strong> Consistency requirements; transaction latency; recovery mechanisms; security; cost; operational complexity (also migration effort, workload fit).</p>
+<hr />
+<p><em>End of Lecture 20 Notes (NewSQL).</em></p>
+<hr />
+<blockquote>
+<p><strong>Revision Tip:</strong> The exam is likely to test (a) <strong>definitions and the central idea</strong> of NewSQL (SQL + ACID + horizontal scalability); (b) <strong>ACID</strong> with a worked example, and <strong>OLTP</strong> examples; (c) <strong>vertical vs horizontal scaling</strong>, <strong>partitioning vs replication</strong>, and why scaling is <strong>not automatically linear</strong>; (d) the <strong>SQL / NoSQL / NewSQL comparison table</strong>; (e) <strong>advantages vs limitations</strong> (the homework asks for four and three); (f) <strong>matching example systems</strong> (VoltDB, CockroachDB, NuoDB, TiDB, Altibase) to scenarios; and (g) the <strong>online banking case study</strong> — expect a <strong>scenario-based (40-mark) question</strong> asking you to justify a database choice, so practise structuring answers as <strong>requirement → feature that meets it → trade-off/challenge.</strong></p>
+</blockquote></article><div class="article-tools"><a href="lecture-12.html">← Previous</a><a href="lecture-14.html">Next lecture →</a></div></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

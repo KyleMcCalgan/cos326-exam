@@ -1,0 +1,1602 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — Neo4j (2): Cypher CRUD Operations &amp; Aggregation — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>NoSQL Databases — Neo4j (2): Cypher CRUD Operations &amp; Aggregation — Comprehensive Notes</h1><p>From S1_L18_Neo4j_2_Notes.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-11.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-11.html">☆ Bookmark</button></div><article class="prose"><h1 id="nosql-databases-neo4j-2-cypher-crud-operations-aggregation-comprehensive-notes">NoSQL Databases — Neo4j (2): Cypher CRUD Operations &amp; Aggregation — Comprehensive Notes</h1>
+<h3 id="cos-326-database-systems-lecture-18-chapter-24-7th-edition">COS 326 Database Systems | Lecture 18 | Chapter 24 (7th Edition)</h3>
+<h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<ul>
+<li><strong>This lecture covers:</strong><ol>
+<li><strong>Recap:</strong> the Neo4j DB environment.</li>
+<li><strong>Neo4j CRUD operations:</strong><ul>
+<li>a. <strong>WRITE</strong> clauses.</li>
+<li>b. <strong>READ</strong> clauses.</li>
+<li>c. <strong>AGGREGATION</strong> clauses.</li>
+</ul>
+</li>
+<li><strong>Neo4j Desktop</strong> (slide lists "v5"; Lecture 17 named <strong>Neo4j Desktop 2.2.1</strong> for the practicals — follow the version your practical guide specifies).</li>
+</ol>
+</li>
+<li><strong>Reference:</strong> the <strong>Neo4j manual</strong> (https://neo4j.com/docs/getting-started/current/) and the <strong>Cypher manual clauses page.</strong></li>
+</ul>
+<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<p>Lecture 17 introduced the property graph and a handful of Cypher statements (<code>CREATE</code>, <code>MATCH … WHERE … RETURN</code>). This lecture completes the toolkit: you can now <strong>create, read, update and delete</strong> graph data (CRUD), and <strong>summarise</strong> it with aggregation — the graph-database counterparts of SQL's <code>INSERT / SELECT / UPDATE / DELETE</code> and <code>GROUP BY</code>.</p>
+<hr />
+<h2 id="2-recap-neo4j-and-cypher">2. Recap — Neo4j and Cypher</h2>
+<ul>
+<li><strong>Cypher:</strong> Neo4j's graph query language:<ul>
+<li><strong>Purpose-built</strong> for graph data; uses <strong>patterns</strong> to describe graph data.</li>
+<li>Uses <strong>familiar SQL-like clauses.</strong></li>
+<li>Is <strong>declarative</strong> — describes <strong>what</strong> to do, <strong>not how.</strong></li>
+</ul>
+</li>
+<li><strong>A Neo4j graph consists of:</strong><ul>
+<li><strong>Nodes</strong> which store data as <strong>properties</strong> (simple key/value pairs, e.g., <code>name: "Thandi"</code>, <code>from: "Durban"</code>).</li>
+<li><strong>Relationships.</strong></li>
+<li><strong>Optional components: constraints &amp; indexes.</strong></li>
+</ul>
+</li>
+<li><strong>Applications should use explicit identifying properties where appropriate, and constraints can enforce uniqueness.</strong></li>
+<li>Each node also has an <strong>internal ID</strong> (the slide's figure shows <code>[nodeID: 85]</code> beside Thandi's node).</li>
+</ul>
+<h3 id="21-nodes-and-relationships-reminder">2.1 Nodes and Relationships — Reminder</h3>
+<ul>
+<li><strong>Relationships connect nodes</strong> — "the real power" of a graph database is in <strong>connected data.</strong></li>
+<li>Relationships describe <strong>how records are related</strong> (e.g., <code>FOLLOWS</code>).</li>
+<li><strong>Relationships always have a direction and a type, and form patterns of data.</strong></li>
+<li><strong>Relationship properties</strong> store information <strong>shared by the two nodes</strong> — in a <strong>property graph, relationships are data records that can also contain properties.</strong></li>
+</ul>
+<h4 id="worked-example-this-lectures-follows-graph">📌 Worked Example — This lecture's <code>FOLLOWS</code> graph</h4>
+<table>
+<thead>
+<tr>
+<th>Relationship</th>
+<th><code>since</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Thandi <strong>FOLLOWS</strong> Neo</td>
+<td><strong>2016</strong></td>
+</tr>
+<tr>
+<td>Thandi <strong>FOLLOWS</strong> Johan</td>
+<td><strong>2017</strong></td>
+</tr>
+<tr>
+<td>Johan <strong>FOLLOWS</strong> Thandi</td>
+<td><strong>2018</strong></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-mermaid">flowchart LR
+  Thandi[&quot;Person: Thandi&lt;br/&gt;from: Durban&quot;]
+  Neo[&quot;Person: Neo&lt;br/&gt;from: Cape Town&quot;]
+  Johan[&quot;Person: Johan&lt;br/&gt;from: Pretoria&quot;]
+  Thandi --&gt;|FOLLOWS, since 2016| Neo
+  Thandi --&gt;|FOLLOWS, since 2017| Johan
+  Johan --&gt;|FOLLOWS, since 2018| Thandi
+</code></pre>
+<ul>
+<li>The arrows show who follows whom. Each <code>since</code> value belongs to its relationship.</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> these <code>since</code> years differ from the Lecture 17 figures (2009/2012/2010). The structure is identical — only the sample data changed. Use the values given in <strong>this</strong> lecture's queries when tracing.</p>
+</blockquote>
+<hr />
+<h2 id="3-crud-operations-overview">3. CRUD Operations — Overview</h2>
+<h3 id="31-crud-mapping-from-the-slides">3.1 CRUD Mapping (from the slides)</h3>
+<table>
+<thead>
+<tr>
+<th>CRUD operation</th>
+<th>Cypher</th>
+<th>SQL equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Create</strong></td>
+<td><code>CREATE</code>, <code>MERGE</code></td>
+<td><code>INSERT</code></td>
+</tr>
+<tr>
+<td><strong>Read</strong></td>
+<td><code>MATCH</code>, <code>OPTIONAL MATCH</code> (+ <code>RETURN</code>)</td>
+<td><code>SELECT</code></td>
+</tr>
+<tr>
+<td><strong>Update</strong></td>
+<td><code>SET</code>, <code>REMOVE</code></td>
+<td><code>UPDATE</code></td>
+</tr>
+<tr>
+<td><strong>Delete</strong></td>
+<td><code>DELETE</code>, <code>DETACH DELETE</code></td>
+<td><code>DELETE</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-writing-clauses">4. Writing Clauses</h2>
+<h3 id="41-summary-table">4.1 Summary Table</h3>
+<table>
+<thead>
+<tr>
+<th>Writing clause</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>CREATE</code></strong></td>
+<td>Creating graph elements: <strong>nodes, relationships, constraints.</strong></td>
+</tr>
+<tr>
+<td><strong><code>MERGE</code></strong></td>
+<td>A combination of <strong><code>MATCH</code> &amp; <code>CREATE</code></strong> that additionally lets you specify <strong>what happens if the data was matched or created.</strong></td>
+</tr>
+<tr>
+<td><strong><code>SET</code></strong></td>
+<td><strong>Updating labels on nodes and properties on nodes and relationships.</strong></td>
+</tr>
+<tr>
+<td><strong><code>DELETE</code></strong></td>
+<td><strong>Deleting graph elements:</strong> nodes and relationships.</td>
+</tr>
+<tr>
+<td><strong><code>REMOVE</code></strong></td>
+<td><strong>Removing properties and labels</strong> from graph elements.</td>
+</tr>
+<tr>
+<td><strong><code>FOREACH</code></strong></td>
+<td>Updating commands on <strong>elements in a collection</strong> — a path, or a collection created by aggregation.</td>
+</tr>
+<tr>
+<td><strong><code>DETACH DELETE</code></strong></td>
+<td>Deletes a node or set of nodes; <strong>all associated relationships are automatically deleted.</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-create-1-many-nodes-and-relationships-at-once-from-the-slides">4.2 <code>CREATE</code> (1) — Many Nodes and Relationships at Once (from the slides)</h3>
+<pre><code class="language-cypher">CREATE
+  (psT:Person { name: &quot;Thandi&quot;, from: &quot;Durban&quot;,    hobby: &quot;singing&quot; }),
+  (psJ:Person { name: &quot;Johan&quot;,  from: &quot;Pretoria&quot;,  hobby: &quot;surfing&quot; }),
+  (psN:Person { name: &quot;Neo&quot;,    from: &quot;Cape Town&quot;, hobby: &quot;soccer&quot;  }),
+  (psT)-[:FOLLOWS { since: 2017 }]-&gt;(psJ),
+  (psT)-[:FOLLOWS { since: 2016 }]-&gt;(psN),
+  (psJ)-[:FOLLOWS { since: 2018 }]-&gt;(psT)
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li>A <strong>single <code>CREATE</code> clause</strong> creates <strong>three <code>Person</code> nodes</strong> (variables <code>psT</code>, <code>psJ</code>, <code>psN</code>) and <strong>three <code>FOLLOWS</code> relationships.</strong></li>
+<li>The variables are <strong>only valid within this statement</strong>; they let the relationship patterns point to the nodes just created.</li>
+<li>Relationship direction follows the arrow: <code>(psT)-[...]-&gt;(psJ)</code> = <strong>Thandi → Johan.</strong></li>
+<li><strong>Counts:</strong> 3 nodes, 3 relationships, 3 × 3 + 3 × 1 = <strong>12 properties</strong>, 3 labels.</li>
+<li><strong>Reminder (Lecture 17):</strong> <code>CREATE</code> does <strong>not</strong> check for existing data — re-running it creates <strong>duplicates.</strong></li>
+</ol>
+<h3 id="43-create-2-creating-a-uniqueness-constraint-from-the-slides">4.3 <code>CREATE</code> (2) — Creating a Uniqueness Constraint (from the slides)</h3>
+<pre><code class="language-cypher">CREATE CONSTRAINT person_name_unique
+FOR (psn:Person)
+REQUIRE psn.name IS UNIQUE;
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong><code>CREATE CONSTRAINT person_name_unique</code></strong> — creates a <strong>named constraint</strong> (the name <code>person_name_unique</code> is chosen by you).</li>
+<li><strong><code>FOR (psn:Person)</code></strong> — applies it to <strong>nodes labelled <code>Person</code>.</strong></li>
+<li><strong><code>REQUIRE psn.name IS UNIQUE</code></strong> — <strong>no two <code>Person</code> nodes may share the same <code>name</code>.</strong></li>
+<li><strong>Result (slide screenshot):</strong> <em>"Added 1 constraint."</em></li>
+<li><strong>Effect:</strong> trying to create a second <code>Person</code> named "Thandi" now <strong>fails with an error</strong> — a safeguard against the duplicate problem of <code>CREATE</code>. It also makes <code>name</code> lookups efficient (uniqueness constraints are backed by an index).</li>
+<li><strong>Relational analogy:</strong> like a <code>UNIQUE</code> constraint on a column.</li>
+</ol>
+<h3 id="44-set-updating-properties-from-the-slides">4.4 <code>SET</code> — Updating Properties (from the slides)</h3>
+<h4 id="updating-a-node-property">Updating a node property</h4>
+<pre><code class="language-cypher">MATCH (psT)
+WHERE psT.name = &quot;Thandi&quot;
+SET psT.age = 20
+RETURN psT
+</code></pre>
+<ol>
+<li><strong><code>MATCH … WHERE</code></strong> finds the Thandi node.</li>
+<li><strong><code>SET psT.age = 20</code></strong> <strong>adds</strong> the property <code>age</code> (or <strong>overwrites</strong> it if it already exists).</li>
+<li><strong><code>RETURN psT</code></strong> shows the updated node — Thandi now has <code>name, from, hobby, age: 20</code>.</li>
+</ol>
+<h4 id="updating-a-relationship-property">Updating a relationship property</h4>
+<pre><code class="language-cypher">MATCH (psN:Person)-[r:FOLLOWS]-&gt;(psT:Person)
+WHERE psN.name = &quot;Neo&quot; AND psT.name = &quot;Thandi&quot;
+SET r.since = 2018
+RETURN psN, r, psT;
+</code></pre>
+<ol>
+<li>The <strong>relationship is bound to a variable <code>r</code></strong> inside square brackets <code>[r:FOLLOWS]</code>.</li>
+<li><strong><code>WHERE</code></strong> restricts the pattern to the pair Neo → Thandi.</li>
+<li><strong><code>SET r.since = 2018</code></strong> updates the <strong>relationship's</strong> property (not a node's).</li>
+<li><strong>Key point ("BUT for relationships"):</strong> to update a relationship you must <strong>match the relationship with a variable</strong>, then <code>SET</code> on that variable.</li>
+<li><strong>Caution (added):</strong> the pattern follows the <strong>arrow direction</strong> <code>(Neo)-[:FOLLOWS]-&gt;(Thandi)</code>. In the Section 2.1 data, it is <strong>Thandi who follows Neo</strong>, so this exact query would only match if a Neo → Thandi relationship exists (in the slide's updated figure, Neo → Thandi appears with <code>since: 2018</code>). If a pattern finds nothing, <code>SET</code> changes nothing — check your <strong>direction.</strong></li>
+</ol>
+<p><strong><code>SET</code> can also add a label:</strong> <code>MATCH (p {name:"Neo"}) SET p:Admin</code> <em>(added for completeness)</em>.</p>
+<h3 id="45-merge-match-or-create-from-the-slides">4.5 <code>MERGE</code> — Match or Create (from the slides)</h3>
+<pre><code class="language-cypher">MERGE (psT:Person { name: &quot;Thandi&quot; })
+ON MATCH  SET psT.age = 21
+ON CREATE SET psT.from = &quot;Durban&quot;,
+              psT.hobby = &quot;singing&quot;,
+              psT.age = 21
+RETURN psT;
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong><code>MERGE</code></strong> <strong>either matches an existing node and binds it, or creates a new node and binds it.</strong></li>
+<li>The <strong>pattern in <code>MERGE</code></strong> (<code>{ name: "Thandi" }</code>) is the <strong>identifying part</strong> — Neo4j looks for a <code>Person</code> with that name.</li>
+<li><strong><code>ON MATCH SET …</code></strong> runs <strong>only if the node already existed</strong> → here, set <code>age = 21</code>.</li>
+<li><strong><code>ON CREATE SET …</code></strong> runs <strong>only if the node had to be created</strong> → here, set <code>from</code>, <code>hobby</code> and <code>age</code>.</li>
+<li>You can use <strong>only <code>ON CREATE</code>, only <code>ON MATCH</code>, or both.</strong></li>
+<li><strong>Result with the slide's data:</strong> Thandi <strong>already exists</strong>, so <code>ON MATCH</code> runs → Thandi's <code>age</code> becomes <strong>21</strong> (final figure: <code>name, from, hobby, age: 21</code>). <strong>No duplicate</strong> is created.</li>
+<li><strong><code>CREATE</code> vs <code>MERGE</code>:</strong> <code>CREATE</code> always adds; <code>MERGE</code> is <strong>idempotent</strong> — running it repeatedly gives the same graph.</li>
+</ol>
+<h3 id="46-delete-and-detach-delete">4.6 <code>DELETE</code> and <code>DETACH DELETE</code></h3>
+<h4 id="1-delete-a-relationship-from-the-slides">1. Delete a relationship (from the slides)</h4>
+<pre><code class="language-cypher">MATCH (psT:Person {name: &quot;Thandi&quot;})-[r:FOLLOWS]-&gt;(psN:Person {name: &quot;Neo&quot;})
+DELETE r;
+</code></pre>
+<ul>
+<li>Finds the <strong>Thandi → Neo</strong> <code>FOLLOWS</code> relationship (bound to <code>r</code>) and <strong>deletes only that relationship</strong> — both nodes remain.</li>
+<li><strong>Inline properties:</strong> <code>(psT:Person {name: "Thandi"})</code> is a <strong>shorter form</strong> of <code>MATCH (psT:Person) WHERE psT.name = "Thandi"</code>.</li>
+</ul>
+<h4 id="2-delete-a-node-and-its-connected-relationships-from-the-slides">2. Delete a node and its connected relationships (from the slides)</h4>
+<pre><code class="language-cypher">MATCH (p:Person {name: &quot;Zorro&quot;})
+DETACH DELETE p;
+</code></pre>
+<ul>
+<li><strong><code>DETACH DELETE</code></strong> removes the node <strong>and all relationships connected to it.</strong></li>
+<li><strong>Important note on the slide:</strong> <em>"<code>DELETE</code> cannot delete a node that still has relationships. <code>DETACH DELETE</code> removes the node and its connected relationships."</em></li>
+<li>In the slide's graph, <strong>Zorro</strong> (from California, hobby swords) has a <code>FOLLOWS</code> relationship (since 2000) — so a plain <code>DELETE p</code> would <strong>fail with an error</strong>, while <code>DETACH DELETE p</code> succeeds.</li>
+</ul>
+<h4 id="3-delete-all-person-nodes-from-the-slides">3. Delete all <code>Person</code> nodes (from the slides)</h4>
+<pre><code class="language-cypher">MATCH (psn:Person)
+DETACH DELETE psn;
+</code></pre>
+<ul>
+<li>⚠️ <strong>Use with care:</strong> this deletes <strong>all <code>Person</code> nodes and their relationships.</strong></li>
+<li><strong>SQL analogy:</strong> like <code>DELETE FROM Person;</code> but also removing every connected "foreign key row" automatically.</li>
+</ul>
+<h3 id="47-remove-removing-properties-and-labels-from-the-slides">4.7 <code>REMOVE</code> — Removing Properties and Labels (from the slides)</h3>
+<pre><code class="language-cypher">MATCH (psZ:Person)
+WHERE psZ.name = &quot;Zorro&quot;
+REMOVE psZ.hobby
+RETURN psZ
+</code></pre>
+<ul>
+<li>Removes the <strong><code>hobby</code> property</strong> from Zorro (his node then has only <code>name</code> and <code>from</code>).</li>
+<li><strong>Note on the slide:</strong> <em>"<code>REMOVE</code> removes a property; it does <strong>not</strong> delete the node."</em></li>
+<li><code>REMOVE</code> also removes <strong>labels:</strong> <code>REMOVE psZ:Person</code> <em>(added)</em>.</li>
+</ul>
+<h3 id="48-set-vs-remove-vs-delete-comparison-added-for-clarity">4.8 <code>SET</code> vs <code>REMOVE</code> vs <code>DELETE</code> — Comparison (added for clarity)</h3>
+<table>
+<thead>
+<tr>
+<th>Clause</th>
+<th>Acts on</th>
+<th>Effect on the node/relationship</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>SET</code></strong></td>
+<td>Properties / labels</td>
+<td><strong>Adds or changes</strong> a property or label</td>
+</tr>
+<tr>
+<td><strong><code>REMOVE</code></strong></td>
+<td>Properties / labels</td>
+<td><strong>Takes away</strong> a property or label — the element <strong>stays</strong></td>
+</tr>
+<tr>
+<td><strong><code>DELETE</code></strong></td>
+<td>Nodes / relationships</td>
+<td>Deletes the <strong>whole element</strong> (a node must have <strong>no relationships</strong>)</td>
+</tr>
+<tr>
+<td><strong><code>DETACH DELETE</code></strong></td>
+<td>Nodes</td>
+<td>Deletes the node <strong>plus all its relationships</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-reading-clauses">5. Reading Clauses</h2>
+<table>
+<thead>
+<tr>
+<th>Reading clause</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>MATCH</code></strong></td>
+<td>Lets you <strong>specify the patterns Cypher will search for</strong> in the database.</td>
+</tr>
+<tr>
+<td><strong><code>OPTIONAL MATCH</code></strong></td>
+<td>If <strong>no matches</strong> are found, uses <strong><code>NULL</code>s</strong> for the missing parts of the pattern.</td>
+</tr>
+<tr>
+<td><strong><code>WHERE</code></strong></td>
+<td><strong>Filters</strong> the results of <code>MATCH</code>, <code>OPTIONAL MATCH</code> and <code>WITH</code>.</td>
+</tr>
+<tr>
+<td><strong>Aggregation clauses/functions</strong></td>
+<td>Calculate aggregated data — <strong>much like SQL's aggregates and <code>GROUP BY</code>.</strong></td>
+</tr>
+<tr>
+<td><strong><code>ORDER BY</code></strong></td>
+<td>(General clause) <strong>sorts the output.</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="51-patterns-for-match">5.1 Patterns for <code>MATCH</code></h3>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MATCH (&lt;var&gt;)</code></td>
+<td><strong>Any node</strong></td>
+</tr>
+<tr>
+<td><code>MATCH (&lt;var&gt;:&lt;label&gt;)</code></td>
+<td>A <strong>single node pattern</strong> with label <code>&lt;label&gt;</code>, assigning matches to <code>&lt;var&gt;</code></td>
+</tr>
+<tr>
+<td><code>MATCH (&lt;var1&gt;:&lt;label&gt;)-[:&lt;relationship&gt;]-(&lt;var2&gt;)</code></td>
+<td>Nodes connected by a relationship of the given type</td>
+</tr>
+<tr>
+<td><code>MATCH (&lt;var1&gt; { &lt;key&gt;: &lt;value&gt; })--&gt;(&lt;var2&gt;)</code></td>
+<td><code>--&gt;</code> specifies a <strong>path</strong> (any relationship, in that direction) from a node with that property</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Direction cheat-sheet (added for clarity):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>(a)-[:FOLLOWS]-&gt;(b)</code></td>
+<td>a <strong>follows</strong> b (outgoing from a)</td>
+</tr>
+<tr>
+<td><code>(a)&lt;-[:FOLLOWS]-(b)</code></td>
+<td>b follows a (incoming to a)</td>
+</tr>
+<tr>
+<td><code>(a)-[:FOLLOWS]-(b)</code></td>
+<td><strong>Either direction</strong> (no arrowhead)</td>
+</tr>
+<tr>
+<td><code>(a)--&gt;(b)</code></td>
+<td><strong>Any</strong> relationship type, a → b</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-basic-match-return-from-the-slides">5.2 Basic <code>MATCH</code> … <code>RETURN</code> (from the slides)</h3>
+<p><strong>Sample graph for the following examples:</strong> nodes Thandi (Durban, singing, age 20/21), Johan (Pretoria, surfing), Neo (Cape Town, soccer) and <strong>Melanie</strong> (Joburg, dancing), with <code>FOLLOWS</code> relationships.</p>
+<pre><code class="language-cypher">MATCH (psT:Person) RETURN psT;        // returns the NODES
+MATCH (psT:Person) RETURN psT.name;   // returns only the NAMES
+</code></pre>
+<ul>
+<li><strong><code>RETURN psT</code></strong> returns <strong>entire nodes</strong> (all their properties — shown as graph objects).</li>
+<li><strong><code>RETURN psT.name</code></strong> returns <strong>one property per node</strong> — a table column of names (Thandi, Johan, Neo, Melanie).</li>
+<li><strong>SQL analogy:</strong> <code>SELECT * FROM Person</code> vs <code>SELECT name FROM Person</code>.</li>
+</ul>
+<h3 id="53-match-where-from-the-slides">5.3 <code>MATCH</code> &amp; <code>WHERE</code> (from the slides)</h3>
+<h4 id="eg-1-show-melanies-details">e.g. 1 — Show Melanie's details</h4>
+<pre><code class="language-cypher">MATCH (psM)
+WHERE psM.name = &quot;Melanie&quot;
+RETURN psM.name, psM.from, psM.hobby
+</code></pre>
+<ul>
+<li><code>(psM)</code> has <strong>no label</strong> → matches <strong>any node</strong>; <code>WHERE</code> filters to the one named Melanie.</li>
+<li><strong>Result:</strong> one row — <code>Melanie | Joburg | dancing</code>.</li>
+</ul>
+<h4 id="eg-2-find-the-people-that-thandi-follows">e.g. 2 — Find the people that Thandi follows</h4>
+<pre><code class="language-cypher">MATCH (psn:Person)-[:FOLLOWS]-&gt;(followed)
+WHERE psn.name = &quot;Thandi&quot;
+RETURN psn.name, followed.name
+</code></pre>
+<ul>
+<li><strong>Result:</strong> rows pairing <code>Thandi</code> with <strong>each person she follows</strong> — e.g., (Thandi, Johan) and (Thandi, Neo).</li>
+<li>Note the difference from Lecture 17: returning <strong>properties</strong> (<code>psn.name</code>, <code>followed.name</code>) rather than whole nodes gives a <strong>clean table.</strong></li>
+</ul>
+<h3 id="54-match-order-by-from-the-slides">5.4 <code>MATCH</code> &amp; <code>ORDER BY</code> (from the slides)</h3>
+<pre><code class="language-cypher">MATCH (psn)
+RETURN psn.name
+ORDER BY psn.name
+</code></pre>
+<ul>
+<li>Returns <strong>all node names in sorted (ascending) order</strong>: Johan, Melanie, Neo, Thandi.</li>
+<li>Add <strong><code>DESC</code></strong> for descending order: <code>ORDER BY psn.name DESC</code> <em>(added)</em>.</li>
+<li><strong>SQL equivalent:</strong> <code>SELECT name FROM ... ORDER BY name;</code></li>
+</ul>
+<h3 id="55-optional-match-added-for-step-by-step-clarity">5.5 <code>OPTIONAL MATCH</code> (added for step-by-step clarity)</h3>
+<pre><code class="language-cypher">MATCH (p:Person)
+OPTIONAL MATCH (p)-[:FOLLOWS]-&gt;(f)
+RETURN p.name, f.name
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><code>MATCH (p:Person)</code> finds <strong>every</strong> person.</li>
+<li><code>OPTIONAL MATCH</code> tries to find who each person follows — but, <strong>unlike <code>MATCH</code>, a person with no outgoing <code>FOLLOWS</code> is NOT dropped</strong>; the missing part is filled with <strong><code>NULL</code>.</strong></li>
+<li>A person who follows nobody (e.g., Neo in the Section 2.1 data) still appears, as <code>(Neo, null)</code>.</li>
+<li><strong>SQL analogy:</strong> <code>OPTIONAL MATCH</code> ≈ a <strong><code>LEFT OUTER JOIN</code></strong>; plain <code>MATCH</code> ≈ an <strong>inner join.</strong></li>
+</ol>
+<hr />
+<h2 id="6-aggregation">6. Aggregation</h2>
+<ul>
+<li>Cypher <strong>performs grouping implicitly</strong> — based on the <strong>non-aggregated expressions returned alongside aggregate functions</strong> (there is <strong>no <code>GROUP BY</code> keyword</strong>).</li>
+</ul>
+<h3 id="61-aggregation-functions-from-the-slides">6.1 Aggregation Functions (from the slides)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Example</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Implicit "GROUP BY"</strong></td>
+<td><code>MATCH (n {name:'A'})--&gt;(x) RETURN n.name, count(x)</code></td>
+<td><code>n.name</code> is the <strong>grouping key</strong>; <code>count(x)</code> is the <strong>aggregate</strong></td>
+</tr>
+<tr>
+<td><strong><code>count</code></strong></td>
+<td><code>RETURN count(*)</code></td>
+<td>Number of rows/matches</td>
+</tr>
+<tr>
+<td><strong><code>sum</code></strong></td>
+<td><code>RETURN sum(n.property)</code></td>
+<td>Total (property must be <strong>numeric</strong>)</td>
+</tr>
+<tr>
+<td><strong><code>avg</code></strong></td>
+<td><code>RETURN avg(n.property)</code></td>
+<td>Average</td>
+</tr>
+<tr>
+<td><strong><code>stdev</code></strong></td>
+<td><code>RETURN stdev(n.property)</code></td>
+<td>Standard deviation</td>
+</tr>
+<tr>
+<td><strong><code>max</code></strong></td>
+<td><code>RETURN max(n.property)</code></td>
+<td>Maximum</td>
+</tr>
+<tr>
+<td><strong><code>min</code></strong></td>
+<td><code>RETURN min(n.property)</code></td>
+<td>Minimum</td>
+</tr>
+<tr>
+<td><strong><code>collect</code></strong></td>
+<td><code>RETURN collect(n.property)</code></td>
+<td>Returns a <strong>collection (list) of values</strong></td>
+</tr>
+<tr>
+<td><strong><code>DISTINCT</code></strong></td>
+<td><code>RETURN count(DISTINCT b.name)</code></td>
+<td>Counts only <strong>unique</strong> values</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-example-1-count-the-people-thandi-follows-from-the-slides">6.2 Example 1 — Count the People Thandi Follows (from the slides)</h3>
+<pre><code class="language-cypher">MATCH (psT { name: &quot;Thandi&quot; })-[:FOLLOWS]-&gt;(followed)
+RETURN psT.name, count(*) AS count_follows;
+</code></pre>
+<p><strong>Result (slide screenshot):</strong></p>
+<table>
+<thead>
+<tr>
+<th>psT.name</th>
+<th>count_follows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Thandi"</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li>The pattern matches <strong>two rows</strong> — (Thandi → Johan) and (Thandi → Neo).</li>
+<li><strong><code>psT.name</code></strong> is <strong>non-aggregated</strong>, so it becomes the <strong>implicit grouping key.</strong></li>
+<li><strong><code>count(*) AS count_follows</code></strong> counts the rows in the group (2) and <strong>names the column</strong> with <code>AS</code>.</li>
+<li><strong>SQL equivalent:</strong> <code>SELECT t.name, COUNT(*) AS count_follows FROM … GROUP BY t.name;</code></li>
+</ol>
+<h3 id="63-example-2-count-the-relationships-in-the-graph-by-type-from-the-slides">6.3 Example 2 — Count the Relationships in the Graph, by Type (from the slides)</h3>
+<pre><code class="language-cypher">MATCH (psn)-[relation]-&gt;()
+RETURN type(relation), count(*)
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong><code>(psn)-[relation]-&gt;()</code></strong> matches <strong>every relationship</strong> in the graph: any start node, <strong>any relationship type</strong> (bound to <code>relation</code>), and an <strong>anonymous end node <code>()</code></strong> (we don't need a variable for it).</li>
+<li><strong><code>type(relation)</code></strong> is a <strong>function returning the relationship's type name</strong> (e.g., <code>"FOLLOWS"</code>); because it is non-aggregated it is the <strong>grouping key.</strong></li>
+<li><strong><code>count(*)</code></strong> counts how many relationships exist <strong>per type.</strong></li>
+<li><strong>Result shape:</strong> one row per relationship type — here all relationships are <code>FOLLOWS</code>, so a <strong>single row:</strong> <code>"FOLLOWS" | &lt;number of FOLLOWS relationships&gt;</code>.</li>
+<li><strong>Tip:</strong> with 3 <code>FOLLOWS</code> relationships in the Section 2.1 graph the answer is <code>"FOLLOWS" | 3</code>; the larger slide graph (with Melanie's relationship added) would give a correspondingly larger count.</li>
+</ol>
+<h3 id="64-example-3-collect-from-the-slides">6.4 Example 3 — <code>collect</code> (from the slides)</h3>
+<pre><code class="language-cypher">MATCH (psn:Person)
+RETURN collect(psn.name);
+</code></pre>
+<p><strong>Result (slide screenshot):</strong> <code>["Thandi", "Johan", "Neo", "Melanie"]</code></p>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><code>MATCH</code> finds <strong>all four Person nodes.</strong></li>
+<li><strong><code>collect(psn.name)</code></strong> gathers their names into <strong>one list (collection)</strong> in a <strong>single row/value</strong> — rather than one row per person.</li>
+<li><strong>Compare:</strong> <code>RETURN psn.name</code> → <strong>4 rows</strong>; <code>RETURN collect(psn.name)</code> → <strong>1 row containing a list of 4 names.</strong></li>
+</ol>
+<h4 id="extra-examples-added-for-step-by-step-clarity">📌 Extra Examples (added for step-by-step clarity)</h4>
+<pre><code class="language-cypher">// How many people are there?
+MATCH (p:Person) RETURN count(p) AS people;                      // 4
+
+// Who does each person follow — as a list?
+MATCH (p:Person)-[:FOLLOWS]-&gt;(f)
+RETURN p.name, collect(f.name) AS follows;
+// Thandi -&gt; [&quot;Johan&quot;,&quot;Neo&quot;],  Johan -&gt; [&quot;Thandi&quot;], ...
+
+// Average age of people who have an age
+MATCH (p:Person) WHERE p.age IS NOT NULL RETURN avg(p.age);
+</code></pre>
+<ul>
+<li>In the second query, <strong><code>p.name</code> is the grouping key</strong> and <code>collect(f.name)</code> aggregates each person's followed people into a list.</li>
+</ul>
+<h3 id="65-cypher-aggregation-vs-sql-added-for-clarity">6.5 Cypher Aggregation vs SQL (added for clarity)</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>SQL</th>
+<th>Cypher</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Grouping</td>
+<td>Explicit <strong><code>GROUP BY</code></strong></td>
+<td><strong>Implicit</strong> — every non-aggregated item in <code>RETURN</code> is a grouping key</td>
+</tr>
+<tr>
+<td>Count rows</td>
+<td><code>COUNT(*)</code></td>
+<td><code>count(*)</code></td>
+</tr>
+<tr>
+<td>Unique count</td>
+<td><code>COUNT(DISTINCT x)</code></td>
+<td><code>count(DISTINCT x)</code></td>
+</tr>
+<tr>
+<td>List of values</td>
+<td><code>STRING_AGG</code> / <code>ARRAY_AGG</code></td>
+<td><strong><code>collect()</code></strong></td>
+</tr>
+<tr>
+<td>Filter on aggregate</td>
+<td><code>HAVING</code></td>
+<td><code>WITH … WHERE</code> (pass the aggregate on with <code>WITH</code>, then filter)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-homework-the-movie-graph">7. Homework — The Movie Graph</h2>
+<ul>
+<li><strong>Work through the "Movie Graph" learning guide in Neo4j Query:</strong><ol>
+<li><strong>Open your Neo4j database.</strong></li>
+<li><strong>Open Query.</strong></li>
+<li><strong>Click the "Try Neo4j with the Movie Graph" icon.</strong></li>
+<li><strong>Follow the examples and execute the Cypher queries.</strong></li>
+</ol>
+</li>
+<li><strong>Example query from the slide:</strong></li>
+</ul>
+<pre><code class="language-cypher">MATCH (people:Person)-[relatedTo]-(:Movie {title: &quot;Cloud Atlas&quot;})
+RETURN people.name, type(relatedTo), relatedTo;
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong><code>(people:Person)</code></strong> — nodes labelled <strong><code>Person</code>.</strong></li>
+<li><strong><code>-[relatedTo]-</code></strong> — <strong>any relationship type</strong>, <strong>in either direction</strong> (no arrowhead), bound to the variable <code>relatedTo</code>.</li>
+<li><strong><code>(:Movie {title: "Cloud Atlas"})</code></strong> — an <strong>anonymous</strong> <code>Movie</code> node (no variable) with that title.</li>
+<li><strong><code>RETURN people.name, type(relatedTo), relatedTo</code></strong> — the person's name, the <strong>relationship type as text</strong>, and the relationship itself.</li>
+<li><strong>Result (slide screenshot — 10 records):</strong> people connected to <em>Cloud Atlas</em> — e.g., <strong>Hugo Weaving, Tom Hanks, Halle Berry, Jim Broadbent</strong> (<code>ACTED_IN</code>); <strong>Lilly Wachowski, Lana Wachowski, Tom Tykwer</strong> (<code>DIRECTED</code>); <strong>Stefan Arndt</strong> (<code>PRODUCED</code>); plus two further rows below the visible area.</li>
+<li><strong>Lesson:</strong> a graph can hold <strong>different relationship types between different labels</strong> (<code>Person</code>–<code>ACTED_IN</code>/<code>DIRECTED</code>/<code>PRODUCED</code>→<code>Movie</code>) and one pattern retrieves them <strong>all</strong> without any joins.</li>
+</ol>
+<hr />
+<h2 id="8-questions-memo">8. Questions &amp; Memo</h2>
+<h3 id="section-3-4-crud-and-writing-clauses">Section 3 &amp; 4 — CRUD and Writing Clauses</h3>
+<p><strong>Q1:</strong> Map the four CRUD operations to Cypher clauses and to SQL statements.</p>
+<p><strong>A1:</strong> <strong>Create</strong> — <code>CREATE</code>, <code>MERGE</code> (SQL <code>INSERT</code>); <strong>Read</strong> — <code>MATCH</code>, <code>OPTIONAL MATCH</code> + <code>RETURN</code> (SQL <code>SELECT</code>); <strong>Update</strong> — <code>SET</code>, <code>REMOVE</code> (SQL <code>UPDATE</code>); <strong>Delete</strong> — <code>DELETE</code>, <code>DETACH DELETE</code> (SQL <code>DELETE</code>).</p>
+<hr />
+<p><strong>Q2:</strong> Define each writing clause: <code>CREATE</code>, <code>MERGE</code>, <code>SET</code>, <code>DELETE</code>, <code>REMOVE</code>, <code>FOREACH</code>, <code>DETACH DELETE</code>.</p>
+<p><strong>A2:</strong> <code>CREATE</code> — creates nodes, relationships, constraints. <code>MERGE</code> — match-or-create, with options for what to do on each outcome. <code>SET</code> — updates labels and properties on nodes/relationships. <code>DELETE</code> — deletes nodes and relationships. <code>REMOVE</code> — removes properties and labels. <code>FOREACH</code> — runs update commands on each element of a collection. <code>DETACH DELETE</code> — deletes a node and automatically all its relationships.</p>
+<hr />
+<p><strong>Q3:</strong> What does the following statement do, and what message would you expect? <code>CREATE CONSTRAINT person_name_unique FOR (psn:Person) REQUIRE psn.name IS UNIQUE;</code></p>
+<p><strong>A3:</strong> It creates a constraint named <code>person_name_unique</code> ensuring <strong>no two <code>Person</code> nodes have the same <code>name</code></strong>; Neo4j reports <strong>"Added 1 constraint."</strong> Attempting to create a duplicate name afterwards <strong>fails.</strong></p>
+<hr />
+<p><strong>Q4 (Code Tracing):</strong> Explain each line: <code>MATCH (psT) WHERE psT.name = "Thandi" SET psT.age = 20 RETURN psT</code>.</p>
+<p><strong>A4:</strong> Line 1 binds any node to <code>psT</code>; line 2 restricts it to the node named "Thandi"; <code>SET psT.age = 20</code> <strong>adds/overwrites</strong> the <code>age</code> property; <code>RETURN psT</code> displays the updated node (now with <code>age: 20</code>).</p>
+<hr />
+<p><strong>Q5 (Code Tracing):</strong> How do you update a property of a <strong>relationship</strong>? Write a query that changes the year Thandi started following Neo to 2020.</p>
+<p><strong>A5:</strong> <strong>Bind the relationship to a variable</strong> in the pattern, then <code>SET</code> its property:</p>
+<pre><code class="language-cypher">MATCH (:Person {name:&quot;Thandi&quot;})-[r:FOLLOWS]-&gt;(:Person {name:&quot;Neo&quot;})
+SET r.since = 2020
+RETURN r;
+</code></pre>
+<hr />
+<p><strong>Q6 (Code Tracing):</strong> Explain the result of the following when Thandi already exists with <code>age: 20</code>, and when she does not exist at all:
+<code>MERGE (psT:Person {name:"Thandi"}) ON MATCH SET psT.age = 21 ON CREATE SET psT.from = "Durban", psT.hobby = "singing", psT.age = 21 RETURN psT;</code></p>
+<p><strong>A6:</strong> <strong>Exists:</strong> <code>ON MATCH</code> runs → <code>age</code> becomes <strong>21</strong>; other properties are unchanged and <strong>no new node</strong> is created. <strong>Does not exist:</strong> a new node is created and <code>ON CREATE</code> runs → it gets <code>from: "Durban"</code>, <code>hobby: "singing"</code>, <code>age: 21</code>.</p>
+<hr />
+<p><strong>Q7:</strong> Compare <code>CREATE</code> and <code>MERGE</code>.</p>
+<p><strong>A7:</strong> <code>CREATE</code> <strong>always creates</strong> new data (running it twice duplicates it); <code>MERGE</code> <strong>matches if the data exists, otherwise creates</strong>, so repeated runs do not create duplicates, and it supports <code>ON MATCH</code> / <code>ON CREATE</code> actions.</p>
+<hr />
+<p><strong>Q8:</strong> What is the difference between <code>DELETE</code> and <code>DETACH DELETE</code>? Why would <code>MATCH (p:Person {name:"Zorro"}) DELETE p</code> fail in the lecture's graph?</p>
+<p><strong>A8:</strong> <code>DELETE</code> removes a node <strong>only if it has no relationships</strong>; <code>DETACH DELETE</code> removes the node <strong>and all connected relationships.</strong> Zorro has a <code>FOLLOWS</code> relationship (since 2000), so a plain <code>DELETE</code> fails — <code>DETACH DELETE</code> is required (or delete the relationship first).</p>
+<hr />
+<p><strong>Q9:</strong> Write a query to delete only the <code>FOLLOWS</code> relationship from Thandi to Neo, leaving both nodes intact.</p>
+<p><strong>A9:</strong></p>
+<pre><code class="language-cypher">MATCH (:Person {name:&quot;Thandi&quot;})-[r:FOLLOWS]-&gt;(:Person {name:&quot;Neo&quot;})
+DELETE r;
+</code></pre>
+<hr />
+<p><strong>Q10:</strong> What does <code>MATCH (psn:Person) DETACH DELETE psn;</code> do, and why is it dangerous?</p>
+<p><strong>A10:</strong> It <strong>deletes every <code>Person</code> node and all their relationships</strong> — effectively wiping the people data from the graph, and it cannot be undone without a backup.</p>
+<hr />
+<p><strong>Q11:</strong> What does <code>REMOVE psZ.hobby</code> do, and does it delete the node?</p>
+<p><strong>A11:</strong> It <strong>removes the <code>hobby</code> property</strong> from Zorro's node; the <strong>node is not deleted</strong> (and its other properties/relationships remain).</p>
+<hr />
+<p><strong>Q12:</strong> Distinguish <code>SET</code>, <code>REMOVE</code> and <code>DELETE</code>.</p>
+<p><strong>A12:</strong> <code>SET</code> <strong>adds or changes</strong> properties/labels; <code>REMOVE</code> <strong>takes away</strong> properties/labels (the element stays); <code>DELETE</code> <strong>deletes the entire</strong> node or relationship.</p>
+<hr />
+<h3 id="section-5-reading-clauses">Section 5 — Reading Clauses</h3>
+<p><strong>Q13:</strong> What is the difference between <code>RETURN psT</code> and <code>RETURN psT.name</code>?</p>
+<p><strong>A13:</strong> <code>RETURN psT</code> returns <strong>whole nodes</strong> (with all properties); <code>RETURN psT.name</code> returns <strong>only the <code>name</code> property</strong> of each matched node, as a table column.</p>
+<hr />
+<p><strong>Q14:</strong> What does the pattern <code>MATCH (n)</code> match? And <code>MATCH (n)--&gt;(m)</code>?</p>
+<p><strong>A14:</strong> <code>(n)</code> matches <strong>any node</strong> (no label restriction). <code>(n)--&gt;(m)</code> matches <strong>any relationship, in the arrow's direction</strong>, from node <code>n</code> to node <code>m</code> (a path of length one).</p>
+<hr />
+<p><strong>Q15 (Code Tracing):</strong> What does <code>MATCH (psn:Person)-[:FOLLOWS]-&gt;(followed) WHERE psn.name = "Thandi" RETURN psn.name, followed.name</code> return?</p>
+<p><strong>A15:</strong> One row per person Thandi follows, pairing her name with theirs: <strong>(Thandi, Johan)</strong> and <strong>(Thandi, Neo).</strong></p>
+<hr />
+<p><strong>Q16:</strong> What does <code>MATCH (psn) RETURN psn.name ORDER BY psn.name</code> return?</p>
+<p><strong>A16:</strong> All the names, <strong>sorted ascending</strong> (alphabetically): Johan, Melanie, Neo, Thandi.</p>
+<hr />
+<p><strong>Q17:</strong> Explain <code>OPTIONAL MATCH</code> and its SQL analogy.</p>
+<p><strong>A17:</strong> If <strong>no match</strong> is found, <code>OPTIONAL MATCH</code> <strong>returns <code>NULL</code></strong> for the missing parts of the pattern instead of discarding the row — like a <strong><code>LEFT OUTER JOIN</code></strong>.</p>
+<hr />
+<h3 id="section-6-aggregation">Section 6 — Aggregation</h3>
+<p><strong>Q18:</strong> How does Cypher decide how to group results, given it has no <code>GROUP BY</code> keyword?</p>
+<p><strong>A18:</strong> It <strong>groups implicitly by the non-aggregated expressions returned alongside the aggregate functions</strong> (e.g., in <code>RETURN n.name, count(x)</code>, <code>n.name</code> is the grouping key).</p>
+<hr />
+<p><strong>Q19:</strong> List eight aggregation functions given in the lecture.</p>
+<p><strong>A19:</strong> <code>count</code>, <code>sum</code>, <code>avg</code>, <code>stdev</code>, <code>max</code>, <code>min</code>, <code>collect</code>, and <code>DISTINCT</code> (e.g., <code>count(DISTINCT b.name)</code>).</p>
+<hr />
+<p><strong>Q20 (Code Tracing):</strong> What does <code>MATCH (psT {name:"Thandi"})-[:FOLLOWS]-&gt;(followed) RETURN psT.name, count(*) AS count_follows;</code> return?</p>
+<p><strong>A20:</strong> A single row: <strong><code>"Thandi" | 2</code></strong> — she follows two people (Johan and Neo).</p>
+<hr />
+<p><strong>Q21:</strong> Explain <code>MATCH (psn)-[relation]-&gt;() RETURN type(relation), count(*)</code>.</p>
+<p><strong>A21:</strong> It matches <strong>every relationship</strong> in the graph, returns each relationship's <strong>type name</strong> via <code>type(relation)</code> and <strong>counts</strong> how many exist <strong>per type</strong> (grouping by the type).</p>
+<hr />
+<p><strong>Q22 (Code Tracing):</strong> What is the difference between <code>MATCH (p:Person) RETURN p.name</code> and <code>MATCH (p:Person) RETURN collect(p.name)</code>?</p>
+<p><strong>A22:</strong> The first returns <strong>one row per person</strong> (4 rows); the second returns <strong>a single row</strong> containing <strong>a list</strong> of all names: <code>["Thandi", "Johan", "Neo", "Melanie"]</code>.</p>
+<hr />
+<p><strong>Q23:</strong> Write a query returning, for each person, how many people they follow.</p>
+<p><strong>A23:</strong></p>
+<pre><code class="language-cypher">MATCH (p:Person)-[:FOLLOWS]-&gt;(f)
+RETURN p.name, count(f) AS follows
+</code></pre>
+<p><em>(Grouping key: <code>p.name</code>. People who follow nobody do not appear, because <code>MATCH</code> drops them — use <code>OPTIONAL MATCH</code> to include them with a count of 0.)</em></p>
+<hr />
+<p><strong>Q24:</strong> Write a query listing all names of people in the graph in <strong>one list</strong>, sorted alphabetically.</p>
+<p><strong>A24:</strong></p>
+<pre><code class="language-cypher">MATCH (p:Person)
+WITH p ORDER BY p.name
+RETURN collect(p.name)
+</code></pre>
+<hr />
+<h3 id="section-7-movie-graph-homework">Section 7 — Movie Graph Homework</h3>
+<p><strong>Q25 (Code Tracing):</strong> Explain <code>MATCH (people:Person)-[relatedTo]-(:Movie {title: "Cloud Atlas"}) RETURN people.name, type(relatedTo), relatedTo;</code></p>
+<p><strong>A25:</strong> It finds every <code>Person</code> connected, <strong>by any relationship type and in either direction</strong>, to the <code>Movie</code> titled "Cloud Atlas" (the movie node is <strong>anonymous</strong> — no variable). It returns each person's <strong>name</strong>, the <strong>relationship type as text</strong> (e.g., <code>ACTED_IN</code>, <code>DIRECTED</code>, <code>PRODUCED</code>) and the <strong>relationship itself.</strong></p>
+<hr />
+<p><em>End of Lecture 18 Notes (Neo4j 2).</em></p>
+<hr />
+<blockquote>
+<p><strong>Revision Tip:</strong> The exam is likely to test (a) <strong>mapping SQL ↔ Cypher</strong> CRUD (<code>INSERT/CREATE-MERGE</code>, <code>SELECT/MATCH-RETURN</code>, <code>UPDATE/SET-REMOVE</code>, <code>DELETE/DETACH DELETE</code>); (b) <strong>tracing</strong> <code>SET</code>, <code>MERGE … ON MATCH / ON CREATE</code>, <code>DELETE</code> vs <code>DETACH DELETE</code> and <code>REMOVE</code> against the Thandi/Johan/Neo/Melanie graph — especially <strong>what happens to relationships</strong> and <strong>why plain <code>DELETE</code> fails on a connected node</strong>; (c) <strong>writing</strong> <code>MATCH … WHERE … RETURN … ORDER BY</code> queries with correct <strong>relationship direction</strong>; (d) <strong>aggregation</strong> with <strong>implicit grouping</strong> (<code>count(*) AS …</code>, <code>type(relation)</code>, <code>collect</code>) and converting to SQL <code>GROUP BY</code>; and (e) the role of <strong>constraints</strong> (<code>IS UNIQUE</code>) in preventing duplicates. Practise the Movie Graph tutorial queries, since they apply exactly these patterns to a larger dataset.</p>
+</blockquote>
+<h1 id="cos-326-neo4j-cypher-study-cheat-sheet">COS 326 — Neo4j &amp; Cypher Study Cheat Sheet</h1>
+<p>Based on Lectures 17–18 and everything we've discussed, including node creation, matching patterns, relationships, variables, properties, <code>MERGE</code>, and how queries return results.</p>
+<h2 id="1-understanding-neo4js-structure">1. Understanding Neo4j's structure</h2>
+<p>Neo4j is a graph database, meaning that rather than storing information in tables, it stores information using nodes and relationships.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node</td>
+<td>Represents an entity</td>
+<td>A student named John</td>
+</tr>
+<tr>
+<td>Label</td>
+<td>Categorises a node</td>
+<td><code>:Student</code>, <code>:Module</code></td>
+</tr>
+<tr>
+<td>Property</td>
+<td>Stores data inside a node</td>
+<td><code>{name: "John", age: 21}</code></td>
+</tr>
+<tr>
+<td>Relationship</td>
+<td>Connects two nodes</td>
+<td><code>[:ENROLLED_IN]</code></td>
+</tr>
+<tr>
+<td>Relationship property</td>
+<td>Stores information about a connection</td>
+<td><code>[:ENROLLED_IN {year: 2026}]</code></td>
+</tr>
+<tr>
+<td>Variable</td>
+<td>Temporary reference to a matched or created node</td>
+<td><code>s</code>, <code>john</code>, <code>m</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="node-syntax">Node syntax</h3>
+<pre><code>(variable:Label {property: value})
+</code></pre>
+<p>Examples:</p>
+<pre><code>()                               // Anonymous node
+(s)                              // Node assigned to variable s
+(s:Student)                      // Student node
+(s:Student {name: &quot;John&quot;})       // Student named John
+(s:Student {name: &quot;John&quot;, age: 21})
+</code></pre>
+<p>Important discoveries:</p>
+<ul>
+<li>
+<p>Nodes do not require properties, labels or relationships.</p>
+</li>
+<li>
+<p>Properties are key-value pairs stored inside the nodes.</p>
+</li>
+<li>
+<p>Labels help categorise nodes but aren't unique identifiers.</p>
+</li>
+<li>
+<p>Variables are temporary names used within a query.</p>
+</li>
+<li>
+<p>Neo4j nodes have internal identifiers, even without properties.</p>
+</li>
+</ul>
+<h2 id="2-creating-nodes-and-relationships">2. Creating nodes and relationships</h2>
+<h3 id="creating-nodes">Creating nodes</h3>
+<pre><code>CREATE (john:Student {name: &quot;John&quot;, age: 21})
+</code></pre>
+<p>This creates a Student node with two properties.</p>
+<h3 id="creating-multiple-nodes-and-relationships">Creating multiple nodes and relationships</h3>
+<pre><code>CREATE
+  (john:Student {name: &quot;John&quot;, age: 21}),
+  (sarah:Student {name: &quot;Sarah&quot;, age: 22}),
+  (mike:Student {name: &quot;Mike&quot;, age: 20}),
+  (db:Module {code: &quot;COS326&quot;, credits: 18}),
+  (se:Module {code: &quot;COS301&quot;, credits: 24}),
+
+  (john)-[:FRIENDS_WITH]-&gt;(sarah),
+  (sarah)-[:FRIENDS_WITH]-&gt;(mike),
+
+  (john)-[:ENROLLED_IN]-&gt;(db),
+  (sarah)-[:ENROLLED_IN]-&gt;(db),
+  (sarah)-[:ENROLLED_IN]-&gt;(se),
+  (mike)-[:ENROLLED_IN]-&gt;(se)
+</code></pre>
+<h3 id="visual-representation">Visual representation</h3>
+<pre><code class="language-mermaid">flowchart LR
+  John[&quot;John&lt;br/&gt;Student, age 21&quot;]
+  Sarah[&quot;Sarah&lt;br/&gt;Student, age 22&quot;]
+  Mike[&quot;Mike&lt;br/&gt;Student, age 20&quot;]
+  DB[&quot;COS326&lt;br/&gt;Module, 18 credits&quot;]
+  SE[&quot;COS301&lt;br/&gt;Module, 24 credits&quot;]
+
+  John --&gt;|FRIENDS_WITH| Sarah
+  Sarah --&gt;|FRIENDS_WITH| Mike
+  John --&gt;|ENROLLED_IN| DB
+  Sarah --&gt;|ENROLLED_IN| DB
+  Sarah --&gt;|ENROLLED_IN| SE
+  Mike --&gt;|ENROLLED_IN| SE
+</code></pre>
+<p>This is the dataset used in the following examples.</p>
+<h2 id="3-relationships-and-direction">3. Relationships and direction</h2>
+<p>Relationships have types and directions.</p>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>(a)-[:FRIENDS_WITH]-&gt;(b)</code></td>
+<td>A has an outgoing friendship relationship to B</td>
+</tr>
+<tr>
+<td><code>(a)&lt;-[:FRIENDS_WITH]-(b)</code></td>
+<td>B has an outgoing friendship relationship to A</td>
+</tr>
+<tr>
+<td><code>(a)-[:FRIENDS_WITH]-(b)</code></td>
+<td>Match friendship in either direction</td>
+</tr>
+<tr>
+<td><code>(a)-[r:FRIENDS_WITH]-&gt;(b)</code></td>
+<td>Store the relationship in variable <code>r</code></td>
+</tr>
+<tr>
+<td><code>(a)-[r]-&gt;(b)</code></td>
+<td>Match any outgoing relationship type</td>
+</tr>
+<tr>
+<td><code>(a)--(b)</code></td>
+<td>Match any relationship in either direction</td>
+</tr>
+</tbody>
+</table>
+<p>An important distinction: Although friendships are logically mutual, Neo4j does not automatically treat directed <code>FRIENDS_WITH</code> relationships as bidirectional.</p>
+<p>For example:</p>
+<pre><code>MATCH (s:Student {name: &quot;Sarah&quot;})-[:FRIENDS_WITH]-(friend)
+RETURN friend.name
+</code></pre>
+<p>Result:</p>
+<table>
+<thead>
+<tr>
+<th>friend.name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>John</td>
+</tr>
+<tr>
+<td>Mike</td>
+</tr>
+</tbody>
+</table>
+<p>Removing the arrowhead allows Neo4j to match either direction.</p>
+<h2 id="4-match-finding-existing-patterns">4. MATCH — Finding existing patterns</h2>
+<p><code>MATCH</code> searches the graph for nodes and relationships that satisfy a specified pattern.</p>
+<h3 id="basic-match">Basic MATCH</h3>
+<pre><code>MATCH (s:Student)
+RETURN s.name, s.age
+</code></pre>
+<p>Result:</p>
+<table>
+<thead>
+<tr>
+<th>s.name</th>
+<th>s.age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>John</td>
+<td>21</td>
+</tr>
+<tr>
+<td>Sarah</td>
+<td>22</td>
+</tr>
+<tr>
+<td>Mike</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
+<h3 id="finding-a-specific-student">Finding a specific student</h3>
+<p>Both queries are equivalent.</p>
+<p>Using WHERE:</p>
+<pre><code>MATCH (s:Student)
+WHERE s.name = &quot;John&quot;
+RETURN s
+</code></pre>
+<p>Putting the condition directly inside MATCH:</p>
+<pre><code>MATCH (s:Student {name: &quot;John&quot;})
+RETURN s
+</code></pre>
+<p>For simple equality conditions, you do not need <code>WHERE</code>.</p>
+<h3 id="finding-connections">Finding connections</h3>
+<pre><code>MATCH (s:Student {name: &quot;John&quot;})
+      -[:FRIENDS_WITH]-&gt;(friend)
+RETURN friend.name
+</code></pre>
+<p>Result:</p>
+<table>
+<thead>
+<tr>
+<th>friend.name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sarah</td>
+</tr>
+</tbody>
+</table>
+<p>Here:</p>
+<ul>
+<li>
+<p><code>s</code> represents John.</p>
+</li>
+<li>
+<p><code>friend</code> is a variable that Neo4j binds to matching destination nodes.</p>
+</li>
+<li>
+<p>The relationship pattern tells Neo4j what connections to follow.</p>
+</li>
+<li>
+<p><code>RETURN</code> determines which information to display.</p>
+</li>
+</ul>
+<h2 id="5-understanding-properties-and-return">5. Understanding properties and RETURN</h2>
+<p>Properties are accessed using:</p>
+<pre><code>variable.property
+</code></pre>
+<p>For example:</p>
+<pre><code>RETURN s.name, s.age
+</code></pre>
+<p>These are the actual property keys stored inside the node.</p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>s</code></td>
+<td>Entire node</td>
+</tr>
+<tr>
+<td><code>s.name</code></td>
+<td>Value of the node's <code>name</code> property</td>
+</tr>
+<tr>
+<td><code>s.age</code></td>
+<td>Value of its <code>age</code> property</td>
+</tr>
+<tr>
+<td><code>m.code</code></td>
+<td>Module's <code>code</code> property</td>
+</tr>
+<tr>
+<td><code>r.since</code></td>
+<td>Value of the relationship's <code>since</code> property</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<pre><code>MATCH (s:Student)-[:ENROLLED_IN]-&gt;(m:Module)
+RETURN s.name, m.code
+</code></pre>
+<p>Result:</p>
+<table>
+<thead>
+<tr>
+<th>s.name</th>
+<th>m.code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>John</td>
+<td>COS326</td>
+</tr>
+<tr>
+<td>Sarah</td>
+<td>COS326</td>
+</tr>
+<tr>
+<td>Sarah</td>
+<td>COS301</td>
+</tr>
+<tr>
+<td>Mike</td>
+<td>COS301</td>
+</tr>
+</tbody>
+</table>
+<p>Important: Returning <code>s</code> gives the entire node, while returning <code>s.name</code> retrieves only the name. If a requested property is missing, its value is <code>null</code>.</p>
+<h2 id="6-variables-are-not-permanent-identifiers">6. Variables are not permanent identifiers</h2>
+<p>Consider:</p>
+<pre><code>CREATE (john:Student {name: &quot;John&quot;})
+</code></pre>
+<p>The variable <code>john</code> only exists within that query.</p>
+<p>This means running another query:</p>
+<pre><code>MATCH (john)-[:FRIENDS_WITH]-&gt;(friend)
+RETURN friend
+</code></pre>
+<p>does not automatically refer to the John created earlier.</p>
+<p>Instead, <code>john</code> is a new variable that can match any node with the specified relationship.</p>
+<p>To specifically identify John:</p>
+<pre><code>MATCH (john:Student {name: &quot;John&quot;})
+      -[:FRIENDS_WITH]-&gt;(friend)
+RETURN friend
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Persisted in the database?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Variable <code>john</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td>Label <code>Student</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Property <code>name: "John"</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Relationship <code>FRIENDS_WITH</code></td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-matching-more-complex-relationships">7. Matching more complex relationships</h2>
+<p>You can chain multiple relationship patterns together.</p>
+<p>Question: Which modules are studied by Sarah's friends?</p>
+<pre><code>MATCH (s:Student)-[:FRIENDS_WITH]-(f:Student)
+      -[:ENROLLED_IN]-&gt;(m:Module)
+WHERE s.name = &quot;Sarah&quot;
+RETURN f.name, m.code
+</code></pre>
+<p>Result:</p>
+<table>
+<thead>
+<tr>
+<th>f.name</th>
+<th>m.code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>John</td>
+<td>COS326</td>
+</tr>
+<tr>
+<td>Mike</td>
+<td>COS301</td>
+</tr>
+</tbody>
+</table>
+<p>Notice:</p>
+<ul>
+<li>
+<p><code>FRIENDS_WITH</code> is matched in either direction.</p>
+</li>
+<li>
+<p><code>ENROLLED_IN</code> is still directional.</p>
+</li>
+<li>
+<p>Neo4j finds the complete chain before returning the matching values.</p>
+</li>
+</ul>
+<p>The labels and relationship types define the structure we want; variables are bound to the nodes satisfying that structure.</p>
+<h2 id="8-multiple-match-clauses-and-multiple-results">8. Multiple MATCH clauses and multiple results</h2>
+<p>Multiple <code>MATCH</code> clauses build on existing matches. The second <code>MATCH</code> uses variables bound by the first.</p>
+<p>Suppose we have three different students named Emma:</p>
+<pre><code>CREATE
+  (:Student {name: &quot;Emma&quot;, age: 19}),
+  (:Student {name: &quot;Emma&quot;, age: 22}),
+  (:Student {name: &quot;Emma&quot;, age: 25})
+</code></pre>
+<h3 id="query-all-emmas">Query all Emmas</h3>
+<pre><code>MATCH (s:Student {name: &quot;Emma&quot;})
+RETURN s.name, s.age
+</code></pre>
+<p>Result:</p>
+<table>
+<thead>
+<tr>
+<th>s.name</th>
+<th>s.age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Emma</td>
+<td>19</td>
+</tr>
+<tr>
+<td>Emma</td>
+<td>22</td>
+</tr>
+<tr>
+<td>Emma</td>
+<td>25</td>
+</tr>
+</tbody>
+</table>
+<p>All matching nodes are returned, not just the first.</p>
+<h3 id="multiple-match-clauses">Multiple MATCH clauses</h3>
+<p>Suppose Emma (19) studies COS326, Emma (22) studies COS301 and COS326, and Emma (25) studies nothing.</p>
+<pre><code>MATCH (s:Student {name: &quot;Emma&quot;})
+MATCH (s)-[:ENROLLED_IN]-&gt;(m:Module)
+RETURN s.age, m.code
+</code></pre>
+<p>Result:</p>
+<table>
+<thead>
+<tr>
+<th>s.age</th>
+<th>m.code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>19</td>
+<td>COS326</td>
+</tr>
+<tr>
+<td>22</td>
+<td>COS301</td>
+</tr>
+<tr>
+<td>22</td>
+<td>COS326</td>
+</tr>
+</tbody>
+</table>
+<p>Key observations:</p>
+<ul>
+<li>
+<p>The first <code>MATCH</code> finds all three Emmas.</p>
+</li>
+<li>
+<p>The second <code>MATCH</code> searches for matching relationships for each Emma.</p>
+</li>
+<li>
+<p>Emma (25) disappears because she has no matching enrolment.</p>
+</li>
+<li>
+<p>Emma (22) produces two rows because she is enrolled in two modules.</p>
+</li>
+</ul>
+<h3 id="optional-match">OPTIONAL MATCH</h3>
+<p>To include students even when they have no enrolments:</p>
+<pre><code>MATCH (s:Student {name: &quot;Emma&quot;})
+OPTIONAL MATCH (s)-[:ENROLLED_IN]-&gt;(m:Module)
+RETURN s.age, m.code
+</code></pre>
+<p>Now Emma (25) also appears, with <code>null</code> for <code>m.code</code>.</p>
+<table>
+<thead>
+<tr>
+<th>MATCH</th>
+<th>OPTIONAL MATCH</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Removes rows without a complete match</td>
+<td>Retains rows with <code>null</code> for missing parts</td>
+</tr>
+<tr>
+<td>Similar to SQL inner joins</td>
+<td>Similar to SQL left outer joins</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-merge-match-or-create">9. MERGE — Match or create</h2>
+<p><code>MERGE</code> combines the behaviour of matching and creating.</p>
+<pre><code>MERGE (s:Student {name: &quot;John&quot;})
+</code></pre>
+<ul>
+<li>
+<p>If a matching John exists, Neo4j uses that node.</p>
+</li>
+<li>
+<p>If no matching John exists, Neo4j creates one.</p>
+</li>
+</ul>
+<p>Unlike <code>CREATE</code>, running the same <code>MERGE</code> repeatedly does not normally create a new matching node each time.</p>
+<h3 id="on-match-set-vs-on-create-set">ON MATCH SET vs ON CREATE SET</h3>
+<pre><code>MERGE (s:Student {name: &quot;John&quot;})
+ON MATCH SET s.age = 25
+ON CREATE SET s.age = 18
+RETURN s
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>John already exists</td>
+<td><code>ON MATCH SET</code> executes; age becomes 25</td>
+</tr>
+<tr>
+<td>John doesn't exist</td>
+<td><code>ON CREATE SET</code> executes; John is created with age 18</td>
+</tr>
+</tbody>
+</table>
+<p>Important: <code>MERGE</code> itself doesn't update other properties. The <code>SET</code> clauses perform those updates.</p>
+<p>You can use either branch, both branches, or neither.</p>
+<h3 id="what-if-there-are-duplicate-johns">What if there are duplicate Johns?</h3>
+<p>If multiple nodes already match:</p>
+<pre><code>MERGE (s:Student {name: &quot;John&quot;})
+ON MATCH SET s.age = 25
+</code></pre>
+<p>Neo4j matches all qualifying Johns, and each gets updated.</p>
+<p><code>MERGE</code> does not automatically remove existing duplicates.</p>
+<h3 id="uniqueness-constraints">Uniqueness constraints</h3>
+<p>To ensure students have unique student numbers:</p>
+<pre><code>CREATE CONSTRAINT student_no_unique
+FOR (s:Student)
+REQUIRE s.studentNo IS UNIQUE
+</code></pre>
+<p>This prevents two <code>Student</code> nodes from having the same non-null <code>studentNo</code>.</p>
+<p>A constraint is particularly useful when <code>MERGE</code> should identify exactly one student. Unlike a node's temporary variable name, a stored student number can serve as a permanent identifier.</p>
+<h2 id="10-updating-and-deleting-data">10. Updating and deleting data</h2>
+<table>
+<thead>
+<tr>
+<th>Clause</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SET</code></td>
+<td>Add or change properties</td>
+<td><code>SET s.age = 22</code></td>
+</tr>
+<tr>
+<td><code>SET</code></td>
+<td>Add a node label</td>
+<td><code>SET s:Graduate</code></td>
+</tr>
+<tr>
+<td><code>REMOVE</code></td>
+<td>Remove properties</td>
+<td><code>REMOVE s.age</code></td>
+</tr>
+<tr>
+<td><code>REMOVE</code></td>
+<td>Remove a label</td>
+<td><code>REMOVE s:Graduate</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td>Delete a node or relationship</td>
+<td><code>DELETE r</code></td>
+</tr>
+<tr>
+<td><code>DETACH DELETE</code></td>
+<td>Delete a node and all its relationships</td>
+<td><code>DETACH DELETE s</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="update-johns-age">Update John's age</h3>
+<pre><code>MATCH (s:Student {name: &quot;John&quot;})
+SET s.age = 23
+RETURN s
+</code></pre>
+<h3 id="update-a-relationship-property">Update a relationship property</h3>
+<pre><code>MATCH (a:Student {name: &quot;John&quot;})
+      -[r:FRIENDS_WITH]-&gt;
+      (b:Student {name: &quot;Sarah&quot;})
+SET r.since = 2024
+RETURN r
+</code></pre>
+<p>Here, <code>r</code> is the variable referencing the relationship. Relationships can have properties just like nodes.</p>
+<h3 id="delete-only-a-relationship">Delete only a relationship</h3>
+<pre><code>MATCH (:Student {name: &quot;John&quot;})
+      -[r:FRIENDS_WITH]-&gt;
+      (:Student {name: &quot;Sarah&quot;})
+DELETE r
+</code></pre>
+<p>Both students remain; only their specified relationship is removed.</p>
+<h3 id="delete-a-connected-node">Delete a connected node</h3>
+<pre><code>MATCH (s:Student {name: &quot;John&quot;})
+DETACH DELETE s
+</code></pre>
+<p>This deletes John and every relationship connected to his node.</p>
+<p>A normal <code>DELETE s</code> fails if John still has relationships.</p>
+<h2 id="11-aggregation-functions">11. Aggregation functions</h2>
+<p>Cypher supports aggregation similar to SQL, but does not require an explicit <code>GROUP BY</code> clause.</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>count()</code></td>
+<td>Count matching values or rows</td>
+<td><code>count(s)</code></td>
+</tr>
+<tr>
+<td><code>sum()</code></td>
+<td>Add numeric values</td>
+<td><code>sum(s.age)</code></td>
+</tr>
+<tr>
+<td><code>avg()</code></td>
+<td>Calculate average</td>
+<td><code>avg(s.age)</code></td>
+</tr>
+<tr>
+<td><code>min()</code></td>
+<td>Minimum value</td>
+<td><code>min(s.age)</code></td>
+</tr>
+<tr>
+<td><code>max()</code></td>
+<td>Maximum value</td>
+<td><code>max(s.age)</code></td>
+</tr>
+<tr>
+<td><code>stdev()</code></td>
+<td>Standard deviation</td>
+<td><code>stdev(s.age)</code></td>
+</tr>
+<tr>
+<td><code>collect()</code></td>
+<td>Combine values into a list</td>
+<td><code>collect(s.name)</code></td>
+</tr>
+<tr>
+<td><code>DISTINCT</code></td>
+<td>Remove duplicate results or values</td>
+<td><code>count(DISTINCT s.name)</code></td>
+</tr>
+<tr>
+<td><code>type()</code></td>
+<td>Retrieve relationship type as text</td>
+<td><code>type(r)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-count-enrolments-per-module">Example: Count enrolments per module</h3>
+<pre><code>MATCH (s:Student)-[:ENROLLED_IN]-&gt;(m:Module)
+RETURN m.code, count(s) AS total
+ORDER BY total DESC
+</code></pre>
+<p>Result from the original example graph:</p>
+<table>
+<thead>
+<tr>
+<th>m.code</th>
+<th>total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>COS326</td>
+<td>2</td>
+</tr>
+<tr>
+<td>COS301</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>Because <code>m.code</code> is returned alongside <code>count(s)</code>, Neo4j implicitly groups the results by module code.</p>
+<h3 id="collect-values-into-a-list">Collect values into a list</h3>
+<pre><code>MATCH (s:Student)
+RETURN collect(s.name) AS names
+</code></pre>
+<p>Result (order not guaranteed):</p>
+<pre><code>[&quot;John&quot;, &quot;Sarah&quot;, &quot;Mike&quot;]
+</code></pre>
+<p>Rather than three rows, this produces one row containing a list.</p>
+<h2 id="12-additional-clauses-to-recognise">12. Additional clauses to recognise</h2>
+<table>
+<thead>
+<tr>
+<th>Clause</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WHERE</code></td>
+<td>Filter matches</td>
+<td><code>WHERE s.age &gt; 20</code></td>
+</tr>
+<tr>
+<td><code>RETURN</code></td>
+<td>Select results to display</td>
+<td><code>RETURN s.name</code></td>
+</tr>
+<tr>
+<td><code>AS</code></td>
+<td>Rename an output expression</td>
+<td><code>RETURN s.name AS student</code></td>
+</tr>
+<tr>
+<td><code>ORDER BY</code></td>
+<td>Sort results</td>
+<td><code>ORDER BY s.age DESC</code></td>
+</tr>
+<tr>
+<td><code>DISTINCT</code></td>
+<td>Remove duplicate result rows</td>
+<td><code>RETURN DISTINCT s.name</code></td>
+</tr>
+<tr>
+<td><code>WITH</code></td>
+<td>Pass intermediate results to the next part of a query</td>
+<td><code>WITH s, count(m) AS total</code></td>
+</tr>
+<tr>
+<td><code>FOREACH</code></td>
+<td>Apply updates to items in a collection</td>
+<td><code>FOREACH (x IN nodes \\| SET x.active = true)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Example using <code>WITH</code>:</p>
+<pre><code>MATCH (s:Student)-[:ENROLLED_IN]-&gt;(m:Module)
+WITH s, count(m) AS total
+WHERE total &gt; 1
+RETURN s.name, total
+</code></pre>
+<p>Returns students enrolled in more than one module.</p>
+<h2 id="13-sql-vs-cypher-comparison">13. SQL vs Cypher comparison</h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>SQL</th>
+<th>Cypher</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create data</td>
+<td><code>INSERT</code></td>
+<td><code>CREATE</code></td>
+</tr>
+<tr>
+<td>Retrieve data</td>
+<td><code>SELECT ... FROM</code></td>
+<td><code>MATCH ... RETURN</code></td>
+</tr>
+<tr>
+<td>Filter</td>
+<td><code>WHERE</code></td>
+<td><code>WHERE</code> or inline properties</td>
+</tr>
+<tr>
+<td>Update properties</td>
+<td><code>UPDATE ... SET</code></td>
+<td><code>MATCH ... SET</code></td>
+</tr>
+<tr>
+<td>Delete data</td>
+<td><code>DELETE FROM</code></td>
+<td><code>DELETE</code> / <code>DETACH DELETE</code></td>
+</tr>
+<tr>
+<td>Match or create</td>
+<td><code>INSERT ... ON CONFLICT</code> (PostgreSQL)</td>
+<td><code>MERGE</code></td>
+</tr>
+<tr>
+<td>Sort</td>
+<td><code>ORDER BY</code></td>
+<td><code>ORDER BY</code></td>
+</tr>
+<tr>
+<td>Group</td>
+<td><code>GROUP BY</code></td>
+<td>Implicit aggregation grouping</td>
+</tr>
+<tr>
+<td>Preserve unmatched left-side rows</td>
+<td><code>LEFT JOIN</code></td>
+<td><code>OPTIONAL MATCH</code></td>
+</tr>
+<tr>
+<td>Follow a relationship</td>
+<td><code>JOIN</code> through keys</td>
+<td>Relationship pattern such as <code>-[:FOLLOWS]-&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="14-most-important-things-youve-established">14. Most important things you've established</h2>
+<ol>
+<li>
+<p>Nodes don't need properties, but properties make them easier to identify and query.</p>
+</li>
+<li>
+<p>Labels categorise nodes; properties contain their actual data.</p>
+</li>
+<li>
+<p>Variables are temporary and do not persist between separate queries.</p>
+</li>
+<li>
+<p><code>MATCH</code> searches for patterns, not merely individual nodes.</p>
+</li>
+<li>
+<p><code>WHERE</code> is optional when you can put an equality condition directly inside a pattern.</p>
+</li>
+<li>
+<p>Relationships have directions, but queries can ignore direction by removing the arrowhead.</p>
+</li>
+<li>
+<p><code>RETURN node.property</code> accesses the stored property, while <code>RETURN node</code> returns the full node.</p>
+</li>
+<li>
+<p>Multiple matches produce multiple rows, including when multiple nodes share the same property values.</p>
+</li>
+<li>
+<p>Successive <code>MATCH</code> clauses build on previous matches, so one starting node can lead to several result rows.</p>
+</li>
+<li>
+<p><code>MERGE</code> matches or creates, while <code>ON MATCH SET</code> and <code>ON CREATE SET</code> determine which properties to update on each outcome.</p>
+</li>
+<li>
+<p><code>MERGE</code> does not guarantee uniqueness by itself; use constraints on appropriate identifying properties.</p>
+</li>
+<li>
+<p><code>SET</code> modifies properties, <code>REMOVE</code> removes properties, and <code>DELETE</code> removes graph elements.</p>
+</li>
+<li>
+<p><code>DETACH DELETE</code> also removes connected relationships.</p>
+</li>
+<li>
+<p>Cypher aggregation groups implicitly according to the non-aggregated expressions returned alongside aggregate functions.</p>
+</li>
+</ol>
+<p>The central concept to remember for your test is:</p>
+<p>Cypher describes a graph pattern → Neo4j finds every matching combination → <code>WHERE</code> filters those combinations → <code>RETURN</code> determines what information you see.</p>
+<p>For writing operations, use <code>CREATE</code> to add new graph elements, <code>MATCH</code> with <code>SET</code> to update existing ones, and <code>MERGE</code> when you want matching-or-creation behaviour.</p></article><div class="article-tools"><a href="lecture-10.html">← Previous</a><a href="lecture-12.html">Next lecture →</a></div></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

@@ -1,0 +1,1380 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Object-Oriented Database Systems (OODBMS) — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu ☰</button><nav id="nav"><a href="../index.html">Home</a><a href="../lectures/index.html">Lectures</a><a href="../practice.html">Practice</a><a href="../exams/index.html">Past papers</a><a href="../resources/cheat.html">Cheat sheet</a><a href="../progress.html">Progress</a></nav><button id="theme" aria-label="Toggle color theme">◐</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Object-Oriented Database Systems (OODBMS) — Comprehensive Notes</h1><p>From S1 L1,2,3,4.md · Read the source-based notes and mark your progress.</p></div><button class="study" data-id="lecture-01.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All lectures</a><button class="bookmark" data-id="lecture-01.html">☆ Bookmark</button></div><article class="prose"><h1 id="object-oriented-database-systems-oodbms-comprehensive-notes">Object-Oriented Database Systems (OODBMS) — Comprehensive Notes</h1>
+<h3 id="cos-326-database-systems-lectures-2-3-4-chapter-12-7th-edition">COS 326 Database Systems | Lectures 2, 3 &amp; 4 | Chapter 12 (7th Edition)</h3>
+<h2 id="2-limitations-weaknesses-of-relational-dbmss">2. Limitations ("Weaknesses") of Relational DBMSs</h2>
+<blockquote>
+<p><strong>Why this matters:</strong> This section is the <em>motivation</em> for OODBMSs — every weakness discussed here is later solved by an OODBMS feature (see <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#11-how-oodbmss-overcome-the-limitations-of-rdbmss">Section 11</a>).</p>
+</blockquote>
+<h3 id="21-weakness-1-poor-representation-of-real-world-entities">2.1 Weakness 1 — Poor Representation of "Real World" Entities</h3>
+<ul>
+<li><strong>Normalization</strong> leads to relations (tables) that do <strong>not correspond directly to entities in the "real world."</strong></li>
+<li>This causes <strong>fragmentation of the "real world"</strong> — a single real-world object (e.g., a member of staff) ends up scattered across multiple normalized tables.</li>
+<li><strong>Information is most commonly obtained from the DB through performing a JOIN</strong> (an intensive computation) of 2 or more tables.</li>
+</ul>
+<h4 id="example-the-join-problem-from-the-slides">📌 Example — The JOIN Problem (from the slides)</h4>
+<p>To see a staff member's name <strong>together with</strong> their branch's address, two separate tables must be joined:</p>
+<p><strong>Staff table</strong></p>
+<table>
+<thead>
+<tr>
+<th>staffNo</th>
+<th>sName</th>
+<th>position</th>
+<th>salary</th>
+<th>branchNo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SL21</td>
+<td>John White</td>
+<td>Manager</td>
+<td>30000</td>
+<td>B005</td>
+</tr>
+<tr>
+<td>SG37</td>
+<td>Ann Beech</td>
+<td>Assistant</td>
+<td>12000</td>
+<td>B003</td>
+</tr>
+<tr>
+<td>SG14</td>
+<td>David Ford</td>
+<td>Supervisor</td>
+<td>18000</td>
+<td>B003</td>
+</tr>
+<tr>
+<td>SA9</td>
+<td>Mary Howe</td>
+<td>Assistant</td>
+<td>9000</td>
+<td>B007</td>
+</tr>
+<tr>
+<td>SG5</td>
+<td>Susan Brand</td>
+<td>Manager</td>
+<td>24000</td>
+<td>B003</td>
+</tr>
+<tr>
+<td>SL41</td>
+<td>Julie Lee</td>
+<td>Assistant</td>
+<td>9000</td>
+<td>B005</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Branch table</strong></p>
+<table>
+<thead>
+<tr>
+<th>branchNo</th>
+<th>bAddress</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B005</td>
+<td>22 Deer Rd, London</td>
+</tr>
+<tr>
+<td>B007</td>
+<td>16 Argyll St, Aberdeen</td>
+</tr>
+<tr>
+<td>B003</td>
+<td>163 Main St, Glasgow</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>To answer "What is the address of the branch where John White works?" the DBMS must <strong>JOIN Staff and Branch on branchNo</strong> — an expensive relational-algebra operation — even though, conceptually, "a staff member works at a branch with an address" is a single real-world fact.</li>
+</ul>
+<h4 id="additional-example-added-for-clarity">📌 Additional Example (added for clarity)</h4>
+<p>A university database with <code>Student</code>, <code>Registration</code>, and <code>Module</code> tables must JOIN all three tables just to answer "Which modules is student S12345 registered for, and what are their names?" — even though this is one simple real-world question ("what is this student currently studying?").</p>
+<h3 id="22-weakness-2-semantic-overloading">2.2 Weakness 2 — Semantic Overloading</h3>
+<ul>
+<li>The relational model has a <strong>single construct for representing both data AND data relationships: the relation</strong> (table).</li>
+<li>There is <strong>no mechanism to distinguish between</strong>:<ul>
+<li>relations vs. relationships, or</li>
+<li>different <strong>types</strong> of relationships (e.g., one-to-one vs. one-to-many vs. many-to-many; composition vs. association).</li>
+</ul>
+</li>
+<li>This means the relational model is <strong>semantically overloaded</strong> — one construct is forced to carry multiple different meanings.</li>
+</ul>
+<h4 id="example-erd-semantic-overloading-from-the-slides">📌 Example — ERD Semantic Overloading (from the slides)</h4>
+<p>Consider the ERD: <strong>Student — (is written in) → Registration — (is found in) → Module</strong></p>
+<ul>
+<li><code>Registration</code> is <strong>both a relation (table) AND a relationship</strong> (it represents the many-to-many association between Student and Module) — the relational model cannot express that duality directly.</li>
+<li>The relationship <strong>"is written in"</strong> is not recorded/labelled anywhere in the Relational DB — it's implicit.</li>
+<li>The relationship <strong>"is found in"</strong> is likewise not recorded in the Relational DB.</li>
+</ul>
+<h4 id="additional-example-added-for-clarity_1">📌 Additional Example (added for clarity)</h4>
+<p>Consider a <code>Manages</code> relationship between <code>Employee</code> and <code>Department</code>. In a relational schema, this becomes just another table with two foreign keys — indistinguishable, at the schema level, from a genuine independent entity like <code>Orders</code>. The <em>type</em> of relationship (1:1 management vs. 1:* employment) is not explicitly modelled — it can only be inferred from constraints.</p>
+<h3 id="23-weakness-3-limited-operations">2.3 Weakness 3 — Limited Operations</h3>
+<ul>
+<li>RDBMSs only have a <strong>fixed set of operations</strong> (using SQL) which <strong>cannot be extended</strong>, i.e., operations are limited to those defined by the <strong>Relational calculus &amp; algebra</strong> on sets of tuples.</li>
+<li>It is <strong>not possible for software developers to specify new operations</strong> — this is <strong>in contrast to OOP methods</strong>, where developers can define arbitrary new behaviour on objects.</li>
+<li><strong>BUT:</strong> Database programmers <strong>can</strong> create <strong>stored procedures</strong> on the server side as a workaround.</li>
+</ul>
+<h3 id="24-weakness-4-homogeneous-data-structure">2.4 Weakness 4 — Homogeneous Data Structure</h3>
+<ul>
+<li><strong>Horizontal and vertical homogeneity</strong> is restrictive for representing "real world" objects.<ul>
+<li><strong>Horizontal homogeneity:</strong> each tuple (row) is composed of the <strong>same attributes</strong>.</li>
+<li><strong>Vertical homogeneity:</strong> values of an attribute (column) come from the <strong>same domain</strong>.</li>
+</ul>
+</li>
+<li>The <strong>intersection of a row and column must be atomic</strong> — this means it is <strong>not possible to store an object that can be decomposed into its components</strong> (i.e., no nested/composite values).</li>
+<li><strong>Note:</strong> it <em>is</em> possible to store a <strong>BLOB</strong> or <strong>CLOB</strong> (a pointer to a file containing the object) for <strong>viewing purposes only</strong> — but the DBMS cannot query/decompose the internal structure of that BLOB/CLOB.</li>
+</ul>
+<h4 id="example-from-the-slides">📌 Example (from the slides)</h4>
+<p>A simple <code>position</code>/<code>salary</code> table:</p>
+<table>
+<thead>
+<tr>
+<th>position</th>
+<th>salary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manager</td>
+<td>30000</td>
+</tr>
+<tr>
+<td>Assistant</td>
+<td>12000</td>
+</tr>
+<tr>
+<td>Supervisor</td>
+<td>18000</td>
+</tr>
+<tr>
+<td>Assistant</td>
+<td>9000</td>
+</tr>
+<tr>
+<td>Manager</td>
+<td>24000</td>
+</tr>
+<tr>
+<td>Assistant</td>
+<td>9000</td>
+</tr>
+</tbody>
+</table>
+<p>Every cell (e.g., "Manager", 30000) is atomic — there is no way to store, say, a <code>salary</code> cell that itself contains a structured sub-object like <code>{basic: 25000, bonus: 5000}</code> without breaking First Normal Form.</p>
+<h3 id="25-weakness-5-impedance-mismatch">2.5 Weakness 5 — Impedance (Mismatch)</h3>
+<ul>
+<li><strong>Impedance (Physics analogy):</strong> a measure of the <strong>opposition (resistance)</strong> to the flow of a current in an electrical circuit: <strong>I = V / R</strong>.</li>
+<li><strong>Impedance (Software Engineering):</strong> a measure of the <strong>opposition (difficulty)</strong> caused by <strong>differences between two programming paradigms</strong> — e.g., the set-based, declarative paradigm of SQL vs. the object-based, imperative paradigm of Java/C++.</li>
+<li><strong>Embedded SQL:</strong><ul>
+<li>Used for applications that access database data from within a host programming language.</li>
+<li>The SQL standard provides "embedded SQL."</li>
+<li>This creates the <strong>problem of impedance mismatch</strong> for software developers: <strong>mixing different programming paradigms</strong> within one application (e.g., relational rows/tables vs. objects/classes).</li>
+</ul>
+</li>
+</ul>
+<h3 id="26-weakness-6-part-1-example-of-impedance-mismatch-jdbc-code">2.6 Weakness 6 (part 1) — Example of Impedance Mismatch: JDBC Code</h3>
+<h4 id="coding-example-1-jdbcsamplejava-from-the-slides-reproduced-in-full">📌 Coding Example 1 — <code>JDBCSample.java</code> (from the slides, reproduced in full)</h4>
+<p>This program demonstrates the impedance mismatch: Java (OOP) code has to embed textual SQL strings, and results come back as generic <code>ResultSet</code> rows rather than typed Java objects.</p>
+<pre><code class="language-java">import java.sql.*
+
+public class JDBCSample {
+    public static void main( String args[ ]) {
+        String connectionURL =
+            &quot;jdbc:postgresql://localhost:5432/movies;user=java;password=samples&quot;;
+        try {
+            Class.forName(&quot;org.postgresql.Driver&quot;);
+            Connection con = DriverManager.getConnection(connectionURL);
+            Statement stmt = con.createStatement();
+            ResultSet rs =
+                stmt.executeQuery(&quot;SELECT moviename, releasedate FROM movies&quot;);
+            while (rs.next())
+                System.out.println(&quot;Name= &quot; + rs.getString(&quot;moviename&quot;)
+                                    + &quot; Date= &quot; + rs.getString(&quot;releasedate&quot;));
+        } finally {
+            con.close();
+        }
+    }
+}
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong>Import the JDBC API</strong> — <code>import java.sql.*</code> gives access to <code>Connection</code>, <code>Statement</code>, <code>ResultSet</code>, etc.</li>
+<li><strong>Build a connection URL</strong> — a plain string specifying the driver protocol (<code>jdbc:postgresql://</code>), host, port, database name (<code>movies</code>), and credentials.</li>
+<li><strong>Load the driver class</strong> — <code>Class.forName("org.postgresql.Driver")</code> registers the PostgreSQL JDBC driver with the <code>DriverManager</code>.</li>
+<li><strong>Open a connection</strong> — <code>DriverManager.getConnection(connectionURL)</code> returns a live <code>Connection</code> object to the database.</li>
+<li><strong>Create a <code>Statement</code></strong> — <code>con.createStatement()</code> gives an object that can execute raw SQL text.</li>
+<li><strong>Execute a query</strong> — <code>stmt.executeQuery("SELECT moviename, releasedate FROM movies")</code> sends a <strong>string</strong> of SQL to the database and returns a <code>ResultSet</code> (a cursor over relational rows, <strong>not</strong> Java objects).</li>
+<li><strong>Iterate the result set</strong> — <code>while (rs.next())</code> moves the cursor row by row; each column must be manually extracted by <strong>name</strong> and <strong>type</strong> (<code>rs.getString("moviename")</code>) and reassembled by the programmer — this is the impedance mismatch in action: the programmer must manually translate between rows/columns and any meaningful Java object.</li>
+<li><strong>Clean up</strong> — <code>con.close()</code> in a <code>finally</code> block releases the database connection.</li>
+</ol>
+<h4 id="coding-example-2-added-for-step-by-step-clarity">📌 Coding Example 2 (added for step-by-step clarity)</h4>
+<p>A minimal JDBC example inserting a row, showing the same mismatch in the opposite direction (Java object → SQL string):</p>
+<pre><code class="language-java">import java.sql.*;
+
+public class InsertStudent {
+    public static void main(String[] args) throws Exception {
+        // Step 1: Load driver
+        Class.forName(&quot;org.postgresql.Driver&quot;);
+
+        // Step 2: Open connection
+        Connection con = DriverManager.getConnection(
+            &quot;jdbc:postgresql://localhost:5432/university&quot;, &quot;java&quot;, &quot;samples&quot;);
+
+        // Step 3: Prepare an SQL statement with placeholders
+        PreparedStatement ps = con.prepareStatement(
+            &quot;INSERT INTO Student (studentNo, sName) VALUES (?, ?)&quot;);
+
+        // Step 4: Manually map Java field values into the SQL statement
+        ps.setString(1, &quot;S12345&quot;);
+        ps.setString(2, &quot;Thabo Mokoena&quot;);
+
+        // Step 5: Execute the update
+        ps.executeUpdate();
+
+        // Step 6: Close connection
+        con.close();
+    }
+}
+</code></pre>
+<p><strong>Why this illustrates impedance mismatch:</strong> a <code>Student</code> object in Java naturally has fields (<code>studentNo</code>, <code>sName</code>), but to persist it, the programmer must manually flatten it into an SQL string with positional <code>?</code> placeholders — there is no automatic translation between the Java class and the relational table.</p>
+<h3 id="27-weakness-6-part-2-rdbms-supports-only-short-lived-transactions">2.7 Weakness 6 (part 2) — RDBMS Supports Only Short-Lived Transactions</h3>
+<ul>
+<li>A <strong>transaction</strong> is: <strong>an indivisible sequence of DB operations</strong>.</li>
+</ul>
+<pre><code class="language-sql">BEGIN TRANSACTION
+    SQL statements for transaction go here
+END TRANSACTION
+</code></pre>
+<ul>
+<li>RDBMS transactions are designed to be <strong>short-lived (business)</strong> transactions (e.g., "transfer money between two accounts," completing in milliseconds), as opposed to <strong>long-duration (design)</strong> transactions (e.g., a CAD engineer working on a design for several days) which RDBMSs handle poorly.</li>
+</ul>
+<h3 id="28-weakness-7-schema-changes-create-problems">2.8 Weakness 7 — Schema Changes Create Problems</h3>
+<ul>
+<li>A <strong>database schema change requires corresponding program changes.</strong></li>
+<li><strong>Example of a change:</strong> adding new attributes (columns) to a table — every piece of application code that reads/writes that table may need to be updated to account for the new column, and existing rows must be back-filled or given defaults.</li>
+</ul>
+<hr />
+<h2 id="3-storing-objects-in-relational-databases-objectrelational-mapping">3. Storing Objects in Relational Databases (Object–Relational Mapping)</h2>
+<ul>
+<li><strong>Storing objects in a relational DB</strong> is <strong>one approach to achieving persistence with an OOP language</strong>: use an <strong>RDBMS as the underlying storage engine.</strong></li>
+<li>This requires <strong>mapping class instances (i.e., objects) to one or more rows distributed over one or more relations</strong> — the programmer must <strong>write code to convert between objects and rows.</strong></li>
+<li><strong>Object–Relational Mapping (ORM) Adds Complexity.</strong></li>
+</ul>
+<h4 id="example-from-the-slides_1">📌 Example (from the slides)</h4>
+<p>A <code>STUDENT</code> registers for <code>COURSES</code> for a <code>DEGREE PROGRAM</code>.</p>
+<ul>
+<li>⇒ <strong>The data for a single <code>STUDENT</code> object ends up stored across 3 separate tables</strong> (e.g., <code>Student</code>, <code>Registration</code>, <code>Module</code>/<code>DegreeProgram</code>) — reconstructing one <code>Student</code> object back into memory requires multiple JOINs, which is exactly the ORM complexity/impedance-mismatch problem described above.</li>
+</ul>
+<h4 id="additional-example-added-for-clarity_2">📌 Additional Example (added for clarity)</h4>
+<p>A <code>Book</code> object with an internal <code>List&lt;Author&gt;</code> (multiple authors per book) requires at least two tables in an RDBMS: <code>Book</code> and <code>Author</code>, linked via a <code>BookAuthor</code> join table for the many-to-many relationship — the single conceptual <code>Book</code> object is fragmented across three relations.</p>
+<hr />
+<h2 id="4-introduction-to-object-oriented-databases">4. Introduction to Object-Oriented Databases</h2>
+<h3 id="41-origins-design-data-characteristics">4.1 Origins — Design Data Characteristics</h3>
+<p>Some <strong>common characteristics of design data</strong> that motivated OODBs:</p>
+<ul>
+<li>Design has <strong>many parts &amp; interdependent subsystems.</strong></li>
+<li><strong>Large number of types &amp; small number of instances</strong> — this is the <strong>opposite</strong> of the relational world, where there are typically <strong>few relations but many tuples.</strong></li>
+<li>OODBs <strong>originate from Engineering &amp; design domains.</strong><ul>
+<li><strong>e.g., CAD (Computer Aided Design)</strong> databases store data relating to engineering designs.</li>
+<li><strong>Examples of designs:</strong> (1) Cars, (2) Buildings.</li>
+<li>Realised today using <strong>CAD, BIM (Building Information Modelling), Digital Twins, Engineering Simulation,</strong> etc.</li>
+</ul>
+</li>
+<li><strong>Note:</strong> the <strong>OODBMS market is relatively small compared with the RDBMS market.</strong></li>
+</ul>
+<h4 id="example-added-for-clarity">📌 Example (added for clarity)</h4>
+<p>An automotive CAD system might model a <code>Car</code> design with <strong>thousands of distinct part <em>types</em></strong> (bolt, gasket, sensor, ECU, bracket, etc. — each its own class/type) but only a handful of design <em>instances</em> (one master design per car model). This is the inverse of, say, a <code>Sales</code> relational database, which has very few table <em>types</em> (Customer, Order, Product) but millions of row <em>instances</em>.</p>
+<h3 id="42-object-databases-object-data-management-systems">4.2 Object Databases / Object Data Management Systems</h3>
+<ul>
+<li><strong>Object databases (ODB)</strong> / <strong>Object data management systems (ODMS)</strong> are designed to:<ul>
+<li><strong>Meet some of the needs of more complex applications.</strong></li>
+<li><strong>Specify:</strong><ul>
+<li>The <strong>structure of complex objects.</strong></li>
+<li>The <strong>operations that can be applied to these objects.</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="5-oo-database-terminology">5. OO Database Terminology</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OO data model</strong></td>
+<td>A (logical) data model that captures the <strong>semantics of objects (classes)</strong> supported in object-oriented programming.</td>
+</tr>
+<tr>
+<td><strong>OO database</strong></td>
+<td>A <strong>persistent, sharable collection of objects</strong> defined by an OO data model.</td>
+</tr>
+<tr>
+<td><strong>OODBMS</strong></td>
+<td>The <strong>manager (software)</strong> of an OODB.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-added-for-clarity_1">📌 Example (added for clarity)</h4>
+<p>For a real-estate agency system: the <strong>OO data model</strong> defines classes like <code>PropertyForRent</code>, <code>Client</code>, <code>Branch</code>; the <strong>OO database</strong> is the actual persistent, shared collection of <code>PropertyForRent</code>, <code>Client</code>, and <code>Branch</code> <strong>object instances</strong> stored on disk; the <strong>OODBMS</strong> is the software (e.g., ObjectDB or ObjectStore) that manages creating, storing, querying, and retrieving those objects.</p>
+<hr />
+<h2 id="6-oodb-and-oodbms-how-they-relate">6. OODB and OODBMS — How They Relate</h2>
+<ul>
+<li>The <strong>OO data model defines the contents of the OODB.</strong></li>
+<li><strong>Diagram structure (from the slides):</strong><ul>
+<li>A <strong>Database system</strong> contains <strong>Sales application programs</strong> and <strong>Contracts application programs</strong>, each with their own <strong>"Data entry and reports"</strong> modules, used by <strong>Sales staff</strong> and <strong>Contracts staff</strong> respectively.</li>
+<li>Both sets of application programs communicate with a central <strong>DBMS</strong> — labelled here as the <strong>Object-oriented DBMS (OODBMS)</strong>.</li>
+<li>The OODBMS in turn manages the <strong>Database</strong> itself — labelled as the <strong>Object-oriented database (OODB)</strong> — which, in the slide's real-estate example, stores <strong><code>PropertyForRent</code>, <code>PrivateOwner</code>, <code>Client</code>, and <code>Lease</code> details + file definitions.</strong></li>
+<li>The <strong>OO data model</strong> is what "defines the contents of" both the OODBMS logic and the OODB data.</li>
+</ul>
+</li>
+<li><strong>OO data model:</strong> (logical) data model that captures the semantics of objects (classes) supported in object-oriented programming.</li>
+</ul>
+<hr />
+<h2 id="7-commercial-and-open-source-oodbmss">7. Commercial and Open-Source OODBMSs</h2>
+<h3 id="commercial">Commercial</h3>
+<ul>
+<li><strong>GemStone</strong> — from Gemstone Systems Inc.</li>
+<li><strong>Objectivity/DB</strong> — from Objectivity Inc.</li>
+<li><strong>ObjectStore</strong> — from Progress Software Corp.</li>
+</ul>
+<h3 id="open-source">Open Source</h3>
+<ul>
+<li><strong>ZooDB</strong> — by Tilmann Zäschke.</li>
+<li><strong>ObjectDB</strong> — by ObjectDB Corp.</li>
+<li><strong>ConceptBase</strong> — by University of Skövde.</li>
+</ul>
+<hr />
+<h2 id="8-strategies-for-developing-an-oodbms">8. Strategies for Developing an OODBMS</h2>
+<p>There are <strong>5 strategies</strong> in total (strategies 1–2 are core content; strategies 3–5 are marked <strong>"additional reading for the student"</strong>):</p>
+<h3 id="strategy-1-extend-an-existing-object-oriented-programming-language">Strategy 1 — Extend an Existing Object-Oriented Programming Language</h3>
+<ul>
+<li><strong>Add traditional database capabilities to an existing OOP language.</strong></li>
+<li><strong>e.g.</strong>, Smalltalk, C++, Java.</li>
+<li><strong>e.g., GemStone extended Smalltalk, C++, Java.</strong></li>
+</ul>
+<h3 id="strategy-2-provide-an-extensible-oodbms-library">Strategy 2 — Provide an Extensible OODBMS Library</h3>
+<ul>
+<li><strong>No extensions to the OOP language</strong> are needed.</li>
+<li>Instead, <strong>provide a persistence framework/library.</strong></li>
+<li>The <strong>library provides persistence and database capabilities.</strong></li>
+<li>Developers <strong>work in a known programming language with the same compiler</strong> (no special compiler required).</li>
+<li><strong>Examples:</strong> <strong>ObjectStore</strong> (for <strong>C++</strong>) and <strong>ObjectDB</strong> (for <strong>Java</strong>).</li>
+</ul>
+<h3 id="strategy-3-imbed-oodb-language-constructs-in-a-conventional-host-language-additional-reading">Strategy 3 — Imbed OODB Language Constructs in a Conventional Host Language <em>(additional reading)</em></h3>
+<ul>
+<li><strong>e.g., O2</strong> : extensions for C.</li>
+</ul>
+<h3 id="strategy-4-extend-an-existing-database-language-sql-with-object-oriented-capabilities-additional-reading">Strategy 4 — Extend an Existing Database Language (SQL) with Object-Oriented Capabilities <em>(additional reading)</em></h3>
+<ul>
+<li><strong>Object-oriented features were introduced in SQL:1999</strong> and <strong>remain supported by many modern DBMSs, including PostgreSQL.</strong></li>
+<li>There is an <strong>Object SQL standard by ODMG.</strong></li>
+<li><strong>Ontos and Versant</strong> provide a version of Object SQL.</li>
+</ul>
+<h3 id="strategy-5-develop-a-novel-database-data-modellanguage-additional-reading">Strategy 5 — Develop a Novel Database Data Model/Language <em>(additional reading)</em></h3>
+<ul>
+<li><strong>No history / baggage</strong> — start from scratch.</li>
+<li><strong>No installed base, no skills</strong> (a downside — nobody already knows it).</li>
+<li><strong>Example: Semantic Information Manager (SIM).</strong></li>
+</ul>
+<h4 id="example-added-for-clarity_2">📌 Example (added for clarity)</h4>
+<ul>
+<li><strong>Strategy 1 in practice:</strong> GemStone/S adds persistence keywords directly into the Smalltalk language itself, so a Smalltalk programmer writes almost no "extra" database code — persistence is baked into the language.</li>
+<li><strong>Strategy 2 in practice:</strong> ObjectDB requires <strong>no</strong> changes to the Java language or compiler — a normal <code>javac</code>-compiled program simply imports the <code>javax.persistence</code> (JPA) library, annotates classes with <code>@Entity</code>, and calls library methods like <code>em.persist(obj)</code> to get database behaviour (this is explored fully in <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#9-case-study-objectdb-for-java">Section 9</a>).</li>
+</ul>
+<hr />
+<h2 id="9-case-study-objectdb-for-java">9. Case Study: ObjectDB for Java</h2>
+<h3 id="91-what-is-objectdb">9.1 What is ObjectDB?</h3>
+<ul>
+<li><strong>ObjectDB</strong> is a <strong>powerful Object-Oriented Database Management System (ODBMS).</strong></li>
+<li>It provides <strong>all the standard database management services</strong> — <strong>storage and retrieval, transactions, lock management, query processing,</strong> etc. — in a way that makes <strong>development easier</strong> and <strong>applications faster.</strong></li>
+</ul>
+<h3 id="92-objectdb-features">9.2 ObjectDB Features</h3>
+<ul>
+<li><strong>100% pure Java</strong> Object-Oriented Database Management System (ODBMS).</li>
+<li><strong>No proprietary API</strong> — managed only by standard <strong>Java APIs (JPA 2 / JDO 2).</strong></li>
+<li>Suitable for database files ranging <strong>from kilobytes to terabytes.</strong></li>
+<li>Supports both <strong>Client-Server mode</strong> and <strong>Embedded mode.</strong></li>
+<li><strong>Single JAR</strong> with <strong>no external dependencies.</strong></li>
+<li>Database is stored <strong>as a single file.</strong></li>
+<li><strong>Advanced querying and indexing capabilities.</strong></li>
+<li><strong>Effective in heavy loaded multi-user environments.</strong></li>
+<li>Can easily be <strong>embedded in applications of any type and size.</strong></li>
+</ul>
+<h3 id="93-object-identifier-oid">9.3 Object Identifier (OID)</h3>
+<ul>
+<li>One <strong>goal of an OODB</strong> is to maintain a <strong>direct correspondence between real-world and database objects</strong> so that objects <strong>do not lose their integrity and identity</strong> and can easily be <strong>identified and operated upon.</strong></li>
+<li>Hence, a <strong>unique identity is assigned to each independent object stored in the database.</strong></li>
+<li>This unique identity is typically implemented via a <strong>unique, system-generated object identifier (OID).</strong></li>
+</ul>
+<h3 id="94-defining-a-jpa-entity-class">9.4 Defining a JPA Entity Class</h3>
+<ul>
+<li><strong>Jakarta Persistence API (JPA)</strong> — formerly <strong>Java Persistence API</strong> — <strong>defines a standard for management of persistence and object/relational mapping in Java environments.</strong></li>
+<li>A <strong>JPA entity class is a POJO (Plain Old Java Object)</strong> class — i.e., an ordinary Java class that is <strong>marked (annotated)</strong> as having the ability to <strong>represent objects in the database.</strong></li>
+<li><strong>Common implementations</strong> include: <strong>Hibernate, EclipseLink,</strong> and <strong>ObjectDB.</strong></li>
+</ul>
+<h3 id="95-the-point-entity-class-coding-example-1">9.5 The <code>Point</code> Entity Class — Coding Example 1</h3>
+<blockquote>
+<p>The following <code>Point</code> class, which represents points in a plane, is marked as an entity class. It provides the ability to <strong>store <code>Point</code> objects in the database</strong> and <strong>retrieve <code>Point</code> objects from the database.</strong></p>
+</blockquote>
+<pre><code class="language-java">package com.objectdb.tutorial;
+
+import javax.persistence.Entity;
+
+@Entity
+public class Point {
+    // Persistent Fields:
+    private int x;
+    private int y;
+
+    // Constructor:
+    Point (int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    // Accessor Methods:
+    public int getX() { return this.x; }
+    public int getY() { return this.y; }
+
+    // String Representation:
+    @Override
+    public String toString() {
+        return String.format(&quot;(%d, %d)&quot;, this.x, this.y);
+    }
+}
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong>Package declaration</strong> — <code>package com.objectdb.tutorial;</code> — normal Java package organisation, no persistence meaning.</li>
+<li><strong>Import the annotation</strong> — <code>import javax.persistence.Entity;</code> brings in the JPA <code>@Entity</code> annotation.</li>
+<li><strong>Annotate the class</strong> — <code>@Entity</code> marks <code>Point</code> as a <strong>persistent entity class</strong> — this single annotation is what tells ObjectDB "instances of this POJO can be stored in and retrieved from the database." No special base class or interface needs to be implemented (unlike some older persistence frameworks).</li>
+<li><strong>Declare persistent fields</strong> — <code>private int x;</code> and <code>private int y;</code> are the class's <strong>persistent fields</strong>; by default JPA persists all non-static, non-transient fields of an <code>@Entity</code> class.</li>
+<li><strong>Constructor</strong> — <code>Point(int x, int y)</code> is a normal Java constructor used to create <code>Point</code> instances in memory before they are persisted.</li>
+<li><strong>Accessor methods</strong> — <code>getX()</code> and <code>getY()</code> are plain getters — no special persistence logic needed here; JPA can use field or property access.</li>
+<li><strong><code>toString()</code> override</strong> — a normal Java convenience method for readable printing of a <code>Point</code>; unrelated to persistence, included to show that entity classes remain <strong>ordinary Java classes</strong> (POJOs) — they are not required to be "database-only" objects.</li>
+</ol>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-a-student-entity-class">📌 Coding Example 2 (added for step-by-step clarity) — A <code>Student</code> Entity Class</h4>
+<p>Applying the exact same pattern to a different domain object, to reinforce the "POJO + <code>@Entity</code>" recipe:</p>
+<pre><code class="language-java">package com.university.demo;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
+public class Student {
+    // Persistent Fields:
+    @Id
+    private String studentNo;
+    private String name;
+    private double gpa;
+
+    // Constructor:
+    public Student(String studentNo, String name, double gpa) {
+        this.studentNo = studentNo;
+        this.name = name;
+        this.gpa = gpa;
+    }
+
+    // No-arg constructor required by JPA:
+    public Student() {}
+
+    // Accessor Methods:
+    public String getStudentNo() { return this.studentNo; }
+    public String getName() { return this.name; }
+    public double getGpa() { return this.gpa; }
+
+    @Override
+    public String toString() {
+        return String.format(&quot;%s (%s) — GPA: %.2f&quot;, name, studentNo, gpa);
+    }
+}
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><code>@Entity</code> marks the class as persistent — identical role to the <code>Point</code> example.</li>
+<li><code>@Id</code> marks <code>studentNo</code> as the <strong>primary/identifying field</strong> for this entity (an addition beyond the slide's simpler <code>Point</code> example, showing how identity can also be application-defined alongside the system-generated OID).</li>
+<li>A <strong>no-argument constructor</strong> is added — JPA implementations require this so they can reconstruct objects from stored data via reflection.</li>
+<li>The rest of the class (fields, accessors, <code>toString</code>) follows exactly the same POJO pattern as <code>Point</code>.</li>
+</ol>
+<h3 id="96-database-connections-in-objectdb">9.6 Database Connections in ObjectDB</h3>
+<ul>
+<li>In JPA, a <strong>database connection is represented by the <code>EntityManager</code> interface.</strong></li>
+<li>Therefore, in order to manipulate an ObjectDB database, we need an <strong><code>EntityManager</code> instance.</strong></li>
+<li><strong>Operations that modify database content</strong> also require an <strong><code>EntityTransaction</code> instance.</strong></li>
+</ul>
+<h3 id="97-obtaining-an-entitymanagerfactory">9.7 Obtaining an <code>EntityManagerFactory</code></h3>
+<ul>
+<li>Obtaining an <code>EntityManager</code> instance consists of <strong>two steps</strong>:<ol>
+<li><strong>Obtain an instance of <code>EntityManagerFactory</code></strong> that represents the relevant database.</li>
+<li><strong>Use that factory instance</strong> to get an <code>EntityManager</code> instance.</li>
+</ol>
+</li>
+</ul>
+<pre><code class="language-java">EntityManagerFactory emf =
+    Persistence.createEntityManagerFactory(
+        &quot;objectdb:$objectdb/db/points.odb&quot;);
+</code></pre>
+<h3 id="98-obtaining-an-entitymanager">9.8 Obtaining an <code>EntityManager</code></h3>
+<ul>
+<li>Once we have an <code>EntityManagerFactory</code>, we can easily obtain an <code>EntityManager</code> instance:</li>
+</ul>
+<pre><code class="language-java">EntityManager em = emf.createEntityManager();
+</code></pre>
+<ul>
+<li>The <code>EntityManager</code> instance <strong>represents a connection to the database.</strong></li>
+<li>When using JPA, <strong>every operation on a database is associated with an <code>EntityManager</code>.</strong></li>
+</ul>
+<h3 id="99-using-an-entitytransaction">9.9 Using an <code>EntityTransaction</code></h3>
+<ul>
+<li>Operations that <strong>modify database content</strong>, such as <strong>store, update, and delete</strong>, should only be performed <strong>within an active transaction.</strong></li>
+<li>Given an <code>EntityManager</code>, <code>em</code>, you begin a transaction like this:</li>
+</ul>
+<pre><code class="language-java">em.getTransaction().begin();
+</code></pre>
+<ul>
+<li>There is a <strong>one-to-one relationship</strong> between an <code>EntityManager</code> instance and its associated <code>EntityTransaction</code> instance (the one returned by <code>getTransaction()</code>).</li>
+</ul>
+<h3 id="910-crud-operations-using-objectdb-coding-example-1">9.10 CRUD Operations Using ObjectDB — Coding Example 1</h3>
+<blockquote>
+<p>Given an <code>EntityManager</code>, <code>em</code>, that represents a JPA connection to the object database, we can use it to store, retrieve, update and delete database objects as follows:</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Storing New Entity Objects</strong></td>
+<td><code>em.getTransaction().begin();</code> <code>for (int i = 0; i &lt; 1000; i++) {</code> <code>Point p = new Point(i, i);</code> <code>em.persist(p);</code> <code>}</code> <code>em.getTransaction().commit();</code></td>
+</tr>
+<tr>
+<td><strong>2. Reading Entity Objects</strong></td>
+<td><code>Query q1 = em.createQuery("SELECT COUNT(p) FROM Point p");</code> <code>System.out.println("Total Points: " + q1.getSingleResult());</code></td>
+</tr>
+<tr>
+<td><strong>3. Delete Entities</strong></td>
+<td><code>em.getTransaction().begin();</code> <code>em.remove(p); // delete entity</code> <code>em.getTransaction().commit();</code></td>
+</tr>
+<tr>
+<td><strong>4. Update Entities</strong></td>
+<td><code>em.getTransaction().begin();</code> <code>p.setX(p.getX() + 100); // update entity</code> <code>em.getTransaction().commit();</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step-by-step walkthrough of the full CRUD lifecycle:</strong></p>
+<ol>
+<li><strong>Create (Store):</strong><ol>
+<li><strong>Begin a transaction</strong> — <code>em.getTransaction().begin();</code>.</li>
+<li><strong>Loop and construct</strong> 1000 in-memory <code>Point</code> objects — <code>new Point(i, i)</code>.</li>
+<li><strong>Mark each object for persistence</strong> — <code>em.persist(p);</code> (this schedules the object to be written to the DB).</li>
+<li><strong>Commit the transaction</strong> — <code>em.getTransaction().commit();</code> — this is when the objects are actually flushed to the database file, and each is assigned an OID.</li>
+</ol>
+</li>
+<li><strong>Read:</strong><ol>
+<li><strong>Create a JPQL query</strong> — <code>em.createQuery("SELECT COUNT(p) FROM Point p")</code> counts all <code>Point</code> entities.</li>
+<li><strong>Execute and retrieve a single scalar result</strong> — <code>q1.getSingleResult()</code> runs the query and returns the count.</li>
+</ol>
+</li>
+<li><strong>Update:</strong><ol>
+<li><strong>Begin a transaction.</strong></li>
+<li><strong>Mutate a managed object directly</strong> — <code>p.setX(p.getX() + 100);</code> — note there is <strong>no explicit SQL <code>UPDATE</code> statement</strong>; because <code>p</code> is a <em>managed</em> entity (retrieved via <code>em</code>), simply changing its field is enough.</li>
+<li><strong>Commit</strong> — ObjectDB automatically detects the change and writes it to the database.</li>
+</ol>
+</li>
+<li><strong>Delete:</strong><ol>
+<li><strong>Begin a transaction.</strong></li>
+<li><strong>Call <code>em.remove(p);</code></strong> to mark the entity for deletion.</li>
+<li><strong>Commit</strong> — the object is removed from the database file.</li>
+</ol>
+</li>
+</ol>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-full-crud-program-for-student">📌 Coding Example 2 (added for step-by-step clarity) — Full CRUD Program for <code>Student</code></h4>
+<p>Combining everything above into one complete, runnable-style program using the <code>Student</code> entity from Section 9.5:</p>
+<pre><code class="language-java">EntityManagerFactory emf =
+    Persistence.createEntityManagerFactory(&quot;objectdb:$objectdb/db/university.odb&quot;);
+EntityManager em = emf.createEntityManager();
+
+// --- CREATE ---
+em.getTransaction().begin();
+Student s1 = new Student(&quot;S12345&quot;, &quot;Thabo Mokoena&quot;, 3.8);
+em.persist(s1);
+em.getTransaction().commit();
+
+// --- READ ---
+Query q = em.createQuery(&quot;SELECT s FROM Student s WHERE s.gpa &gt; 3.5&quot;);
+List&lt;Student&gt; topStudents = q.getResultList();
+for (Student s : topStudents) {
+    System.out.println(s);
+}
+
+// --- UPDATE ---
+em.getTransaction().begin();
+s1.getClass(); // (s1 is already a managed entity)
+// Suppose gpa is updated after a re-mark:
+// s1.gpa = 3.9;  (would require a setter in a real class)
+em.getTransaction().commit();
+
+// --- DELETE ---
+em.getTransaction().begin();
+em.remove(s1);
+em.getTransaction().commit();
+
+em.close();
+emf.close();
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li>Obtain the factory and manager exactly as in Section 9.7–9.8, pointing at a different database file (<code>university.odb</code>).</li>
+<li><strong>Create:</strong> begin → construct → <code>persist()</code> → commit, identical pattern to the <code>Point</code> loop.</li>
+<li><strong>Read:</strong> this time using a <strong>JPQL <code>WHERE</code> clause</strong> (<code>s.gpa &gt; 3.5</code>) instead of <code>COUNT</code>, and <code>getResultList()</code> instead of <code>getSingleResult()</code> since multiple rows may come back.</li>
+<li><strong>Update:</strong> shown conceptually — any field mutation on a managed entity between <code>begin()</code> and <code>commit()</code> is automatically saved.</li>
+<li><strong>Delete:</strong> identical <code>remove()</code> pattern as the <code>Point</code> example.</li>
+<li><strong>Close resources</strong> — <code>em.close()</code> and <code>emf.close()</code> — good practice not explicitly shown on the slide, added here for completeness.</li>
+</ol>
+<hr />
+<h2 id="10-case-study-objectstore-for-c">10. Case Study: ObjectStore for C++</h2>
+<ul>
+<li><strong>ObjectStore</strong> is a <strong>Commercial OODBMS.</strong></li>
+<li>It uses <strong>heap-allocated objects.</strong></li>
+</ul>
+<h3 id="101-what-is-objectstore-architecture">10.1 What is ObjectStore? (Architecture)</h3>
+<ul>
+<li><strong>ObjectStore is a "pure" object database.</strong></li>
+<li>It <strong>stores C++ objects in the same format as they are used in memory.</strong></li>
+<li>Objects are <strong>accessed and updated using the same C++ syntax as heap-allocated objects</strong> — i.e., there is <strong>almost no impedance mismatch</strong> for the C++ programmer, because persistent objects "look like" ordinary in-memory C++ objects.</li>
+<li><strong>Architecture (Client Side vs. Server Side):</strong><ul>
+<li><strong>Client Side:</strong> a <strong>C++ Client</strong> holds <strong>"Persistent objects used by client"</strong> — an in-memory tree/graph of linked objects.</li>
+<li><strong>Server Side:</strong> an <strong>ObjectStore Server</strong> manages <strong>"Persistent objects in ObjectStore database"</strong> stored on disk.</li>
+<li>The client and server communicate: the client sends requests and receives objects back from the server; the server's database persists the equivalent object graph on disk.</li>
+</ul>
+</li>
+</ul>
+<h3 id="102-objectstore-is-distributed">10.2 ObjectStore is Distributed</h3>
+<ul>
+<li>A <strong>client can access objects in different remote databases in the same transaction.</strong></li>
+<li><strong>Architecture:</strong> multiple <strong>Clients</strong> connect (via a network) to multiple <strong><code>osserver</code></strong> (ObjectStore server) processes, each of which manages one or more <strong>DB</strong> files.</li>
+<li>This means a single logical transaction on the client side can span object data physically stored on <strong>several different remote database servers</strong> simultaneously.</li>
+</ul>
+<h3 id="103-objectstore-c-client-detailed-architecture">10.3 ObjectStore C++ Client — Detailed Architecture</h3>
+<ul>
+<li><strong>The C++ client is the program you write.</strong></li>
+<li>It is <strong>linked with the ObjectStore libraries.</strong></li>
+<li>It <strong>opens databases and runs transactions against them.</strong></li>
+<li>It <strong>allocates objects, calls methods on them, and deletes them.</strong></li>
+<li><strong>Pages are fetched automatically from the DB as needed.</strong></li>
+<li><strong>ObjectStore automatically maintains a cache of recently accessed pages.</strong></li>
+<li><strong>Client is a C++ application program.</strong></li>
+<li><strong>Architecture components (from the slide diagram):</strong><ul>
+<li><strong>Client Side:</strong> memory is organised into <strong>Heap → PSR → Stack</strong>; within it sits the <strong>C++ Client</strong> process, which contains a <strong>Session</strong> object, and connects to a <strong>Cache Manager</strong>, a <strong>Commseg</strong> (communication segment), and a <strong>Client Cache.</strong></li>
+<li><strong>Server Side:</strong> the <strong>ObjectStore Server</strong> communicates with the <strong>Cache Manager</strong> (client side), writes to a <strong>Txn Log</strong> (transaction log, for recovery), and manages one or more <strong>Databases.</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="example-added-for-clarity_3">📌 Example (added for clarity)</h4>
+<p>A CAD application built with ObjectStore might have a C++ class <code>Car3DModel</code> containing pointers to thousands of <code>Part</code> sub-objects. In an RDBMS, saving this would require flattening the object graph into many rows across many tables (see <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#3-storing-objects-in-relational-databases-objectrelational-mapping">Section 3</a>). With ObjectStore, the <em>entire in-memory pointer graph</em> of <code>Car3DModel</code> and its <code>Part</code> objects can be made persistent with a single call, using ordinary C++ pointer syntax (<code>car-&gt;parts[i]-&gt;name</code>) to navigate it — both while it's in memory and after retrieving it from disk.</p>
+<hr />
+<h2 id="11-how-oodbmss-overcome-the-limitations-of-rdbmss">11. How OODBMSs Overcome the Limitations of RDBMSs</h2>
+<blockquote>
+<p>This section directly answers the recap question posed in Lecture 3: <em>"How does OODBMSs e.g. ObjectDB overcome the limitations discussed previously?"</em> It maps back one-to-one onto <a href="https://claude.ai/chat/a4597ef7-0397-4372-b140-e5a252a58c39#2-limitations-weaknesses-of-relational-dbmss">Section 2</a>.</p>
+</blockquote>
+<h3 id="111-recap-weaknesses-1-2">11.1 Recap — Weaknesses 1 &amp; 2</h3>
+<p><strong>1. Poor representation of "real world" entities</strong></p>
+<ul>
+<li>Normalization leads to relations that do not correspond to entities in the "real world."</li>
+<li>Joins are needed to obtain information from relations (tables).</li>
+</ul>
+<p><strong>2. Semantic Overloading</strong></p>
+<ul>
+<li>Single construct for representing data and data relationships: the relation.</li>
+<li>No mechanism to distinguish between relations &amp; relationships, or between different types of relationships.</li>
+</ul>
+<h3 id="112-solution-to-weakness-1-representation-of-real-world-entities">11.2 Solution to Weakness 1 — Representation of "Real World" Entities</h3>
+<ul>
+<li><strong>OOP constructs are used</strong>: <strong>classes, inheritance, composition,</strong> etc. — these map directly onto real-world entities and their structure.</li>
+<li><strong>Joins are not used</strong> (<strong>there are no tables in the DB</strong>) — since a real-world object is stored as <strong>one</strong> object, not fragmented across relations, there is nothing to "join" back together.</li>
+</ul>
+<h3 id="113-solution-to-weakness-2-no-semantic-overloading">11.3 Solution to Weakness 2 — No Semantic Overloading</h3>
+<ul>
+<li><strong>Object identifier (OID)</strong> is <strong>generated by the DBMS</strong> for every object, giving every object a unique, unambiguous identity — separate from its data.<ul>
+<li><strong>Logical OID:</strong> <strong>independent of physical location on disk.</strong></li>
+<li><strong>Physical OID:</strong> <strong>points to an actual location on disk.</strong></li>
+</ul>
+</li>
+<li><strong>Representation of relationships (business rules):</strong><ul>
+<li><strong>One-to-one, one-to-many, many-to-many</strong> relationships (<strong>object composition</strong>) are done <strong>using OIDs</strong> (rather than foreign keys embedded in flat tables).</li>
+</ul>
+</li>
+<li><strong>Representation of inheritance relationships:</strong><ul>
+<li>Done <strong>through class definitions</strong> — inheritance is a first-class OOP construct, unlike in the relational model.</li>
+</ul>
+</li>
+</ul>
+<h3 id="114-object-access-example-resident-object-table-rot">11.4 Object Access — Example: Resident Object Table (ROT)</h3>
+<ul>
+<li><strong>Method of locating objects:</strong> <strong>Lookup a virtual memory pointer (in the ROT) with each object access.</strong></li>
+<li><strong>OIDs are obtained from the DBMS</strong>, typically <strong>using constructors &amp; an overloaded <code>new</code> operator.</strong></li>
+</ul>
+<h4 id="worked-example-figure-265-resident-object-table-referencing-four-objects-in-main-memory">📌 Worked Example — Figure 26.5: Resident Object Table Referencing Four Objects in Main Memory</h4>
+<p>The <strong>Resident Object Table (ROT)</strong> maps an object's <strong>OID</strong> to its current <strong>memory address</strong>, so the OODBMS/application can locate any object quickly.</p>
+<p><strong>Resident Object Table</strong></p>
+<table>
+<thead>
+<tr>
+<th>OID</th>
+<th>memory address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>...</td>
+</tr>
+<tr>
+<td>2</td>
+<td>...</td>
+</tr>
+<tr>
+<td>3</td>
+<td>...</td>
+</tr>
+<tr>
+<td>4</td>
+<td>...</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Objects referenced by the ROT:</strong></p>
+<p><code>Branch: OID1</code></p>
+<pre><code>branchNo: B003
+street:   163 Main St
+city:     Glasgow
+postcode: G11 9QX
+staff:    {OID4, OID5, ...}
+property: {OID2, OID3, ...}
+manager:  OID6
+</code></pre>
+<p><code>Staff: OID4</code></p>
+<pre><code>staffNo:  SG14
+fName:    David
+lName:    Ford
+position: Supervisor
+sex:      M
+salary:   18000
+branch:   OID1
+</code></pre>
+<p><code>PropertyForRent: OID2</code></p>
+<pre><code>propertyNo: PG4
+street:     6 Lawrence St
+type:       Flat
+rooms:      3
+rent:       350
+staff:      OID4
+branch:     OID1
+</code></pre>
+<p><code>PropertyForRent: OID3</code></p>
+<pre><code>propertyNo: PG16
+street:     5 Novar Dr
+type:       Flat
+rooms:      4
+rent:       450
+staff:      OID4
+branch:     OID1
+</code></pre>
+<p><strong>How to read this example step by step:</strong></p>
+<ol>
+<li>The <code>Branch: OID1</code> object references <strong>multiple</strong> staff members and properties via <strong>sets of OIDs</strong>: <code>staff: {OID4, OID5, ...}</code> and <code>property: {OID2, OID3, ...}</code>.</li>
+<li>To actually <em>use</em> <code>Branch</code>'s staff, the system takes an OID from that set (e.g., <code>OID4</code>) and <strong>looks it up in the ROT</strong> to find its current memory address.</li>
+<li>The ROT entry for <code>OID4</code> points to the in-memory representation of the <code>Staff: OID4</code> object (David Ford).</li>
+<li>Notice <code>Staff: OID4</code> in turn stores <code>branch: OID1</code> — a <strong>back-reference</strong> to its branch, again via OID, not a foreign key/JOIN.</li>
+<li>Similarly, both <code>PropertyForRent: OID2</code> and <code>PropertyForRent: OID3</code> store <code>staff: OID4</code> and <code>branch: OID1</code> — direct object references rather than relational foreign keys.</li>
+</ol>
+<h3 id="115-11-relationship-between-objects-a-and-b">11.5 1:1 Relationship Between Objects A and B</h3>
+<ul>
+<li><strong>One-to-one relationship.</strong></li>
+<li><strong>Add reference attributes to both objects.</strong></li>
+<li><strong>Reference is an OID</strong> (recall: OIDs are obtained from the DBMS).</li>
+</ul>
+<h4 id="worked-example-branch-manager-11">📌 Worked Example — Branch ↔ Manager (1:1)</h4>
+<pre><code>Branch: OID1                       Manager: OID6
+branchNo: B003                     staffNo:  SG5
+street:   163 Main St              fName:    Susan
+city:     Glasgow                  lName:    Brand
+postcode: G11 9QX                  position: Manager
+staff:    {OID4, OID5, ...}        sex:      F
+property: {OID2, OID3, ...}        DOB:      3-Jun-40
+manager:  OID6   ─────────►        salary:   24000
+        ◄───────────────────────  branch:   OID1
+</code></pre>
+<ul>
+<li><code>Branch: OID1</code> stores <code>manager: OID6</code> — a <strong>reference attribute</strong> pointing at the <code>Manager</code> object.</li>
+<li><code>Manager: OID6</code> stores <code>branch: OID1</code> — a <strong>reference attribute</strong> pointing back at the <code>Branch</code> object.</li>
+<li>Both directions of the 1:1 relationship are captured using simple OID cross-references — <strong>no join table needed.</strong></li>
+</ul>
+<h3 id="116-1-relationship-between-objects-a-and-b-c-d">11.6 1:* Relationship Between Objects A and B, C, D, …</h3>
+<ul>
+<li><strong>One-to-many relationship.</strong></li>
+<li><strong>Example: one Branch has many Properties for rent.</strong></li>
+<li><strong>Add a reference attribute to one object</strong> (<code>branch</code> in <code>PropertyForRent</code>).</li>
+<li><strong>AND</strong></li>
+<li><strong>Add an attribute containing a set of references to the other objects</strong> (<code>property</code> in <code>Branch</code>).</li>
+<li><em>So, how are the problems caused by joins eliminated?</em> — because navigating from <code>Branch</code> to all its properties (or from a <code>PropertyForRent</code> back to its <code>Branch</code>) is a direct <strong>pointer/OID dereference</strong>, not a relational JOIN operation.</li>
+</ul>
+<h4 id="worked-example-branch-propertyforrent-salesstaff-1">📌 Worked Example — Branch ↔ PropertyForRent ↔ SalesStaff (1:*)</h4>
+<pre><code>Branch: OID1
+branchNo: B003
+street:   163 Main St
+city:     Glasgow
+postcode: G11 9QX
+staff:    {OID4, OID5, ...}
+property: {OID2, OID3, ...}   ── references many PropertyForRent objects
+manager:  OID6
+
+PropertyForRent: OID2                 PropertyForRent: OID3
+propertyNo: PG4                       propertyNo: PG16
+street:     6 Lawrence St             street:     5 Novar Dr
+type:       Flat                      type:       Flat
+rooms:      3                         rooms:      4
+rent:       350                       rent:       450
+staff:      OID4                      staff:      OID4
+branch:     OID1  ── points back      branch:     OID1  ── points back
+
+SalesStaff: OID4
+staffNo:  SG14
+fName:    David
+lName:    Ford
+position: Supervisor
+sex:      M
+salary:   18000
+branch:   OID1
+property: {OID2, OID3, ...}
+</code></pre>
+<ul>
+<li><code>Branch: OID1</code>'s <code>property</code> attribute holds a <strong>set</strong> of OIDs <code>{OID2, OID3, ...}</code> — the "many" side.</li>
+<li>Each <code>PropertyForRent</code> object holds a <strong>single</strong> <code>branch: OID1</code> reference back — the "one" side.</li>
+<li><code>SalesStaff: OID4</code> also demonstrates a <strong>second</strong> 1:<em> relationship — one staff member (<code>OID4</code>) is referenced by </em><em>many</em>* properties (<code>OID2</code>, <code>OID3</code>), and in turn the staff member itself stores its own <code>property</code> set referencing those properties back.</li>
+</ul>
+<h3 id="117-many-to-many-relationships">11.7 Many-to-Many (<em>:</em>) Relationships</h3>
+<ul>
+<li><strong>Client can view many properties.</strong></li>
+<li><strong>A property can be viewed by many clients.</strong></li>
+<li><strong>Add an attribute containing a set of references to each object</strong> (i.e., both sides get a set-valued reference attribute — unlike 1:*, where only one side gets a set).</li>
+</ul>
+<h4 id="worked-example-client-propertyforrent-via-a-viewing-association">📌 Worked Example — Client ↔ PropertyForRent (<em>:</em>, via a "Viewing" association)</h4>
+<pre><code>Client: OID9
+clientNo: CR56
+fName:    Aline
+lName:    Stewart
+telNo:    0141-848-1825
+prefType: Flat
+maxRent:  350
+Viewing:
+   { property: OID7, viewDate: 28-Apr-01, comment: &quot;&quot; }
+   { property: OID2, viewDate: 26-May-01, comment: &quot;&quot; }
+
+Client: OID10
+clientNo: CR74
+fName:    Mike
+lName:    Ritchie
+telNo:    01475-392178
+prefType: House
+maxRent:  750
+Viewing:
+   { property: OID2, viewDate: 20-Apr-01, comment: &quot;too remote&quot; }
+
+PropertyForRent: OID7                   PropertyForRent: OID2
+propertyNo: PG36                        propertyNo: PG4
+city:       2 Manor Rd                  city:       6 Lawence St
+type:       Flat                        type:       Flat
+rooms:      3                           rooms:      3
+rent:       375                         rent:       350
+staff:      OID8                        staff:      OID4
+branch:     OID1                        branch:     OID1
+viewers:    {OID9}                      viewers:    {OID9, OID10}
+</code></pre>
+<p><strong>How to read this example step by step:</strong></p>
+<ol>
+<li>Each <code>Client</code> object stores a <strong><code>Viewing</code></strong> collection — a <strong>set of embedded reference records</strong>, each pointing to a <code>property</code> OID plus extra relationship data (<code>viewDate</code>, <code>comment</code>). This is how OODBs attach <strong>attributes to the relationship itself</strong> (something the plain relational model struggles to do cleanly without an extra join table).</li>
+<li>Each <code>PropertyForRent</code> object stores a <strong><code>viewers</code></strong> set of OIDs pointing back to every <code>Client</code> who viewed it — e.g., <code>PropertyForRent: OID2</code>'s <code>viewers: {OID9, OID10}</code> shows <strong>both</strong> Client OID9 and Client OID10 viewed it.</li>
+<li>This is the defining feature of <em>:</em> relationships in an OODB: <strong>both participating objects hold a set-valued reference to the other</strong>, capturing the full many-to-many structure without a separate join table.</li>
+</ol>
+<h3 id="118-recap-weakness-3-limited-operations">11.8 Recap — Weakness 3 (Limited Operations)</h3>
+<p><strong>3. Limited Operations</strong></p>
+<ul>
+<li>RDBMSs only have a fixed set of operations which cannot be extended, i.e., operations on relations (sets of tuples) &amp; tuples.</li>
+<li>Not possible to specify new operations (BUT: can use stored procedures).</li>
+<li><em>How do OODBMSs e.g. ObjectDB overcome the above limitations?</em></li>
+</ul>
+<h3 id="119-solution-to-weakness-3-oop-methods-defined-for-classes">11.9 Solution to Weakness 3 — OOP Methods Defined for Classes</h3>
+<ul>
+<li><strong>Solution: OOP methods are defined for classes.</strong></li>
+</ul>
+<h4 id="coding-example-1-the-pilot-class-for-oodb-from-the-slides-reproduced-in-full">📌 Coding Example 1 — The <code>Pilot</code> Class for OODB (from the slides, reproduced in full)</h4>
+<pre><code class="language-java">//package com.db4o.f1.chapter1;
+
+public class Pilot
+{
+    private String name;
+    private int points;
+
+    public Pilot(String name, int points)
+    {
+        this.name = name;
+        this.points = points;
+    }
+
+    public int getPoints()
+    {
+        return points;
+    }
+
+    public void addPoints(int points)
+    {
+        this.points += points;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String toString()
+    {
+        return name + &quot;/&quot; + points;
+    }
+}
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong>Fields</strong> — <code>name</code> (String) and <code>points</code> (int) hold the pilot's identifying data and score.</li>
+<li><strong>Constructor</strong> — <code>Pilot(String name, int points)</code> initialises a new in-memory <code>Pilot</code> object.</li>
+<li><strong><code>getPoints()</code></strong> — a simple accessor operation.</li>
+<li><strong><code>addPoints(int points)</code></strong> — a <strong>custom, user-defined operation/method</strong> (<code>this.points += points;</code>) — this is exactly the kind of <strong>new operation</strong> that RDBMSs could not support natively (Weakness 3) but is trivially expressed as a method directly on the <code>Pilot</code> class in an OODBMS.</li>
+<li><strong><code>getName()</code></strong> — another accessor.</li>
+<li><strong><code>toString()</code></strong> — overridden for display, formats the object as <code>"name/points"</code>.</li>
+</ol>
+<ul>
+<li>This directly demonstrates the fix for Weakness 3: instead of being limited to SQL's fixed relational operators, the developer can attach <strong>arbitrary behaviour</strong> (like <code>addPoints</code>) directly to the persistent class — this new operation travels with every <code>Pilot</code> object stored in the OODB.</li>
+</ul>
+<h4 id="coding-example-2-added-for-step-by-step-clarity-extending-pilot-with-a-business-rule-method">📌 Coding Example 2 (added for step-by-step clarity) — Extending <code>Pilot</code> with a Business-Rule Method</h4>
+<pre><code class="language-java">public class Pilot {
+    private String name;
+    private int points;
+    private static final int CHAMPIONSHIP_THRESHOLD = 100;
+
+    public Pilot(String name, int points) {
+        this.name = name;
+        this.points = points;
+    }
+
+    public void addPoints(int points) {
+        this.points += points;
+    }
+
+    // New custom operation — not expressible as a fixed SQL operator
+    public boolean isChampionshipContender() {
+        return this.points &gt;= CHAMPIONSHIP_THRESHOLD;
+    }
+
+    public String toString() {
+        return name + &quot;/&quot; + points;
+    }
+}
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li>A <strong>new static constant</strong>, <code>CHAMPIONSHIP_THRESHOLD</code>, encodes a business rule directly in the class.</li>
+<li>The <strong>new method <code>isChampionshipContender()</code></strong> performs a domain-specific computation (<code>points &gt;= 100</code>) that a plain relational SELECT statement could express only via a WHERE clause external to the data — here, it is <strong>encapsulated inside the object itself</strong>, so any part of the application can call <code>pilot.isChampionshipContender()</code> without re-writing that business logic elsewhere.</li>
+<li>This reinforces Weakness 3's solution: OOP methods let the <strong>data and its behaviour travel together</strong> as one persistent unit.</li>
+</ol>
+<h3 id="1110-storing-and-executing-methods">11.10 Storing and Executing Methods</h3>
+<p>There are <strong>two approaches</strong> to storing/executing the methods (behaviour) associated with persistent objects:</p>
+<p><strong>1. Store methods in external files</strong></p>
+<ul>
+<li><strong>Link libraries into the application at compile / link time.</strong></li>
+<li><strong>Architecture:</strong> <code>CLIENT</code> (<code>Application</code> + <code>Object manager</code>) exchanges <strong>Requests</strong> / <strong>Objects</strong> with the <code>SERVER</code> (<code>Object server</code>), which is backed by an <code>Object store</code>; the <code>Object manager</code> on the client side is linked at compile-time to external method files (<code>File1</code>, <code>File2</code>, <code>File3</code>) — i.e., <strong>"Methods in files (bound at compile and link time)."</strong></li>
+</ul>
+<p><strong>2. Store methods in database</strong></p>
+<ul>
+<li><strong>Dynamically bound to the application at run-time.</strong></li>
+<li><strong>Architecture:</strong> identical Client/Server structure, but this time — <strong>"Methods dynamically bound to application"</strong> — the method code itself resides in the <code>Object store</code> alongside the data, and is fetched/bound to the running application at run-time rather than at compile-time.</li>
+</ul>
+<p><strong>Benefits (apply especially to storing methods in external files / libraries):</strong></p>
+<ul>
+<li><strong>Eliminates redundant code.</strong></li>
+<li><strong>Simplifies modifications.</strong></li>
+<li><strong>Methods are more secure.</strong></li>
+<li><strong>Methods can be shared concurrently.</strong></li>
+<li><strong>Improved integrity.</strong></li>
+</ul>
+<h4 id="example-added-for-clarity_4">📌 Example (added for clarity)</h4>
+<p>Approach 1 is analogous to a Java application that is compiled against a <code>.jar</code> library containing the <code>Pilot</code> class's methods — if the method logic changes, the whole application must be recompiled/relinked. Approach 2 is analogous to a stored-procedure-like model where the OODBMS itself stores the bytecode/logic for <code>addPoints()</code> inside the database, so different client applications connecting to the database at run-time automatically get the current version of the method without needing to be recompiled.</p>
+<hr />
+<h2 id="12-objectdb-demo-learning-outcomes">12. ObjectDB Demo — Learning Outcomes</h2>
+<ul>
+<li><strong>ObjectDB Demo</strong> — a live, practical, in-class demonstration (~20–30 minutes).</li>
+<li><strong>Learning outcomes:</strong> after the demo, students should be able to:<ol>
+<li><strong>Create an ObjectDB database.</strong></li>
+<li><strong>Store objects.</strong></li>
+<li><strong>Execute JPQL queries.</strong></li>
+<li><strong>Retrieve objects.</strong></li>
+</ol>
+</li>
+</ul>
+<hr />
+<h2 id="13-jpa-query-api">13. JPA Query API</h2>
+<ul>
+<li>The <strong>JPA Query Language (JPQL)</strong> is defined as an <strong>object-oriented version of SQL.</strong></li>
+<li><strong>Users familiar with SQL find JPQL very easy to learn and use.</strong></li>
+<li>Topics to be discussed:<ul>
+<li><strong>JPA Query API</strong></li>
+<li><strong>JPA Query Structure (JPQL/Criteria)</strong></li>
+<li><strong>JPA Query Expressions (JPQL/Criteria)</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="131-the-two-query-interfaces">13.1 The Two Query Interfaces</h3>
+<p>Queries are represented in <strong>JPA 2</strong> by <strong>two interfaces</strong>:</p>
+<ul>
+<li><strong>The old <code>Query</code> interface:</strong> the <strong>only</strong> interface available for representing queries in <strong>JPA 1.</strong></li>
+<li><strong>The new <code>TypedQuery</code> interface:</strong> introduced in <strong>JPA 2.</strong> The <strong><code>TypedQuery</code> interface extends the <code>Query</code> interface.</strong></li>
+</ul>
+<h4 id="coding-example-query-vs-typedquery-from-the-slides">📌 Coding Example — <code>Query</code> vs. <code>TypedQuery</code> (from the slides)</h4>
+<pre><code class="language-java">Query q1 = em.createQuery(&quot;SELECT c FROM Country c&quot;);
+
+TypedQuery&lt;Country&gt; q2 =
+    em.createQuery(&quot;SELECT c FROM Country c&quot;, Country.class);
+</code></pre>
+<p><strong>Step-by-step comparison:</strong></p>
+<ol>
+<li><strong>Line 1 (<code>Query</code>)</strong> — <code>em.createQuery("SELECT c FROM Country c")</code> returns a raw, <strong>untyped</strong> <code>Query</code> object. Any result retrieved from <code>q1</code> must be manually cast to <code>Country</code> by the developer (e.g., <code>(Country) q1.getSingleResult();</code>).</li>
+<li><strong>Line 2 (<code>TypedQuery&lt;Country&gt;</code>)</strong> — passing the extra <code>Country.class</code> argument returns a <strong><code>TypedQuery&lt;Country&gt;</code></strong>, meaning the compiler and IDE know the result type is <code>Country</code> — <strong>no manual casting needed</strong>, and type errors are caught at compile time.</li>
+<li><strong>Why it matters:</strong> <code>TypedQuery</code> is generally <strong>preferred</strong> in modern JPA/ObjectDB code because it is safer (compile-time type checking) and more convenient (<code>q2.getSingleResult()</code> returns a <code>Country</code> directly).</li>
+</ol>
+<hr />
+<h2 id="14-jpa-query-structure-jpql-criteria">14. JPA Query Structure (JPQL / Criteria)</h2>
+<ul>
+<li><strong>The syntax of the Java Persistence Query Language (JPQL) is very similar to the syntax of SQL.</strong></li>
+<li><strong>The main difference between SQL and JPQL</strong> is that <strong>SQL works with relational database tables, records and fields</strong>, whereas <strong>JPQL works with Java classes and objects.</strong></li>
+</ul>
+<h3 id="141-the-six-jpql-clauses">14.1 The Six JPQL Clauses</h3>
+<p>As with SQL, a <strong>JPQL <code>SELECT</code> query</strong> consists of <strong>up to 6 clauses</strong>, in the following format:</p>
+<pre><code>SELECT ... FROM ...
+[WHERE ...]
+[GROUP BY ... [HAVING ...]]
+[ORDER BY ...]
+</code></pre>
+<p>Additionally, JPQL also supports:</p>
+<pre><code>DELETE FROM ... [WHERE ...]
+UPDATE ... SET ... [WHERE ...]
+</code></pre>
+<h4 id="example-added-for-clarity-all-clauses-in-one-query">📌 Example (added for clarity) — All Clauses in One Query</h4>
+<pre><code class="language-java">TypedQuery&lt;Country&gt; q = em.createQuery(
+    &quot;SELECT c FROM Country c &quot; +
+    &quot;WHERE c.population &gt; 1000000 &quot; +
+    &quot;GROUP BY c.continent &quot; +
+    &quot;HAVING COUNT(c) &gt; 3 &quot; +
+    &quot;ORDER BY c.name&quot;,
+    Country.class);
+</code></pre>
+<p><strong>Step-by-step breakdown:</strong></p>
+<ol>
+<li><code>SELECT c FROM Country c</code> — selects whole <code>Country</code> <strong>objects</strong> (aliased <code>c</code>), analogous to <code>SELECT * FROM Country</code> in SQL but returning <strong>objects</strong>, not rows.</li>
+<li><code>WHERE c.population &gt; 1000000</code> — filters which <code>Country</code> objects are considered, exactly like a SQL <code>WHERE</code> clause but referencing an <strong>object attribute</strong> (<code>c.population</code>) rather than a column.</li>
+<li><code>GROUP BY c.continent</code> — groups the filtered countries by their <code>continent</code> attribute.</li>
+<li><code>HAVING COUNT(c) &gt; 3</code> — keeps only groups (continents) that have more than 3 matching countries.</li>
+<li><code>ORDER BY c.name</code> — sorts the final result set alphabetically by the country's <code>name</code> attribute.</li>
+</ol>
+<hr />
+<h2 id="15-jpa-query-expressions">15. JPA Query Expressions</h2>
+<ul>
+<li><strong>Query expressions are the foundations on which JPQL and criteria queries are built.</strong></li>
+<li><strong>Every query consists of clauses</strong> — <code>SELECT</code>, <code>FROM</code>, <code>WHERE</code>, <code>GROUP BY</code>, <code>HAVING</code> and <code>ORDER BY</code> — and <strong>each clause consists of JPQL query expressions.</strong></li>
+</ul>
+<h4 id="example-added-for-clarity_5">📌 Example (added for clarity)</h4>
+<p>In the query <code>WHERE c.population &gt; 1000000 AND c.continent = 'Africa'</code>, each of the following is a <strong>query expression</strong>:</p>
+<ul>
+<li><code>c.population</code> — a <strong>path expression</strong> (navigation from variable <code>c</code> to its <code>population</code> attribute).</li>
+<li><code>1000000</code> — a <strong>literal expression</strong>.</li>
+<li><code>c.population &gt; 1000000</code> — a <strong>comparison expression</strong> (combining two smaller expressions with the <code>&gt;</code> operator).</li>
+<li><code>c.continent = 'Africa'</code> — another comparison expression.</li>
+<li>The whole <code>... AND ...</code> construct — a <strong>logical expression</strong> combining two comparison expressions.</li>
+</ul>
+<hr />
+<h2 id="16-sql-vs-jpql-terminology-mapping">16. SQL vs JPQL — Terminology Mapping</h2>
+<table>
+<thead>
+<tr>
+<th>SQL</th>
+<th>JPQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Table</strong></td>
+<td><strong>Entity</strong></td>
+</tr>
+<tr>
+<td><strong>Row</strong></td>
+<td><strong>Object</strong></td>
+</tr>
+<tr>
+<td><strong>Column</strong></td>
+<td><strong>Attribute</strong></td>
+</tr>
+<tr>
+<td><strong><code>SELECT *</code></strong></td>
+<td><strong><code>SELECT e</code></strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-added-for-clarity_6">📌 Example (added for clarity)</h4>
+<ul>
+<li>In <strong>SQL</strong>: <code>SELECT * FROM Country</code> returns <strong>rows</strong> — plain sets of column values, with no behaviour attached.</li>
+<li>In <strong>JPQL</strong>: <code>SELECT c FROM Country c</code> returns <strong><code>Country</code> objects</strong> — each result is a fully-formed Java object (with any methods the <code>Country</code> class defines) rather than a disconnected row of values. This mapping is the conceptual key to understanding <em>every</em> JPQL query: mentally substitute "table" → "entity/class," "row" → "object," and "column" → "attribute" when translating SQL knowledge to JPQL.</li>
+</ul>
+<hr />
+<h2 id="17-jpa-atomic-query-expressions-operators-functions">17. JPA Atomic Query Expressions, Operators &amp; Functions</h2>
+<h3 id="171-atomic-query-expressions">17.1 Atomic Query Expressions</h3>
+<ul>
+<li><strong>The atomic query expressions are:</strong><ul>
+<li><strong>JPQL / Criteria Variables</strong> — e.g., <code>Range</code> (e.g., the alias <code>c</code> in <code>FROM Country c</code>).</li>
+<li><strong>JPQL / Criteria Parameters</strong> — e.g., <strong>named</strong>, <strong>ordinal</strong> (bound parameters passed into a query, e.g., <code>:countryName</code> or <code>?1</code>).</li>
+<li><strong>JPQL / Criteria Literals</strong> — e.g., <code>NULL</code>, <code>Boolean</code>, etc.</li>
+</ul>
+</li>
+<li><strong>Every query expression consists of at least one atomic component.</strong> <strong>More complex query expressions are built by combining atomic expressions with operators and functions.</strong></li>
+</ul>
+<h3 id="172-jpa-operators-and-functions">17.2 JPA Operators and Functions</h3>
+<ul>
+<li>JPQL / Criteria queries support the following operators (<strong>in order of decreasing precedence</strong>):</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Precedence</th>
+<th>Operator Category</th>
+<th>Operators</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(1)</td>
+<td><strong>Navigation operator</strong></td>
+<td><code>.</code></td>
+</tr>
+<tr>
+<td>(2)</td>
+<td><strong>Arithmetic operators</strong></td>
+<td><code>*</code> (multiplication), <code>/</code> (division), <code>+</code> (addition), <code>-</code> (subtraction)</td>
+</tr>
+<tr>
+<td>(3)</td>
+<td><strong>Comparison operators</strong></td>
+<td><code>=</code>, <code>&lt;&gt;</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>IS [NOT] NULL</code>, <code>[NOT] BETWEEN</code>, plus <strong>Collection operators</strong>: <code>[NOT] IN</code>, <code>IS [NOT] EMPTY</code>, <code>[NOT] MEMBER [OF]</code>, and the <code>[NOT] LIKE</code> operator</td>
+</tr>
+<tr>
+<td>(4)</td>
+<td><strong>Logical operators</strong></td>
+<td><code>AND</code>, <code>OR</code>, <code>NOT</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-added-for-clarity-using-parameters-and-operators-together">📌 Example (added for clarity) — Using Parameters and Operators Together</h4>
+<pre><code class="language-java">TypedQuery&lt;Student&gt; q = em.createQuery(
+    &quot;SELECT s FROM Student s &quot; +
+    &quot;WHERE s.gpa &gt;= :minGpa AND s.name LIKE :namePattern&quot;,
+    Student.class);
+q.setParameter(&quot;minGpa&quot;, 3.0);
+q.setParameter(&quot;namePattern&quot;, &quot;T%&quot;);
+List&lt;Student&gt; results = q.getResultList();
+</code></pre>
+<p><strong>Step-by-step breakdown:</strong></p>
+<ol>
+<li><code>:minGpa</code> and <code>:namePattern</code> are <strong>named parameters</strong> (an atomic query expression type) — placeholders that get filled in at run-time.</li>
+<li><code>s.gpa &gt;= :minGpa</code> uses the <strong>comparison operator</strong> <code>&gt;=</code> (precedence level 3) between the <strong>navigation expression</strong> <code>s.gpa</code> (precedence level 1, i.e., resolved first) and the parameter.</li>
+<li><code>s.name LIKE :namePattern</code> uses the <strong><code>LIKE</code> collection/string operator</strong> (also precedence level 3) for pattern matching (<code>"T%"</code> matches any name starting with "T").</li>
+<li>The two comparisons are joined with the <strong>logical operator</strong> <code>AND</code> (precedence level 4, evaluated last).</li>
+<li><code>q.setParameter(...)</code> binds actual values to the named parameters before execution.</li>
+<li><code>q.getResultList()</code> executes the query and returns a <code>List&lt;Student&gt;</code> of all matching <strong>objects</strong>.</li>
+</ol>
+<hr />
+<h2 id="18-questions-memo">18. Questions &amp; Memo</h2>
+<h3 id="section-1-administrative">Section 1 — Administrative</h3>
+<p><strong>Q1:</strong> What percentage of a student's semester mark comes from Semester Test 2, and what is the minimum semester mark required to write the exam?</p>
+<p><strong>A1:</strong> Semester Test 2 contributes <strong>50%</strong> of the semester mark. A student needs a <strong>minimum 40% semester mark</strong> <strong>AND</strong> must have completed <strong>at least 3 practical assignments</strong> to be permitted to write the final exam.</p>
+<hr />
+<h3 id="section-2-limitations-of-rdbmss">Section 2 — Limitations of RDBMSs</h3>
+<p><strong>Q2:</strong> List all seven weaknesses of RDBMSs discussed in the lecture.</p>
+<p><strong>A2:</strong></p>
+<ol>
+<li>Poor representation of "real world" entities.</li>
+<li>Semantic overloading.</li>
+<li>Limited operations.</li>
+<li>Homogeneous data structure.</li>
+<li>Impedance (mismatch).</li>
+<li>RDBMS supports only short-lived transactions.</li>
+<li>Schema changes create problems.</li>
+</ol>
+<hr />
+<p><strong>Q3:</strong> Explain why a JOIN is needed to see a staff member's name together with their branch's address in a relational database, and why this is considered a weakness.</p>
+<p><strong>A3:</strong> Because normalization splits the "real world" fact (a staff member works at a branch with an address) across two separate relations, <code>Staff</code> (which stores <code>branchNo</code> as a foreign key) and <code>Branch</code> (which stores <code>bAddress</code>). To reconstruct the combined real-world fact, the DBMS must perform a <strong>JOIN</strong> — an intensive computational operation — on <code>branchNo</code>. This is a weakness because it means a single conceptual real-world entity requires expensive cross-relation computation just to view together, rather than being stored/retrieved as one coherent unit.</p>
+<hr />
+<p><strong>Q4:</strong> What is "semantic overloading" in the relational model, and how does the Student–Registration–Module ERD example illustrate it?</p>
+<p><strong>A4:</strong> Semantic overloading means the relational model has only <strong>one construct — the relation</strong> — to represent both <em>data</em> and <em>relationships between data</em>, with no way to distinguish relations from relationships, or different relationship types from each other. In the ERD example, <code>Registration</code> functions simultaneously as a <strong>relation</strong> (a table storing registration data) <strong>and</strong> as the <strong>relationship</strong> connecting <code>Student</code> and <code>Module</code>. Furthermore, the semantic labels on the relationships themselves ("is written in," "is found in") are <strong>not recorded anywhere in the relational database</strong> — that meaning exists only in the ERD diagram, not in the stored data.</p>
+<hr />
+<p><strong>Q5:</strong> Give an example of "homogeneous data structure" being a limitation, using the intersection-must-be-atomic rule.</p>
+<p><strong>A5:</strong> In a <code>position</code>/<code>salary</code> table, every cell must hold a single atomic value (e.g., <code>"Manager"</code>, <code>30000</code>). It is not possible to store a composite/decomposable object in a single cell — e.g., a <code>salary</code> cell cannot directly hold a structured value like <code>{basic: 25000, bonus: 5000}</code>. The only relational workaround is storing a <strong>BLOB/CLOB</strong> pointer to an external file, but that file's internal structure cannot be queried by the DBMS — it is only useful for viewing.</p>
+<hr />
+<p><strong>Q6:</strong> In the JDBC code example, identify two specific points at which the "impedance mismatch" between Java (OOP) and SQL (relational) is visible.</p>
+<p><strong>A6:</strong></p>
+<ol>
+<li>The SQL query itself is embedded as a <strong>plain string literal</strong> — <code>stmt.executeQuery("SELECT moviename, releasedate FROM movies")</code> — meaning SQL syntax is not checked by the Java compiler and is essentially "foreign" code living inside Java source.</li>
+<li>Extracting results requires <strong>manual, per-column, per-type extraction</strong> from the generic <code>ResultSet</code> — <code>rs.getString("moviename")</code> — the programmer must manually map relational columns back into meaningful application data; there is no automatic object reconstruction.</li>
+</ol>
+<hr />
+<p><strong>Q7:</strong> Distinguish between a short-lived (business) transaction and a long-duration (design) transaction, and state which one RDBMSs are best suited for.</p>
+<p><strong>A7:</strong> A <strong>short-lived (business) transaction</strong> completes quickly (e.g., transferring money between two bank accounts in milliseconds), while a <strong>long-duration (design) transaction</strong> may remain open for extended periods (e.g., an engineer working on a CAD design over several days). RDBMSs are optimised for and best suited to <strong>short-lived (business) transactions</strong>; they handle long-duration design transactions poorly.</p>
+<hr />
+<h3 id="section-3-storing-objects-in-relational-databases">Section 3 — Storing Objects in Relational Databases</h3>
+<p><strong>Q8:</strong> Why does storing objects in a relational database "add complexity," and how does the STUDENT/COURSES/DEGREE PROGRAM example demonstrate this?</p>
+<p><strong>A8:</strong> Because achieving persistence for OOP objects using an RDBMS as the storage engine requires <strong>mapping class instances to one or more rows distributed over one or more relations</strong>, and the developer must <strong>manually write conversion code</strong> between objects and rows (Object-Relational Mapping). In the example, a single conceptual <code>STUDENT</code> object (registering for courses in a degree program) ends up with its data spread across <strong>3 separate tables</strong>, so reconstructing one <code>Student</code> object back into an application requires multiple JOINs and manual object-assembly code.</p>
+<hr />
+<h3 id="section-4-introduction-to-oodbs">Section 4 — Introduction to OODBs</h3>
+<p><strong>Q9:</strong> How does the typical ratio of "types" to "instances" in design/engineering data differ from that of relational data, and why does this matter for OODB origins?</p>
+<p><strong>A9:</strong> Design/engineering data (the origin domain of OODBs, e.g., CAD) typically has a <strong>large number of types and a small number of instances</strong> — many distinct part/component classes but relatively few actual design instances. This is the <strong>opposite</strong> of the relational world, which typically has <strong>few relations (types) but many tuples (instances)</strong>. This mismatch is part of why the relational model (optimised for many rows of few table types) was a poor fit for engineering/design applications, motivating the development of OODBMSs.</p>
+<hr />
+<p><strong>Q10:</strong> What two things does an Object Data Management System (ODMS) need to specify for complex objects?</p>
+<p><strong>A10:</strong> An ODMS needs to specify: (1) the <strong>structure of complex objects</strong>, and (2) the <strong>operations that can be applied to these objects.</strong></p>
+<hr />
+<h3 id="section-5-6-terminology-and-oodboodbms-relationship">Section 5 &amp; 6 — Terminology and OODB/OODBMS Relationship</h3>
+<p><strong>Q11:</strong> Define "OO data model," "OO database," and "OODBMS," and explain how they relate to one another using the real-estate example.</p>
+<p><strong>A11:</strong></p>
+<ul>
+<li><strong>OO data model:</strong> a (logical) data model that captures the semantics of objects (classes) supported in object-oriented programming.</li>
+<li><strong>OO database (OODB):</strong> a persistent, sharable collection of objects defined by an OO data model.</li>
+<li><strong>OODBMS:</strong> the manager (software) of an OODB.</li>
+</ul>
+<p>They relate as follows: the <strong>OO data model</strong> defines the classes (e.g., <code>PropertyForRent</code>, <code>Client</code>, <code>Branch</code>) and their structure. The <strong>OODBMS</strong> (the software) uses that data model to manage the actual stored data. The <strong>OODB</strong> is the resulting persistent collection of object instances (e.g., actual <code>PropertyForRent</code>, <code>PrivateOwner</code>, <code>Client</code>, and <code>Lease</code> records) that the OODBMS manages.</p>
+<hr />
+<h3 id="section-7-8-vendors-and-development-strategies">Section 7 &amp; 8 — Vendors and Development Strategies</h3>
+<p><strong>Q12:</strong> Name one commercial and one open-source OODBMS, and identify which programming language each is most associated with (per the case studies).</p>
+<p><strong>A12:</strong> <strong>ObjectStore</strong> (commercial) is most associated with <strong>C++</strong>; <strong>ObjectDB</strong> (open source) is most associated with <strong>Java</strong>.</p>
+<hr />
+<p><strong>Q13:</strong> Compare Strategy 1 ("Extend an existing OOP language") and Strategy 2 ("Provide an extensible OODBMS library") for building an OODBMS.</p>
+<p><strong>A13:</strong> <strong>Strategy 1</strong> modifies/extends the OOP language itself to add database capabilities (e.g., GemStone extending Smalltalk, C++, or Java) — this typically requires a special compiler/language variant. <strong>Strategy 2</strong> makes <strong>no changes to the OOP language</strong>; instead it provides an "off-the-shelf" persistence library that developers use with a completely standard compiler and language (e.g., ObjectStore for C++, ObjectDB for Java). Strategy 2 is generally less invasive because developers keep working in their normal, unmodified language and tooling.</p>
+<hr />
+<h3 id="section-9-objectdb-case-study">Section 9 — ObjectDB Case Study</h3>
+<p><strong>Q14:</strong> What is an Object Identifier (OID) and why is it necessary in an OODB?</p>
+<p><strong>A14:</strong> An OID is a <strong>unique, system-generated identifier</strong> assigned to each independent object stored in the database. It is necessary because one of the core goals of an OODB is to maintain a <strong>direct correspondence between real-world and database objects</strong>, so that objects retain their integrity and identity and can be easily identified and operated upon — the OID provides that stable, unique identity, independent of the object's changing data values.</p>
+<hr />
+<p><strong>Q15:</strong> What annotation marks a POJO as a JPA entity class, and what does "POJO" stand for?</p>
+<p><strong>A15:</strong> The <code>@Entity</code> annotation marks a POJO as a JPA entity class. <strong>POJO</strong> stands for <strong>Plain Old Java Object</strong> — i.e., an ordinary Java class with no special base class or interface requirements, simply annotated to gain database persistence capability.</p>
+<hr />
+<p><strong>Q16 (Code Tracing):</strong> Given the <code>Point</code> class from Section 9.5, what would be printed by <code>System.out.println(new Point(3, 4));</code>?</p>
+<p><strong>A16:</strong> <code>(3, 4)</code> — because the constructor sets <code>x = 3</code> and <code>y = 4</code>, and the overridden <code>toString()</code> method returns <code>String.format("(%d, %d)", this.x, this.y)</code>, which formats those two field values inside parentheses separated by a comma and space.</p>
+<hr />
+<p><strong>Q17:</strong> Describe the two steps required to obtain an <code>EntityManager</code> instance in ObjectDB.</p>
+<p><strong>A17:</strong> <strong>Step 1:</strong> Obtain an instance of <code>EntityManagerFactory</code> representing the relevant database, via <code>Persistence.createEntityManagerFactory("objectdb:$objectdb/db/points.odb");</code>. <strong>Step 2:</strong> Use that factory instance to get an <code>EntityManager</code> instance, via <code>EntityManager em = emf.createEntityManager();</code>.</p>
+<hr />
+<p><strong>Q18:</strong> Why must operations like store, update, and delete in ObjectDB be performed within an active transaction, but not read (query) operations?</p>
+<p><strong>A18:</strong> Store, update, and delete operations <strong>modify database content</strong>, and transactions ensure such modifications are applied <strong>atomically and consistently</strong> — either the whole set of changes commits, or none of them do, preserving database integrity. Read/query operations do not modify data, so they do not require the same atomic-commit guarantee and can typically be executed directly against the <code>EntityManager</code> without wrapping them in a transaction.</p>
+<hr />
+<p><strong>Q19 (Code Tracing):</strong> Given the CRUD table in Section 9.10, what Java statement is used to persist a <strong>new</strong> <code>Point</code> object, and what statement is used to delete an <strong>existing</strong> entity <code>p</code>?</p>
+<p><strong>A19:</strong> To persist a new object: <code>em.persist(p);</code> (called between <code>em.getTransaction().begin();</code> and <code>em.getTransaction().commit();</code>). To delete an existing entity: <code>em.remove(p);</code> (also wrapped in a begin/commit transaction block).</p>
+<hr />
+<h3 id="section-10-objectstore-case-study">Section 10 — ObjectStore Case Study</h3>
+<p><strong>Q20:</strong> Explain what it means that "ObjectStore stores C++ objects in the same format as they are used in memory," and why this reduces impedance mismatch.</p>
+<p><strong>A20:</strong> It means persistent <code>ObjectStore</code> objects on disk have the <strong>same internal layout/representation</strong> as the equivalent objects would have while sitting in a running C++ program's memory (heap). Because of this, the C++ programmer can <strong>access and update persistent objects using the exact same C++ syntax as ordinary heap-allocated objects</strong> (pointer dereferencing, member access, etc.) — there is no need to translate between a "database format" and an "in-memory format," which is precisely what reduces/eliminates the impedance mismatch problem described in Weakness 5.</p>
+<hr />
+<p><strong>Q21:</strong> What does it mean that "ObjectStore is distributed," and give the specific benefit stated in the slides?</p>
+<p><strong>A21:</strong> It means a client can connect to <strong>multiple <code>osserver</code> processes</strong>, each managing its own database(s), across a network. The specific stated benefit is that a <strong>client can access objects in different remote databases within the same (single) transaction</strong> — i.e., one atomic transaction can span multiple physically separate databases.</p>
+<hr />
+<h3 id="section-11-how-oodbmss-solve-rdbms-weaknesses">Section 11 — How OODBMSs Solve RDBMS Weaknesses</h3>
+<p><strong>Q22:</strong> Explain, step by step, how OODBMSs eliminate the need for JOINs when representing real-world entities.</p>
+<p><strong>A22:</strong> OODBMSs use OOP constructs (classes, inheritance, composition) so that a real-world entity is stored as <strong>one coherent object</strong>, rather than fragmented across multiple normalized tables — this directly addresses Weakness 1. Relationships between objects are then represented using <strong>Object Identifiers (OIDs)</strong> as direct reference attributes (e.g., <code>Branch</code> stores a <code>manager: OID6</code> attribute referencing the <code>Manager</code> object). Since there are <strong>no tables in the database</strong> at all, retrieving a related object is a matter of <strong>directly dereferencing its OID</strong> (a pointer lookup, e.g., via the Resident Object Table) rather than performing a relational JOIN — this is computationally far cheaper and conceptually matches how the real-world objects actually relate.</p>
+<hr />
+<p><strong>Q23:</strong> Distinguish between a Logical OID and a Physical OID.</p>
+<p><strong>A23:</strong> A <strong>Logical OID</strong> is independent of the object's physical location on disk (it is an abstract, stable identifier that survives object relocation). A <strong>Physical OID</strong> points directly to an actual location on disk (faster to dereference, but breaks if the object physically moves without updating all references).</p>
+<hr />
+<p><strong>Q24 (Worked Calculation/Tracing):</strong> Using the Resident Object Table (ROT) example in Section 11.4, if the application needs to find the street address of the branch that David Ford (<code>Staff: OID4</code>) works at, describe the sequence of OID lookups required (no joins allowed).</p>
+<p><strong>A24:</strong></p>
+<ol>
+<li>Start at <code>Staff: OID4</code> (David Ford) and read its <code>branch</code> attribute, which stores the reference <code>OID1</code>.</li>
+<li>Take <code>OID1</code> and <strong>look it up in the Resident Object Table (ROT)</strong> to find its current memory address.</li>
+<li>Follow that memory address to load the <code>Branch: OID1</code> object into memory (if not already resident).</li>
+<li>Read the <code>street</code> attribute of <code>Branch: OID1</code>, which is <code>163 Main St</code>. This is achieved purely through <strong>direct OID/pointer dereferencing</strong> — no relational JOIN operation is performed at any step.</li>
+</ol>
+<hr />
+<p><strong>Q25:</strong> For a 1:1 relationship between two objects A and B in an OODB, how many reference attributes are added, and where?</p>
+<p><strong>A25:</strong> <strong>Two</strong> reference attributes are added — <strong>one to each object</strong>. Object A gets a reference attribute (an OID) pointing to Object B, and Object B gets a reference attribute (an OID) pointing back to Object A. (Worked example: <code>Branch: OID1</code> stores <code>manager: OID6</code>, and <code>Manager: OID6</code> stores <code>branch: OID1</code>.)</p>
+<hr />
+<p><strong>Q26:</strong> For a 1:* relationship (e.g., one Branch has many Properties for rent), what needs to be added on each side, and how does this differ from the 1:1 case?</p>
+<p><strong>A26:</strong> <strong>One</strong> object (<code>PropertyForRent</code>, the "many" side) gets a <strong>single reference attribute</strong> pointing to the "one" side (<code>branch: OID1</code>). The <strong>other</strong> object (<code>Branch</code>, the "one" side) gets an attribute containing a <strong>set of references</strong> to all the related "many"-side objects (<code>property: {OID2, OID3, ...}</code>). This differs from the 1:1 case in that only <strong>one</strong> side stores a <em>set</em> of references — in 1:1, both sides store a single, individual reference.</p>
+<hr />
+<p><strong>Q27:</strong> For a many-to-many (<em>:</em>) relationship (e.g., Client views many PropertyForRent, and a property is viewed by many clients), what needs to be added on each side?</p>
+<p><strong>A27:</strong> <strong>Both</strong> objects need an attribute containing a <strong>set of references</strong> to the other — each <code>Client</code> stores a set of references to the <code>PropertyForRent</code> objects it has viewed, and each <code>PropertyForRent</code> stores a set of references (<code>viewers</code>) to all the <code>Client</code> objects that have viewed it.</p>
+<hr />
+<p><strong>Q28:</strong> Referring to the <code>Pilot</code> class example, explain how OODBMSs solve Weakness 3 (Limited Operations).</p>
+<p><strong>A28:</strong> RDBMSs are restricted to a fixed set of relational-algebra operations (via SQL) and cannot have new operations defined by developers (aside from stored procedures). OODBMSs solve this because <strong>OOP methods can be defined directly on persistent classes</strong> — e.g., the <code>Pilot</code> class defines a custom method <code>addPoints(int points)</code> that mutates the object's state in a domain-specific way. Because this method is part of the class definition itself, <strong>every stored <code>Pilot</code> object automatically has this custom operation available</strong>, something impossible to express as a native, extensible operator in the relational model.</p>
+<hr />
+<p><strong>Q29:</strong> Compare the two approaches to storing and executing methods in an OODBMS, and list the four benefits attributed to the file-based approach.</p>
+<p><strong>A29:</strong> <strong>Approach 1 — Store methods in external files:</strong> the method code is compiled and <strong>linked into the application at compile/link time</strong> (static binding). <strong>Approach 2 — Store methods in the database:</strong> the method code is stored alongside the data and <strong>dynamically bound to the application at run-time.</strong> The four benefits attributed (to storing methods in shared external files/libraries) are: <strong>(1)</strong> eliminates redundant code, <strong>(2)</strong> simplifies modifications, <strong>(3)</strong> methods are more secure, <strong>(4)</strong> methods can be shared concurrently — with an additional note of <strong>improved integrity</strong>.</p>
+<hr />
+<h3 id="section-1217-jpa-jpql-querying">Section 12–17 — JPA / JPQL Querying</h3>
+<p><strong>Q30:</strong> What does JPQL stand for, and what is the single main difference between SQL and JPQL?</p>
+<p><strong>A30:</strong> JPQL stands for <strong>Java Persistence Query Language</strong>. The main difference is that <strong>SQL works with relational database tables, records, and fields</strong>, whereas <strong>JPQL works with Java classes and objects.</strong></p>
+<hr />
+<p><strong>Q31:</strong> Explain the difference between the <code>Query</code> and <code>TypedQuery</code> interfaces, with reference to the <code>Country</code> example.</p>
+<p><strong>A31:</strong> <code>Query</code> is the <strong>original, untyped</strong> interface (the only one available in JPA 1); results retrieved via <code>Query</code> must be <strong>manually cast</strong> to the expected type (e.g., <code>(Country) q1.getSingleResult()</code>). <code>TypedQuery&lt;T&gt;</code> was <strong>introduced in JPA 2</strong> and <strong>extends <code>Query</code></strong>; by supplying the target class (<code>Country.class</code>) when creating the query, results come back <strong>already typed as <code>Country</code></strong>, giving compile-time type safety and removing the need for manual casts.</p>
+<hr />
+<p><strong>Q32:</strong> List, in order, the six possible clauses of a JPQL query.</p>
+<p><strong>A32:</strong> <code>SELECT ... FROM ...</code>, <code>[WHERE ...]</code>, <code>[GROUP BY ... [HAVING ...]]</code>, <code>[ORDER BY ...]</code> — plus the two data-modification forms: <code>DELETE FROM ... [WHERE ...]</code> and <code>UPDATE ... SET ... [WHERE ...]</code>.</p>
+<hr />
+<p><strong>Q33:</strong> Complete the SQL-to-JPQL terminology mapping table: Table → ?, Row → ?, Column → ?, <code>SELECT *</code> → ?</p>
+<p><strong>A33:</strong> Table → <strong>Entity</strong>; Row → <strong>Object</strong>; Column → <strong>Attribute</strong>; <code>SELECT *</code> → <strong><code>SELECT e</code></strong> (where <code>e</code> is the entity alias).</p>
+<hr />
+<p><strong>Q34:</strong> Name the three types of JPA atomic query expressions, with an example of each.</p>
+<p><strong>A34:</strong></p>
+<ol>
+<li><strong>JPQL/Criteria Variables</strong> — e.g., a range variable such as <code>c</code> in <code>FROM Country c</code>.</li>
+<li><strong>JPQL/Criteria Parameters</strong> — e.g., named parameters (<code>:minGpa</code>) or ordinal parameters (<code>?1</code>).</li>
+<li><strong>JPQL/Criteria Literals</strong> — e.g., <code>NULL</code>, Boolean literals (<code>TRUE</code>/<code>FALSE</code>), numeric or string literals.</li>
+</ol>
+<hr />
+<p><strong>Q35:</strong> List the four categories of JPA operators in order of decreasing precedence, and give one example operator from each category.</p>
+<p><strong>A35:</strong></p>
+<ol>
+<li><strong>Navigation operator</strong> (highest precedence) — <code>.</code> (e.g., <code>c.name</code>).</li>
+<li><strong>Arithmetic operators</strong> — <code>*</code>, <code>/</code>, <code>+</code>, <code>-</code>.</li>
+<li><strong>Comparison operators</strong> (including collection operators) — e.g., <code>=</code>, <code>&lt;&gt;</code>, <code>[NOT] BETWEEN</code>, <code>[NOT] IN</code>, <code>IS [NOT] EMPTY</code>, <code>[NOT] MEMBER [OF]</code>, <code>[NOT] LIKE</code>.</li>
+<li><strong>Logical operators</strong> (lowest precedence) — <code>AND</code>, <code>OR</code>, <code>NOT</code>.</li>
+</ol>
+<hr />
+<p><strong>Q36 (Code Tracing):</strong> Given <code>TypedQuery&lt;Student&gt; q = em.createQuery("SELECT s FROM Student s WHERE s.gpa &gt;= :minGpa", Student.class); q.setParameter("minGpa", 3.0);</code>, explain what type of atomic query expression <code>:minGpa</code> is, and what precedence-level operator is used to compare it against <code>s.gpa</code>.</p>
+<p><strong>A36:</strong> <code>:minGpa</code> is a <strong>named parameter</strong> (a type of atomic query expression). It is compared against <code>s.gpa</code> using the <strong>comparison operator</strong> <code>&gt;=</code>, which sits at <strong>precedence level (3)</strong> — evaluated after the navigation operator (<code>.</code> used to resolve <code>s.gpa</code>, precedence level 1) but before any logical operators would be applied.</p>
+<hr />
+<p><em>End of Combined OODBMS Notes (Lectures 2–4).</em></p>
+<hr />
+<blockquote>
+<p><strong>Revision Tip:</strong> The exam is likely to test (a) matching each RDBMS weakness to its OODBMS solution, (b) tracing OID-based object access (ROT lookups) instead of joins for 1:1, 1:*, and <em>:</em> relationships, (c) reading/writing simple JPA entity classes and CRUD code (<code>persist</code>, <code>remove</code>, field mutation + commit), and (d) translating between SQL and JPQL terminology and clause structure. Practice re-deriving the <code>Branch</code>/<code>Manager</code>/<code>PropertyForRent</code>/<code>Client</code> OID examples from memory, since they are the canonical worked examples for relationship representation in this module.</p>
+</blockquote></article><div class="article-tools"><a href="lecture-02.html">Next lecture →</a></div></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

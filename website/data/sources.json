@@ -1,0 +1,355 @@
+[
+  {
+    "path": "S1 L1,2,3,4.md",
+    "bytes": 75766,
+    "sha256": "38b8e0b24ed70dc261d557597f4b27b1a146b235c0fc37fd33ddb2ed56075722",
+    "status": "converted"
+  },
+  {
+    "path": "S1 L5,6,7, 8.md",
+    "bytes": 88088,
+    "sha256": "77535f78cec7009cef5b29baaf7f2d4fed2c126c03ebe6e801988acf70a76a88",
+    "status": "converted"
+  },
+  {
+    "path": "S1 L9, 10.md",
+    "bytes": 57644,
+    "sha256": "f37d09aeaa0666c694e5eb8eb77f8c9eecaeb4c30c8152c978cc0915075692b9",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L11.md",
+    "bytes": 55184,
+    "sha256": "decfa8ba0812a7e2ce16c712c22784b3e490aa9dc37e3e9c10b5c081c7c437e0",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L12_Notes.md",
+    "bytes": 46065,
+    "sha256": "4b5ede2b7c61afc50d18249cb6e49d21040ca432c03e00a2b8d9f9a440b10dfe",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L13_Big_Data_NoSQL_MongoDB_Notes (1).md",
+    "bytes": 31325,
+    "sha256": "351a5a6684563c99867f75b7e5db8dc903af7cc794dd7e536dad1f8b102d6e61",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L14_Notes.md",
+    "bytes": 29993,
+    "sha256": "1cde0e93df22610c31ea6968c5e5e400957ecae4595ee037db0834c433ee715e",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L15_MongoDB_3_Notes.md",
+    "bytes": 38779,
+    "sha256": "d6e2b5d2d5ed273d8db2dfb23608eb756cfd519a7fb538a68056751b3940145a",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L16_Search_ShellFunctions.md",
+    "bytes": 30986,
+    "sha256": "2116d5a05e67a12cd4a1775fd3d10883b55d5d9c76e3e48b599c9339a6fc6d50",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L17_Neo4j_1_Notes.md",
+    "bytes": 26103,
+    "sha256": "9b7f6dd4a5b1e5d1f226da991d59aa42ac3073ff7cbced79236481533f9ce66b",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L18_Neo4j_2_Notes.md",
+    "bytes": 43828,
+    "sha256": "104e74de3642dbdb2a6cfe7b1d33140ea0b1c06d60c92518f0acc493b0420948",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L19_Neo4j_3_Notes.md",
+    "bytes": 35879,
+    "sha256": "3536c3eb75bde75ee843b1f4724b703a5913abd05a41aa0af09c4c5fb418820f",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L20_NewSQL_Notes.md",
+    "bytes": 30774,
+    "sha256": "92731da074551b40e074ec5f211966142cfbc8655d6f1133c15e1a1c5646b972",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L21_Big_Data_Technologies_1_Notes.md",
+    "bytes": 25861,
+    "sha256": "495586738732e18078d3a0d02ebd505964f034a60305f9f1ae7556f88d494d0a",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L22_Data_Mining_Notes.md",
+    "bytes": 42696,
+    "sha256": "ef7bd72c7d0bc3193e9ad8e56a1fdd1b2fa54acbffd768a4ba4d8e69012a8e17",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L23_Data_Warehousing_OLAP_1_Notes.md",
+    "bytes": 33211,
+    "sha256": "c52bc793ecb40d535b2ae5206dd2b86df85a155084e00843907781240d5f0f07",
+    "status": "converted"
+  },
+  {
+    "path": "S1_L24_Data_Warehousing_OLAP_2_Notes.md",
+    "bytes": 35310,
+    "sha256": "c4021c2a0732097cf3c616296019c946572214bdf4f2407cb48b140490e07e99",
+    "status": "converted"
+  },
+  {
+    "path": "COS326_ST2_Exam_Style_Cheat_Sheet.md",
+    "bytes": 27714,
+    "sha256": "ca32d20ddb7d3b5d53912aeb2f12d2d85151c327fdb5d472782b6018e3b0017d",
+    "status": "converted"
+  },
+  {
+    "path": "COS326_ST2_Practice_Questions_and_Memos.md",
+    "bytes": 39023,
+    "sha256": "73692ff51d5b39cdee0c087d2e2810ad90a48526836cbe7d98fd5d5b8ffd8160",
+    "status": "converted"
+  },
+  {
+    "path": "COS326_ST2_Updated_Weighted_Cheat_Sheet.md",
+    "bytes": 29700,
+    "sha256": "0b38459a98ea9ed6bdeb96f0ad5ca059caebae59142e2c9c26758caedf69157d",
+    "status": "converted"
+  },
+  {
+    "path": "Exams\\COS326_ST2_Past_Paper_Question_Index.md",
+    "bytes": 21779,
+    "sha256": "fbbdb6d0e981360edd0e0edbeaa6de4cbafdb3fdb36a69a17b2e14d8c2953855",
+    "status": "converted"
+  },
+  {
+    "path": "Exams\\COS326_ST2_Past_Paper_Answer_Memo.md",
+    "bytes": 33108,
+    "sha256": "225e09b722099636fd2af7c095e2d6fc9923466dbc92667cab70509eb629ab99",
+    "status": "converted"
+  },
+  {
+    "path": "Exams\\COS326 Examination Paper 2022.pdf",
+    "bytes": 1935119,
+    "sha256": "40dfe79814a2953ee568efd6cc88cc1c9b239eb9b0aa62c3ea42b3c66cc311c6",
+    "status": "original PDF included; text extraction checked"
+  },
+  {
+    "path": "Exams\\COS326 Examination Paper 2023.pdf",
+    "bytes": 1536477,
+    "sha256": "1dd21abae79d317ab4647580c1ed16854b5eb874c2303f3ea7c31b05d7600250",
+    "status": "original PDF included; text extraction checked"
+  },
+  {
+    "path": "Exams\\COS326 Examination Paper 2024.pdf",
+    "bytes": 276833,
+    "sha256": "9253126ca03fffc7d73b8cd5cc9f385179237362fb37de8932f5e18d9e5ad938",
+    "status": "original PDF included; text extraction checked"
+  },
+  {
+    "path": "Exams\\COS326 Online Examination 2020.pdf",
+    "bytes": 431793,
+    "sha256": "de47a86b0b2d0110089934bc6bb708898d21fdb859ea6d0ca4b084616afa4023",
+    "status": "original PDF included; text extraction checked"
+  },
+  {
+    "path": "Exams\\COS326 Online Examination 2021.pdf",
+    "bytes": 415265,
+    "sha256": "2b46a003c95bdfa2da0a6a96bb566dfc3d375a62e12f115a5fee0fdc0a196b4d",
+    "status": "original PDF included; text extraction checked"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip",
+    "bytes": 8393877,
+    "sha256": "3ac19ff672261a099bca53f072722d65f10b8a56a2af7c6e9d8e25549693d713",
+    "status": "archive inventoried; individual contents not fully compared"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S1/S1 L1,2,3,4.md",
+    "bytes": 75766,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S1/S1 L5,6,7, 8.md",
+    "bytes": 88088,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S1/S1 L9, 10.md",
+    "bytes": 57644,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S2/S1_L11.md",
+    "bytes": 54776,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S2/S1_L12_Notes.md",
+    "bytes": 42097,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S2/S1_L13_Big_Data_NoSQL_MongoDB_Notes (1).md",
+    "bytes": 31325,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S2/S1_L14_Notes.md",
+    "bytes": 29993,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S2/S1_L15_MongoDB_3_Notes.md",
+    "bytes": 30077,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S2/S1_L16_Notes.md",
+    "bytes": 22670,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S2/S1_L17_Neo4j_1_Notes.md",
+    "bytes": 25593,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S2/S1_L18_Neo4j_2_Notes.md",
+    "bytes": 28348,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S3/S1_L19_Neo4j_3_Notes.md",
+    "bytes": 35879,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S3/S1_L20_NewSQL_Notes.md",
+    "bytes": 30774,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S3/S1_L21_Big_Data_Technologies_1_Notes.md",
+    "bytes": 25861,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S3/S1_L22_Data_Mining_Notes.md",
+    "bytes": 42696,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S3/S1_L23_Data_Warehousing_OLAP_1_Notes.md",
+    "bytes": 33211,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/Markdown/S3/S1_L24_Data_Warehousing_OLAP_2_Notes.md",
+    "bytes": 35310,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S1/S1 L1,2,3,4.pdf",
+    "bytes": 772749,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S1/S1 L5,6,7, 8.pdf",
+    "bytes": 894484,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S1/S1 L9, 10.pdf",
+    "bytes": 712059,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S1 Condensed/COS 326 L5,6,7,8 Condensed.pdf",
+    "bytes": 323442,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S1 Condensed/COS 326 L9, 10 Condensed.pdf",
+    "bytes": 354269,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S1 Condensed/COS 326 S1 L1,2,3,4 Condensed.pdf",
+    "bytes": 347421,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S2/S1_L11.pdf",
+    "bytes": 774711,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S2/S1_L12_Notes.pdf",
+    "bytes": 755371,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S2/S1_L13_Big_Data_NoSQL_MongoDB_Notes (1).pdf",
+    "bytes": 459525,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S2/S1_L14_Notes.pdf",
+    "bytes": 603261,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S2/S1_L15_MongoDB_3_Notes.pdf",
+    "bytes": 557277,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S2/S1_L16_Notes.pdf",
+    "bytes": 528365,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S2/S1_L17_Neo4j_1_Notes.pdf",
+    "bytes": 501818,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S2/S1_L18_Neo4j_2_Notes.pdf",
+    "bytes": 598855,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S3/S1_L19_Neo4j_3_Notes.pdf",
+    "bytes": 597785,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S3/S1_L20_NewSQL_Notes.pdf",
+    "bytes": 303793,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S3/S1_L21_Big_Data_Technologies_1_Notes.pdf",
+    "bytes": 262203,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S3/S1_L22_Data_Mining_Notes.pdf",
+    "bytes": 424424,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S3/S1_L23_Data_Warehousing_OLAP_1_Notes.pdf",
+    "bytes": 422184,
+    "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S3/S1_L24_Data_Warehousing_OLAP_2_Notes.pdf",
+    "bytes": 543759,
+    "status": "archive entry inventoried; not independently reviewed"
+  }
+]
