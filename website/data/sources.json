@@ -351,5 +351,41 @@
     "path": "COS 326 L1-L24 Notes.zip::COS 326 L1-L24 Notes/PDF/S3/S1_L24_Data_Warehousing_OLAP_2_Notes.pdf",
     "bytes": 543759,
     "status": "archive entry inventoried; not independently reviewed"
+  },
+  {
+    "path": "website/semtests/COS326 Semester Test 2020.pdf",
+    "bytes": 332104,
+    "sha256": "5b4f35d3c992348f5ea7202a9191475483f03146dc7d73dc646d689ecd9dbcbc",
+    "status": "semester test linked and text reviewed"
+  },
+  {
+    "path": "website/semtests/COS326 Semester Test 2021.pdf",
+    "bytes": 345084,
+    "sha256": "d39b36f3c8aa89f989a37291fbb0f13a1f5d8d46cda0bea1abb37878330adcdc",
+    "status": "semester test linked and text reviewed"
+  },
+  {
+    "path": "website/semtests/COS326 Semester Test 2022.pdf",
+    "bytes": 1601097,
+    "sha256": "24352ce3df9d934ffed935db799d5157c463c562dd5ad02b1696fa7e00f88ea0",
+    "status": "semester test linked and reviewed; 2022 and 2023 include image-based content"
+  },
+  {
+    "path": "website/semtests/COS326 Semester Test 2023.pdf",
+    "bytes": 1616154,
+    "sha256": "2953a4b8d1d4b527619bb7c2aa7ac820e798c458b22e300ab94fac1dae55bfed",
+    "status": "semester test linked and reviewed; 2022 and 2023 include image-based content"
+  },
+  {
+    "path": "website/semtests/COS326 Semester Test 2024.pdf",
+    "bytes": 408819,
+    "sha256": "ebc74f7edab1537f691e0b88944914b6b56bf85565bdc38940fa3c18d80b7031",
+    "status": "semester test linked and text reviewed"
+  },
+  {
+    "path": "website/semtests/COS326 Semester Test 2025.pdf",
+    "bytes": 1565321,
+    "sha256": "ec3e1e7e8684d370bee4638ea9fac70bf083a0919a03a8016119d08fc9b7e656",
+    "status": "semester test linked and text reviewed"
   }
 ]
