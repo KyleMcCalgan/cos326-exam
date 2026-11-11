@@ -1,0 +1,85 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Semester Test 1 · 2026 · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html">Notes</a><a href="../papers/index.html" aria-current="page">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><nav class="subnav" aria-label="Papers pages"><a href="../papers/index.html">Library</a><a href="../papers/st1-2026.html" aria-current="page">Test 1 · 2026</a><a href="../papers/st2-2026.html">Test 2 · 2026</a><a href="../papers/semester-tests.html">Semester tests 2020–25</a><a href="../papers/question-index.html">Exam question index</a><a href="../papers/answer-memo.html">Exam answer memo</a></nav><div class="eyebrow">PAPERS / SEMESTER TEST 1 · 2026 / MARKED</div><h1>Semester Test 1: your answers against the memo</h1><p class="lead">Question 44 (underwater vehicles) combines JPA, PostgreSQL and XML. Open each part to see your answer next to the memo and where the marks went.</p><div class="scores"><div class="score total"><b>10<small>/20</small></b><span>Q44 total</span></div><div class="score"><b>4.5<small>/7</small></b><span>(a) JPA entity and JPQL</span></div><div class="score"><b>4.5<small>/7</small></b><span>(b) PostgreSQL trigger and array average</span></div><div class="score"><b>1<small>/2</small></b><span>(c)(i) XPath</span></div><div class="score"><b>0<small>/4</small></b><span>(c)(ii) XSD</span></div></div><div class="notice"><strong>Source</strong><p>The original question and your marked script are in the <a href="pdf/semester-test-2026-1-marked.pdf#page=28">marked Test 1 PDF, page 28</a>. The PDF cuts off your answer, so this page uses the supplied screenshots for the full answer, the memo and the feedback. Only Q44 is transcribed here; for the other questions use the PDF.</p></div><section class="prose wide"><h2>Question 44: AUV essay (20 marks)</h2><p>The scenario describes AUV objects with many sensor readings, a PostgreSQL energy array and XML mission summaries. Your lecturer awarded <strong>4.5/7 for JPA, 4.5/7 for PostgreSQL, 1/2 for XPath and 0/4 for XSD</strong>. Each part shows your answer beside the memo (or an equivalent solution), followed by where the marks went. Answers are transcribed from the screenshots; formatting is standardised. The feedback shows component scores but does not specify every deduction, so the explanations identify visible issues without assigning new marks.</p><details open><summary>(a) JPA entity and JPQL <span class="pill part">4.5/7</span></summary><div class="compare"><section class="compare-col mine"><h4 class="answer-label">Your answer</h4><pre><code>@Entity
+Public Class AUV{
+    @Id
+    private String auvId;
+    private String model;
+    private String model;
+    private int depthCapability;
+    private Boolean active;
+
+    @oneToMany
+    SensorReading sensorReading;
+
+    (5: (I assume you just want the query itself not the function since there is no real function name specified) -
+    &quot;SELECT a.auvId FROM AUV a WHERE a.depthCapability &gt; 4000&quot;
+}
+
+@Entity
+Public Class SensorReading{
+    private Double temperature;
+    private Double pressure;
+    private int depth;
+    private String timestamp;
+}</code></pre></section><section class="compare-col memo"><h4 class="answer-label">Memo</h4><pre><code>import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.List;
+
+@Entity
+public class AUV {
+    @Id
+    private String auvId;
+    private String model;
+    private String mission;
+    private int depthCapability;
+    private boolean active;
+
+    @OneToMany
+    private List&lt;SensorReading&gt; sensorReadings;
+    // Constructors and accessors omitted as requested.
+}
+
+// JPQL:
+SELECT a.auvId FROM AUV a
+WHERE a.active = true AND a.depthCapability &gt; 4000</code></pre><p class="memo-note">The lecturer's example uses an integer ID; this version uses a string ID.</p></section></div><div class="feedback"><h4 class="answer-label">Where the marks went</h4><p><strong>What you did:</strong> You declared an entity and identifier, included most fields, attempted a relationship and selected IDs above 4000. Those are useful parts of the solution.</p><p><strong>What to fix:</strong> Java keywords are lowercase (<code>public class</code>); <code>model</code> was declared twice and <code>mission</code> was missing. <code>@OneToMany</code> is case-sensitive and the "many" side needs a collection such as <code>List&lt;SensorReading&gt;</code>, not a single reading. Your JPQL omitted the condition <code>a.active = true</code>. The question only asks for a query, so supplying the JPQL statement was appropriate.</p><p>The sample uses a string ID, consistent with the XML example A17; the marking example uses an integer. The prompt does not prescribe a type. A runnable JPA model also needs a valid mapping for SensorReading, including its own identifier if it is an entity. Use the persistence package required by your course environment (<code>javax.persistence</code> or <code>jakarta.persistence</code>).</p><p><strong>Rubric:</strong> entity 1, ID 1, other attributes 2, collection relationship 1, correct JPQL 2.</p></div></details><details><summary>(b) PostgreSQL trigger and array average <span class="pill part">4.5/7</span></summary><div class="compare"><section class="compare-col mine"><h4 class="answer-label">Your answer</h4><pre><code>CREATE FUNCTION average_energy() RETURN TRIGGER AS
+$$
+DECLARE
+val NUMERIC
+count int := 0
+sum NUMERIC := 0
+BEGIN
+FOR EACH val IN ARRAY NEW.state_energy
+    LOOP
+    sum := sum + val;
+    count := count + 1;
+    END LOOP
+
+NEW.average_energy := sum / count;
+RETURN NEW;
+END
+$$langauge pspgsql
+
+CREATE TRIGGER average_energy_trigger
+BEFORE INSERT on AuvEnergy
+FOR EACH ROW
+EXECUTE FUNCTION average_energy();</code></pre></section><section class="compare-col memo"><h4 class="answer-label">Memo</h4><pre><code>CREATE FUNCTION calculate_average_energy()
+RETURNS TRIGGER AS $$
+DECLARE
+    energy NUMERIC;
+    total_energy NUMERIC := 0;
+    reading_count INTEGER := 0;
+BEGIN
+    FOREACH energy IN ARRAY NEW.stage_energy LOOP
+        total_energy := total_energy + energy;
+        reading_count := reading_count + 1;
+    END LOOP;
+    NEW.average_energy := total_energy / reading_count;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER calculate_auv_average
+BEFORE INSERT OR UPDATE ON AUVEnergy
+FOR EACH ROW
+EXECUTE FUNCTION calculate_average_energy();</code></pre></section></div><div class="feedback"><h4 class="answer-label">Where the marks went</h4><p><strong>What you did:</strong> You attempted a running sum and count, assigned the average to NEW, returned NEW and wrote a row-level BEFORE trigger. The structure shows you understood the task.</p><p><strong>What to fix:</strong> Use <code>RETURNS TRIGGER</code>, semicolons on declarations and statements, <code>FOREACH</code> as one word, and the given <code>NEW.stage_energy</code> rather than <code>NEW.state_energy</code>. The trigger must cover both <code>INSERT OR UPDATE</code>. Finish the function with <code>END;</code> and <code>LANGUAGE plpgsql;</code>.</p><p>The question assumes at least one array value; this example also assumes the elements are non-null. Test mentally with [10, 20, 30]: sum 60, count 3, average 20. <strong>Rubric:</strong> function 1, iteration 2, average 2, assign and return 1, trigger 1.</p></div></details><details><summary>(c)(i) XPath <span class="pill part">1/2</span></summary><div class="compare"><section class="compare-col mine"><h4 class="answer-label">Your answer</h4><pre><code>//readings/reading[depth &gt; 3000]</code></pre></section><section class="compare-col memo"><h4 class="answer-label">Memo</h4><pre><code>/mission/readings/reading[depth &gt; 3000]/depth</code></pre></section></div><div class="feedback"><h4 class="answer-label">Where the marks went</h4><p>You wrote <code>//readings/reading[depth &gt; 3000]</code>. It identifies qualifying <em>reading</em> elements, but the question asks for their <em>depth</em> elements. Add <code>/depth</code>.</p><p>The two rubric points distinguish navigating/filtering from selecting the requested depth. Ask yourself: "What type of node does my expression end on?"</p></div></details><details><summary>(c)(ii) XSD <span class="pill zero">0/4</span></summary><div class="compare"><section class="compare-col mine"><h4 class="answer-label">Your answer</h4><pre><code>&lt;xs:type&gt; (Im not sure)</code></pre></section><section class="compare-col memo"><h4 class="answer-label">Memo</h4><pre><code>&lt;xs:element name="missionCode" type="xs:string" minOccurs="1"/&gt;
+&lt;xs:element name="status" type="xs:string"/&gt;</code></pre></section></div><div class="feedback"><h4 class="answer-label">Where the marks went</h4><p>Your response was incomplete. The task asks for element declarations, not just a type tag. Within an appropriate <code>xs:sequence</code> or other valid schema context, use:</p><p>Assume the prefix <code>xs</code> is bound to the XML Schema namespace. <code>minOccurs="1"</code> explicitly makes missionCode required; it is also the default for a local element declaration. The rubric awards one mark each for the missionCode declaration, its text type, required occurrence and the status text declaration. This is a fragment, not a complete standalone schema.</p></div></details><h2>Where to go next</h2><ul><li><a href="../reference/coding-patterns.html#pattern-jpa">JPA</a>, <a href="../reference/coding-patterns.html#pattern-trigger">PL/pgSQL trigger</a> and <a href="../reference/coding-patterns.html#pattern-xml">XPath/XSD</a> patterns: the exact shapes these parts rewarded.</li><li><a href="../practice/essays.html#practice-mixed">Practise a new mixed essay</a> built on the same three skills, with a model answer and self-marking guide.</li><li>Notes: <a href="../notes/lecture-01.html">Lectures 1–4 (object databases / JPA)</a>, <a href="../notes/lecture-02.html">Lectures 5–8 (PostgreSQL, triggers)</a>, <a href="../notes/lecture-03.html">Lectures 9–10 (XML)</a>.</li></ul></section></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

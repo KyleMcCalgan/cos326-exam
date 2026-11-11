@@ -1,0 +1,34 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>PySpark activity · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html" aria-current="page">Notes</a><a href="../papers/index.html">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><nav class="subnav" aria-label="Notes pages"><a href="../notes/index.html">Topic map</a><a href="../notes/lectures-20-24-guide.html">Lectures 20–24 guide</a><a href="../notes/pyspark-activity.html" aria-current="page">PySpark activity</a></nav><div class="eyebrow">NOTES / LECTURE 21 / WORKED GUIDE</div><h1>PySpark: student score analysis</h1><p class="lead">Learn the class activity by tracing its data, aggregations and join. A practice question follows on the practice pages.</p><div class="notice"><strong>Source: the class activity</strong><p>This guide explains the supplied <a href="pyspark-activity.pdf">PySpark practical PDF</a>. The lecture notes list the activity but do not include the code. The activity is relevant practice; its presence does not establish that it will be examined.</p><p><a href="#load">Load data</a> &middot; <a href="#group">Group and aggregate</a> &middot; <a href="#join">Join top scorers</a> &middot; <a href="../practice/essays.html#practice-spark">Try it yourself</a></p></div><section class="prose"><h2>What the activity does</h2><p>Create a CSV of student scores, start a Spark session, read it into a DataFrame, calculate the average and maximum score for each subject, and join maximums back to the original rows to find the top scorers. The activity uses pandas to create the CSV; the analysis uses a Spark DataFrame.</p><h2 id="load">1. Start Spark and load the data</h2><pre><code>from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("Student Score Analysis").getOrCreate()
+
+df = spark.read.csv("students.csv", header=True, inferSchema=True)
+df.show(10)</code></pre><p><code>header=True</code> reads column names from the first line. <code>inferSchema=True</code> infers types, including a numeric type for the scores. The practical creates students.csv with pandas and includes notebook installation and findspark setup; consult the PDF for those steps. This example assumes the file exists. <code>show(10)</code> displays up to 10 rows.</p><h2 id="group">2. Average and maximum per subject</h2><pre><code>from pyspark.sql.functions import avg, max, col
+
+avg_scores = df.groupBy("Subject").agg(avg("Score").alias("AverageScore"))
+max_scores = df.groupBy("Subject").agg(max("Score").alias("MaxScore"))
+
+avg_scores.show()
+max_scores.show()</code></pre><p><code>groupBy("Subject")</code> forms groups, <code>agg(...)</code> calculates an aggregate, and <code>alias(...)</code> names the result. The output order is not guaranteed unless explicitly sorted.</p><table><thead><tr><th>Subject</th><th>Average</th><th>Maximum</th><th>Top scorer</th></tr></thead><tbody><tr><td>Maths</td><td>82.3</td><td>94</td><td>Sipho</td></tr><tr><td>English</td><td>85.5</td><td>95</td><td>Ayanda</td></tr><tr><td>Science</td><td>89.5</td><td>97</td><td>Siyanda</td></tr></tbody></table><p>The group result contains the subject and maximum, but not the student's name. To recover names, join those maximums back to the original rows.</p><h2 id="join">3. Join to find the top scorer</h2><pre><code>d = df.alias("d")
+m = max_scores.alias("m")
+
+top_scorers = (
+    d.join(
+        m,
+        (col("d.Subject") == col("m.Subject")) &amp;
+        (col("d.Score") == col("m.MaxScore"))
+    )
+    .select(
+        col("d.Name").alias("Name"),
+        col("d.Subject").alias("Subject"),
+        col("d.Score").alias("Score")
+    )
+)
+top_scorers.show()</code></pre><p>The first condition matches the subject; the second matches that subject's maximum score. Both are needed: matching only the score could associate a student with the maximum of another subject. <code>&amp;</code> combines PySpark column conditions, each parenthesised. If students tie for the maximum in a subject, all matching students are returned.</p><h2>Connect it to SQL and MongoDB</h2><pre><code>-- SQL: average per subject
+SELECT Subject, AVG(Score) AS AverageScore
+FROM students
+GROUP BY Subject;
+
+// MongoDB: the same grouping idea
+db.students.aggregate([
+  { $group: { _id: "$Subject", AverageScore: { $avg: "$Score" } } }
+])</code></pre><p>The languages differ, but each groups records by subject and calculates an aggregate.</p><h2 id="practice">Try an exam-style question</h2><p>A 10-mark original question on total revenue per store and the top product is on the practice pages, with a model answer.</p><p><a href="../practice/essays.html#practice-spark">Practise PySpark &rarr;</a> &middot; <a href="lecture-14.html">Lecture 21 notes</a> &middot; <a href="index.html">All notes</a></p></section></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

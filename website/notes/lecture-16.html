@@ -1,0 +1,772 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Data Warehousing &amp; OLAP (1): Business Intelligence, Warehouse Architecture &amp; the Star Schema — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html" aria-current="page">Notes</a><a href="../papers/index.html">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Data warehousing and OLAP: foundations</h1><p>Lecture 23 &middot; Course notes</p></div><button class="study" data-id="lecture-16.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All notes</a><button class="bookmark" data-id="lecture-16.html"> Bookmark</button></div><div class="related"><span class="related-label">Use this topic</span><a href="lectures-20-24-guide.html#olap">OLAP patterns</a><a href="../practice/essays.html#practice-warehouse">Practise: warehouse design</a><a href="../practice/essays.html#practice-ranking">Practise: ranking</a></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-the-business-environment">2. The Business Environment</a></li><li><a href="#3-operational-vs-informational-systems">3. Operational vs Informational Systems</a></li><li><a href="#4-business-intelligence-bi">4. Business Intelligence (BI)</a></li><li><a href="#5-why-data-warehousing-is-a-viable-solution-for-informational-systems">5. Why Data Warehousing Is a Viable Solution for Informational Systems</a></li><li><a href="#6-the-data-warehouse-definition">6. The Data Warehouse — Definition</a></li><li><a href="#7-the-data-warehousing-environment-architecture">7. The Data Warehousing Environment (Architecture)</a></li><li><a href="#8-data-warehousing-roles-responsibilities">8. Data Warehousing Roles &amp; Responsibilities</a></li><li><a href="#9-dimensional-modelling">9. Dimensional Modelling</a></li><li><a href="#10-the-data-mart">10. The Data Mart</a></li><li><a href="#11-the-star-schema-for-the-data-mart-rolap">11. The Star Schema (for the data mart) — ROLAP</a></li><li><a href="#12-the-dimensional-view-data-cube-hypercube">12. The Dimensional View — Data Cube (Hypercube)</a></li><li><a href="#13-dimension-hierarchies-roll-up-and-drill-down">13. Dimension Hierarchies — Roll-up and Drill-down</a></li><li><a href="#14-starjoin-starindex-and-materialised-views">14. STARjoin, STARindex and Materialised Views</a></li><li><a href="#15-sql-for-data-warehousing-bi">15. SQL for Data Warehousing &amp; BI</a></li><li><a href="#16-questions-memo">16. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<ul>
+<li><strong>This lecture covers:</strong><ol>
+<li><strong>Business intelligence (BI) and data warehousing.</strong></li>
+<li><strong>The business environment.</strong></li>
+<li><strong>How operational systems differ from informational systems.</strong></li>
+<li><strong>Business intelligence.</strong></li>
+<li><strong>The architecture and main components of a data warehouse.</strong></li>
+<li><strong>The data mart</strong> and the main reasons for implementing one.</li>
+</ol>
+</li>
+<li><strong>Also on the slides (second half):</strong> dimensional modelling, the <strong>star schema</strong>, information packages, the data cube, hierarchies (drill-down/roll-up), STARjoin/STARindex/materialised views, and the SQL used for data warehousing.</li>
+</ul>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
+<p>Lecture 22 (data mining) said mining can run on data "stored in a warehouse." This lecture explains <strong>what that warehouse is</strong>, how it differs from the database that runs the business day to day, and how it is <strong>structured for analysis</strong> (star schema, cubes, roll-up/drill-down).</p>
+<hr />
+<h2 id="2-the-business-environment">2. The Business Environment</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Answer (from the slides)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What is the purpose of a business?</td>
+<td><strong>To make money</strong></td>
+</tr>
+<tr>
+<td>What do businesses sell?</td>
+<td><strong>Products or services</strong></td>
+</tr>
+<tr>
+<td>To whom do they sell?</td>
+<td><strong>Customers</strong> (individuals or organisations)</td>
+</tr>
+<tr>
+<td>From whom do they get what they sell?</td>
+<td><strong>Suppliers</strong> or internal</td>
+</tr>
+<tr>
+<td>How are operations organised?</td>
+<td><strong>Business units, business processes</strong></td>
+</tr>
+<tr>
+<td>Who makes decisions?</td>
+<td><strong>Managers</strong></td>
+</tr>
+<tr>
+<td>Major threats?</td>
+<td><strong>Losing customers, closing down</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Why it matters:</strong> managers need <strong>timely, accurate information</strong> to make good decisions and avoid those threats — which is the job of <strong>informational systems.</strong></li>
+</ul>
+<hr />
+<h2 id="3-operational-vs-informational-systems">3. Operational vs Informational Systems</h2>
+<h3 id="31-operational-systems">3.1 Operational Systems</h3>
+<ul>
+<li><strong>Purpose:</strong> <strong>"make the wheels of the business turn"</strong> — <strong>record and process business transactions as they happen.</strong></li>
+<li><strong>Examples:</strong> <strong>point-of-sale (POS) system, inventory management system, financial systems (e.g., general ledger), insurance claims processing.</strong></li>
+<li><strong>Used by:</strong> <strong>shop-floor workers</strong> (who interact directly with customers).</li>
+<li><strong>Classified as:</strong> <strong>OLTP</strong> (Online Transaction Processing) systems.</li>
+</ul>
+<h3 id="32-informational-systems">3.2 Informational Systems</h3>
+<ul>
+<li><strong>Purpose:</strong> <strong>"watching the wheels of the business turn"</strong> — <strong>support informed decision-making.</strong></li>
+<li><strong>Example usage:</strong> <em>"Show me the <strong>top-selling products</strong>"</em>; <em>"Show me the <strong>problem branches</strong>"</em>; <em>"<strong>Alert me</strong> when a branch sells below target."</em></li>
+<li><strong>Used by:</strong> <strong>managers (and business analysts).</strong></li>
+<li><strong>Classified as:</strong> <strong>OLAP</strong> (Online Analytical Processing) systems.</li>
+</ul>
+<h3 id="33-comparison-consolidated-added-for-clarity">3.3 Comparison (consolidated, added for clarity)</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th><strong>Operational (OLTP)</strong></th>
+<th><strong>Informational (OLAP)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Metaphor</strong></td>
+<td>Make the wheels turn</td>
+<td><strong>Watch</strong> the wheels turn</td>
+</tr>
+<tr>
+<td><strong>Purpose</strong></td>
+<td>Record &amp; process <strong>transactions as they happen</strong></td>
+<td>Support <strong>informed decision-making</strong></td>
+</tr>
+<tr>
+<td><strong>Users</strong></td>
+<td>Shop-floor workers, clerks</td>
+<td><strong>Managers, business analysts</strong></td>
+</tr>
+<tr>
+<td><strong>Typical request</strong></td>
+<td>"Record this sale"</td>
+<td>"Which products sold best this quarter?"</td>
+</tr>
+<tr>
+<td><strong>Data</strong></td>
+<td>Current, detailed, <strong>application-specific</strong></td>
+<td><strong>Current + historical</strong>, integrated, <strong>designed for analysis</strong></td>
+</tr>
+<tr>
+<td><strong>Examples</strong></td>
+<td>POS, inventory, general ledger, claims</td>
+<td>Dashboards, reports, <strong>data warehouse</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-added"> Example (added)</h4>
+<p>At a supermarket, the <strong>till</strong> (POS) that scans your items and updates stock is <strong>OLTP.</strong> The <strong>head-office report</strong> "Show the five branches furthest below monthly sales target" is <strong>OLAP</strong> — it reads across <strong>many</strong> transactions, branches and months. Running that big report on the live till database would <strong>slow the tills down</strong> — one reason a separate warehouse exists.</p>
+<blockquote>
+<p><strong>Link to Lecture 20:</strong> OLTP (short, frequent, concurrent transactions) is exactly the workload NewSQL targets; OLAP is the <strong>analytical</strong> counterpart.</p>
+</blockquote>
+<h3 id="34-dashboards-slide-tools-dashboards-day-to-day-management">3.4 Dashboards (slide: "Tools: Dashboards — day-to-day management")</h3>
+<ul>
+<li><strong>Analogy on the slide:</strong> managing a business is like <strong>driving a car</strong> or <strong>flying a large aircraft</strong> — you need <strong>instruments</strong> (dashboards) showing the key indicators at a glance.</li>
+<li>The slide's screenshot shows a <strong>BI dashboard:</strong> a <strong>trend line</strong> of "net promoter score" by month for a selected city and a set of <strong>gauges</strong> per product line — i.e., <strong>key indicators, trends and comparisons</strong> on one screen.</li>
+</ul>
+<hr />
+<h2 id="4-business-intelligence-bi">4. Business Intelligence (BI)</h2>
+<ul>
+<li><strong>BI</strong> refers to a <strong>class of applications and technologies</strong> used to:<ul>
+<li><strong>gather</strong> data,</li>
+<li>provide <strong>access</strong> to it,</li>
+<li>and <strong>analyse</strong> data about <strong>business operations.</strong></li>
+</ul>
+</li>
+<li>BI systems give businesses <strong>in-depth knowledge of the factors that affect the business</strong>, e.g.:<ul>
+<li><strong>Customer and supplier behaviour.</strong></li>
+<li><strong>Sales volumes and production volumes.</strong></li>
+<li><strong>Other internal operations.</strong></li>
+</ul>
+</li>
+<li><strong>Result:</strong> this knowledge helps <strong>managers make better business decisions.</strong></li>
+</ul>
+<hr />
+<h2 id="5-why-data-warehousing-is-a-viable-solution-for-informational-systems">5. Why Data Warehousing Is a Viable Solution for Informational Systems</h2>
+<p>The slide gives three reasons:</p>
+<ol>
+<li><strong>Data from multiple applications</strong> — the warehouse <strong>integrates</strong> data from POS, inventory, etc.</li>
+<li><strong>Content includes current and historical data.</strong></li>
+<li><strong>Data designed for analytical tasks</strong> — organised around <strong>key business measures</strong> and <strong>business dimensions</strong> (Section 9).</li>
+</ol>
+<h4 id="example-added_1"> Example (added)</h4>
+<p>The POS system knows today's sales; the inventory system knows stock; the finance system knows costs. A <strong>warehouse</strong> loads all three, keeps <strong>years</strong> of history, and organises them so a manager can ask <em>"revenue by product, branch and month"</em> in one query.</p>
+<hr />
+<h2 id="6-the-data-warehouse-definition">6. The Data Warehouse — Definition</h2>
+<p>A <strong>data warehouse</strong> is a <strong>collection of data to support management decisions</strong> that is:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Meaning (from the slides)</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Subject-oriented</strong></td>
+<td>Data is organised along <strong>business subjects</strong></td>
+<td><strong>Sales, policies, claims</strong></td>
+</tr>
+<tr>
+<td><strong>Integrated</strong></td>
+<td>Data <strong>extracted from different operational systems</strong></td>
+<td>Claims processing + policy sales</td>
+</tr>
+<tr>
+<td><strong>Non-volatile</strong></td>
+<td>Generally <strong>read-oriented</strong>, but data <strong>can be updated through controlled loading and correction processes</strong></td>
+<td>Loaded in batches; not changed by everyday transactions</td>
+</tr>
+<tr>
+<td><strong>Time-variant</strong></td>
+<td><strong>Time is explicitly stored</strong> with the data → supports analysis <strong>along the time dimension</strong></td>
+<td>Sales per <strong>day, week, month, quarter, year</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> the slide's wording for <strong>non-volatile</strong> is more careful than the classic "data is never updated": warehouses are <strong>mostly read-only for users</strong>, with <strong>controlled loads and corrections.</strong></p>
+</blockquote>
+<hr />
+<h2 id="7-the-data-warehousing-environment-architecture">7. The Data Warehousing Environment (Architecture)</h2>
+<p><strong>Components (numbered as on the slide figure):</strong></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Component</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td><strong>Source data</strong></td>
+<td><strong>Internal sources:</strong> internal business applications and systems. <strong>External sources:</strong> suppliers, partners, government agencies and other external data providers.</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Data staging</strong></td>
+<td><strong>Extraction, Transformation &amp; Loading (ETL)</strong> — or <strong>ELT</strong> (<strong>Extract, Load, Transform</strong>)</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Enterprise data warehouse</strong></td>
+<td>The central integrated store (may be a <strong>cloud data warehouse</strong>)</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>Metadata</strong></td>
+<td>Data <strong>about</strong> the data</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><strong>Data mart</strong></td>
+<td>A subset/focused part of the warehouse (Section 10)</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><strong>Information delivery</strong></td>
+<td>Data mining, <strong>OLAP analysis</strong>, reports/queries</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td><strong>Interactive users</strong></td>
+<td>Managers/analysts using the delivered information</td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td><strong>Management &amp; control</strong></td>
+<td>Coordinates the warehouse components and processes</td>
+</tr>
+<tr>
+<td><strong>9</strong></td>
+<td><strong>Hardware, OS, DBMS</strong></td>
+<td>The technical platform</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td><strong>DB personnel</strong></td>
+<td>The people who run it (Section 8)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>ETL vs ELT (slide note):</strong> modern <strong>cloud platforms often load raw data first and perform transformations inside the analytical platform</strong> (ELT).</li>
+</ul>
+<h4 id="etl-vs-elt-worked-comparison-added"> ETL vs ELT — worked comparison (added)</h4>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th><strong>ETL</strong></th>
+<th><strong>ELT</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Extract</strong> from sources</td>
+<td><strong>Extract</strong> from sources</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Transform</strong> in a separate staging area (clean, convert formats, integrate)</td>
+<td><strong>Load</strong> the raw data into the warehouse/lake</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Load</strong> the clean result into the warehouse</td>
+<td><strong>Transform</strong> inside the analytical platform (using its processing power)</td>
+</tr>
+<tr>
+<td>Typical setting</td>
+<td>Traditional on-premises warehouses</td>
+<td>Modern <strong>cloud</strong> warehouses (see Lecture 21)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example transformation (added):</strong> one source stores gender as "M/F", another as "1/2"; the <strong>T</strong> step maps both to a single standard value. Dates are converted to one format; duplicates removed.</p>
+<hr />
+<h2 id="8-data-warehousing-roles-responsibilities">8. Data Warehousing Roles &amp; Responsibilities</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Role</th>
+<th>Responsibility (from the slide)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td><strong>Data transformation specialists</strong></td>
+<td><strong>Extraction, integration, transformation</strong> (the ETL work)</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>Data warehouse administrators</strong></td>
+<td>Decide <strong>what data goes into the warehouse, when, and how</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>Data modellers</strong></td>
+<td><strong>Relational and dimensional modelling</strong></td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>Business analysts</strong></td>
+<td><strong>Designing and creating the required reports</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-dimensional-modelling">9. Dimensional Modelling</h2>
+<ul>
+<li>Warehouse data is organised by <strong>subject</strong>, <strong>business dimensions</strong> and <strong>measures (facts).</strong></li>
+</ul>
+<h3 id="91-examples-of-business-dimensions-from-the-slides">9.1 Examples of Business Dimensions (from the slides)</h3>
+<table>
+<thead>
+<tr>
+<th>Business</th>
+<th>Subject</th>
+<th>Dimensions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Supermarket</strong></td>
+<td><strong>Sales</strong></td>
+<td>Time, branch, product, promotion</td>
+</tr>
+<tr>
+<td><strong>Airline company</strong></td>
+<td><strong>Frequent flyers</strong></td>
+<td>Time, customer, flight, fare class, airport</td>
+</tr>
+<tr>
+<td><strong>Hotel chain</strong></td>
+<td><strong>Hotel occupancy</strong></td>
+<td>Time, hotel branch, room type</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Key point:</strong> dimensions and measures <strong>differ between businesses</strong>, but the <strong>TIME dimension is very common</strong> because <strong>historical, time-based analysis</strong> matters in many businesses. <strong>However, not every dimensional model requires a time dimension.</strong></li>
+</ul>
+<h3 id="92-information-from-a-data-warehouse-the-kind-of-question-asked">9.2 Information From a Data Warehouse — the Kind of Question Asked</h3>
+<blockquote>
+<p><em>Marketing VP of a hotel chain:</em> <strong>"How much revenue did luxury rooms generate, month by month, in the Gauteng province, by hotel branch?"</strong></p>
+</blockquote>
+<p><strong>Analysis of the question (added):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Part of question</th>
+<th>Element</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"How much <strong>revenue</strong>"</td>
+<td><strong>Measure (fact)</strong></td>
+</tr>
+<tr>
+<td>"<strong>luxury</strong> rooms"</td>
+<td><strong>Room type</strong> dimension (filter)</td>
+</tr>
+<tr>
+<td>"<strong>month by month</strong>"</td>
+<td><strong>Time</strong> dimension (level: month)</td>
+</tr>
+<tr>
+<td>"<strong>Gauteng</strong> province"</td>
+<td><strong>Hotel</strong> dimension (filter at province level)</td>
+</tr>
+<tr>
+<td>"<strong>by hotel branch</strong>"</td>
+<td><strong>Hotel</strong> dimension (level: branch)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Users analyse performance by <strong>business dimensions and performance measures.</strong> → Hence the need for <strong>a database structure that supports dimensional analysis</strong> — the <strong>star schema.</strong></li>
+</ul>
+<h3 id="93-information-packages">9.3 Information Packages</h3>
+<ul>
+<li><strong>Created as business requirements are gathered; one information package per specific subject.</strong></li>
+</ul>
+<h4 id="worked-example-slide-information-package-for-the-subject-hotel-occupancy"> Worked Example — Slide: information package for the subject <strong>Hotel occupancy</strong></h4>
+<table>
+<thead>
+<tr>
+<th><strong>TIME</strong></th>
+<th><strong>HOTEL</strong></th>
+<th><strong>ROOM TYPE</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Year</td>
+<td>Hotel line</td>
+<td>Room type</td>
+</tr>
+<tr>
+<td>Quarter</td>
+<td>Province</td>
+<td>Size</td>
+</tr>
+<tr>
+<td>Month</td>
+<td>Branch</td>
+<td>etc.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Facts (key measures):</strong> <strong>occupied rooms, vacant rooms, revenue.</strong></p>
+<p><strong>Step-by-step reading:</strong></p>
+<ol>
+<li><strong>Columns = dimensions</strong> (Time, Hotel, Room type).</li>
+<li><strong>Entries under each dimension = its hierarchy/categories</strong>, listed <strong>from the highest level to the lowest</strong> (Time: Year → Quarter → Month; Hotel: Hotel line → Province → Branch).</li>
+<li><strong>Facts</strong> at the bottom = the <strong>numeric measures</strong> to be analysed.</li>
+<li>This one table <strong>captures the business requirements</strong> and later maps directly to the <strong>dimension tables and fact table</strong> (Section 11).</li>
+</ol>
+<hr />
+<h2 id="10-the-data-mart">10. The Data Mart</h2>
+<ul>
+<li>The lecture overview lists <strong>"the data mart and the main reasons for implementing a data mart."</strong> On the slides, the <strong>data mart</strong> appears in the architecture figure (component 5), as the <strong>star schema location</strong> ("The Star Schema (for data mart)"), and in the roles figure — <strong>but the reasons are not listed on a slide.</strong></li>
+<li><strong>Definition (added):</strong> a <strong>data mart</strong> is a <strong>smaller, focused subset of the data warehouse</strong> serving <strong>one department, business unit or subject</strong> (e.g., a <strong>Sales mart</strong>, a <strong>Finance mart</strong>).</li>
+</ul>
+<h3 id="101-typical-reasons-for-implementing-a-data-mart-added-check-against-the-textbook-chapter-29">10.1 Typical Reasons for Implementing a Data Mart (added — check against the textbook, Chapter 29)</h3>
+<ol>
+<li><strong>Focus:</strong> serves <strong>one department's</strong> specific needs (simpler, more relevant).</li>
+<li><strong>Performance:</strong> <strong>smaller data volume</strong> → <strong>faster queries</strong> for that group.</li>
+<li><strong>Faster, cheaper, lower-risk to build</strong> than an enterprise-wide warehouse; results arrive sooner.</li>
+<li><strong>Easier to use:</strong> users see only the <strong>subject-specific</strong> dimensions and measures they need.</li>
+<li><strong>Access control/security:</strong> a department sees <strong>only its own data.</strong></li>
+<li><strong>Ownership:</strong> a department can manage its own mart.</li>
+</ol>
+<hr />
+<h2 id="11-the-star-schema-for-the-data-mart-rolap">11. The Star Schema (for the data mart) — ROLAP</h2>
+<ul>
+<li>The <strong>star schema</strong> provides <strong>Relational OLAP (ROLAP)</strong> — a <strong>dimensional view of data using relational structures and queries.</strong></li>
+<li><strong>Structure:</strong><ul>
+<li>A <strong>central fact table</strong> (e.g., <strong>Sales</strong>).</li>
+<li>Surrounding <strong>dimension tables</strong> (e.g., <strong>Time, Branch, Promotion, Product</strong>).</li>
+<li><strong>Links are formed by foreign keys in the fact table;</strong> each link is a <strong>one-to-many</strong> relationship (one dimension row → many fact rows).</li>
+</ul>
+</li>
+<li><strong>Fact table row:</strong> represents a <strong>business event or observation at a defined level of granularity</strong>; it contains <strong>foreign keys</strong> referencing the dimension tables and <strong>one or more measures.</strong></li>
+</ul>
+<pre><code>                 TIME
+                  │
+   BRANCH ─── SALES (fact) ─── PROMOTION
+                  │
+               PRODUCT
+</code></pre>
+<h3 id="111-worked-example-creating-the-hotel-star-schema-from-the-slides">11.1 Worked Example — Creating the Hotel Star Schema (from the slides)</h3>
+<p><strong>Dimension tables and fact table derived from the information package:</strong></p>
+<pre><code>OCCUPANCY_FACTS                    HOTEL                 RM_TYPE              TIME
+---------------                    -----                 -------              ----
+Time_Key   (FK)  ───────────────►  Hotel_Key (PK)        Room_Key (PK)        Time_Key (PK)
+Hotel_Key  (FK)                    Hotel_code            Room_code            Time_code
+Room_Key   (FK)                    Hotel_Line            Room_Type            Year
+Occupied_rooms                     Province              Size                 Quarter
+Vacant_rooms                       Branch                                     Month
+Revenue
+</code></pre>
+<p><strong>Step-by-step reading:</strong></p>
+<ol>
+<li><strong><code>HOTEL</code> dimension</strong> holds the <strong>Hotel_Line → Province → Branch</strong> hierarchy; <strong><code>RM_TYPE</code></strong> holds Room_Type and Size; <strong><code>TIME</code></strong> holds Year → Quarter → Month.</li>
+<li>Each dimension table has its own <strong>surrogate key</strong> (<code>Hotel_Key</code>, <code>Room_Key</code>, <code>Time_Key</code>) and a <strong>code</strong> (<code>Hotel_code</code>, …) from the source systems.</li>
+<li><strong><code>OCCUPANCY_FACTS</code></strong> holds <strong>three foreign keys</strong> (one per dimension) + <strong>three measures</strong> (<code>Occupied_rooms</code>, <code>Vacant_rooms</code>, <code>Revenue</code>).</li>
+<li><strong>Granularity:</strong> one fact row = occupancy and revenue for <strong>one hotel branch, one room type, one time period</strong> (the lowest level in each dimension).</li>
+<li><strong>Mapping rule:</strong> <strong>information package → dimension tables (columns of the package) + fact table (the facts row).</strong></li>
+<li>Hierarchy levels are <strong>denormalised</strong> into one wide dimension table (e.g., Province and Branch in the same <code>HOTEL</code> table) — typical of a star schema; it <strong>reduces joins</strong> (the more normalised version is a "snowflake" — <em>added, not on the slides</em>).</li>
+</ol>
+<h3 id="112-answering-a-question-with-sql-added-the-slide-says-sql-statements-are-executed-to-provide-answers-to-users-questions">11.2 Answering a Question with SQL (added — the slide says "SQL statements are executed to provide answers to users' questions")</h3>
+<p><strong>Question:</strong> <em>How much revenue was realised from luxury rooms by province by month?</em></p>
+<pre><code class="language-sql">SELECT   h.Province, t.Year, t.Month, SUM(f.Revenue) AS total_revenue
+FROM     OCCUPANCY_FACTS f
+JOIN     HOTEL   h ON f.Hotel_Key = h.Hotel_Key
+JOIN     RM_TYPE r ON f.Room_Key  = r.Room_Key
+JOIN     TIME    t ON f.Time_Key  = t.Time_Key
+WHERE    r.Room_Type = 'Luxury'
+GROUP BY h.Province, t.Year, t.Month;
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong><code>FROM OCCUPANCY_FACTS f</code></strong> — start at the <strong>fact table</strong> (the centre of the star).</li>
+<li><strong>Three <code>JOIN</code>s</strong> — link the fact table to each dimension via its <strong>foreign key</strong> (this is the <strong>"star join"</strong>).</li>
+<li><strong><code>WHERE r.Room_Type = 'Luxury'</code></strong> — <strong>filter</strong> on a dimension attribute.</li>
+<li><strong><code>GROUP BY</code> province, year, month</strong> — the <strong>dimension levels</strong> to report by.</li>
+<li><strong><code>SUM(f.Revenue)</code></strong> — <strong>aggregates the measure.</strong></li>
+<li><strong>Pattern to remember:</strong> <em>SELECT dimension attributes + aggregated measure FROM fact JOIN dimensions WHERE filters GROUP BY dimension attributes.</em></li>
+</ol>
+<hr />
+<h2 id="12-the-dimensional-view-data-cube-hypercube">12. The Dimensional View — Data Cube (Hypercube)</h2>
+<ul>
+<li>Data can be viewed as a <strong>multidimensional cube</strong> with <strong>one axis per dimension.</strong></li>
+<li><strong>Slide example:</strong> axes <strong>TIME</strong> (Jan, Feb, Mar), <strong>PRODUCT / room type</strong> (Luxury room, Budget room), <strong>PROVINCE</strong> (KZN, Gauteng). <strong>Each cell holds one value of the measure</strong> — e.g., <strong>one sales figure for Feb, Luxury room, Gauteng</strong> (<strong>R20m</strong> on the slide).</li>
+<li><strong>Note (slide):</strong> a <strong>data cube is a conceptual multidimensional representation</strong>, <strong>not necessarily physically stored</strong> as a cube (in ROLAP it is stored in relational tables).</li>
+</ul>
+<h4 id="example-added_2"> Example (added)</h4>
+<p>With 3 months × 2 room types × 2 provinces the cube has <strong>3 × 2 × 2 = 12 cells</strong>; each cell = one revenue figure. Adding a fourth dimension (e.g., promotion) makes a <strong>hyper-cube</strong> that can no longer be drawn simply, but works the same way.</p>
+<hr />
+<h2 id="13-dimension-hierarchies-roll-up-and-drill-down">13. Dimension Hierarchies — Roll-up and Drill-down</h2>
+<ul>
+<li><strong>Hierarchies/categories</strong> within a dimension (e.g., Time: Year → Quarter → Month) are used to perform:<ul>
+<li><strong>Roll-up:</strong> move <strong>up</strong> the hierarchy to a <strong>more summarised</strong> level (e.g., <strong>months → quarter</strong>).</li>
+<li><strong>Drill-down:</strong> move <strong>down</strong> the hierarchy to <strong>more detail</strong> (e.g., <strong>quarter → months</strong>).</li>
+</ul>
+</li>
+</ul>
+<h4 id="worked-example-slide-time-hierarchy-with-revenue-figures"> Worked Example — Slide: Time hierarchy with revenue figures</h4>
+<ul>
+<li>The slide shows <strong>Qtr1 = R20m</strong>, <strong>Qtr2</strong> (another figure), and the months under Qtr1 — <strong>Jan, Feb, Mar</strong> — with figures <strong>R5m, R10m, R5m.</strong></li>
+</ul>
+<p><strong>Step-by-step reading (figures as they appear on the slide):</strong></p>
+<ol>
+<li><strong>Drill-down</strong> from <strong>Qtr1 (R20m)</strong> to months: <strong>Jan R5m + Feb R10m + Mar R5m = R20m</strong> — the detail <strong>adds up</strong> to the summary.</li>
+<li><strong>Roll-up</strong> from the three months back to <strong>Qtr1 = R20m.</strong></li>
+<li><strong>Hierarchy used:</strong> <strong>Year → Quarter → Month</strong> (from the information package).</li>
+<li><strong>Note:</strong> the slide's separate "hypercube" example shows R20m for <em>Feb, Luxury room, Gauteng</em> — a <strong>different illustration</strong> (one cell of a cube); the two R20m values are <strong>not</strong> the same quantity.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Direction</th>
+<th>Detail level</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Roll-up</strong></td>
+<td><strong>Up</strong> the hierarchy</td>
+<td><strong>Less</strong> detail (summary)</td>
+<td>Branch → Province → Hotel line</td>
+</tr>
+<tr>
+<td><strong>Drill-down</strong></td>
+<td><strong>Down</strong> the hierarchy</td>
+<td><strong>More</strong> detail</td>
+<td>Year → Quarter → Month</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="14-starjoin-starindex-and-materialised-views">14. STARjoin, STARindex and Materialised Views</h2>
+<h3 id="141-performance-techniques-from-the-slides">14.1 Performance Techniques (from the slides)</h3>
+<table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>STARjoin</strong></td>
+<td><strong>Joins between a central fact table and multiple dimension tables.</strong></td>
+</tr>
+<tr>
+<td><strong>STARindexes</strong></td>
+<td><strong>Specialised indexing techniques</strong> that can improve query performance on fact and dimension tables. <strong>Bitmap indexes</strong> are commonly used for <strong>low-cardinality dimension attributes</strong> in suitable warehouse workloads.</td>
+</tr>
+<tr>
+<td><strong>Materialised views</strong></td>
+<td><strong>Precomputed and stored query results</strong> that can improve analytical query performance; <strong>may need to be refreshed</strong> when the underlying data changes.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples-added-for-clarity"> Examples (added for clarity)</h4>
+<ul>
+<li><strong>Bitmap index:</strong> a column such as <strong><code>Room_Type</code></strong> (only a few distinct values: Luxury, Budget, …) can have one <strong>bit-vector per value</strong> marking which rows have that value — very <strong>fast to filter and combine</strong> (AND/OR) in analytical queries. <strong>Low cardinality</strong> = few distinct values.</li>
+<li><strong>Materialised view:</strong> store the result of <strong>"total revenue by province and month"</strong> once; queries read the <strong>stored summary</strong> instead of re-aggregating millions of fact rows. Trade-off: it <strong>must be refreshed</strong> after new data loads (<strong>storage and maintenance cost</strong> vs <strong>query speed</strong>).</li>
+</ul>
+<hr />
+<h2 id="15-sql-for-data-warehousing-bi">15. SQL for Data Warehousing &amp; BI</h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>SQL statements (from the slide)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Creating the ROLAP structure</strong></td>
+<td><code>CREATE SEQUENCE</code>, <code>CREATE TABLE</code>, <strong><code>CREATE DIMENSION</code></strong></td>
+</tr>
+<tr>
+<td><strong>Loading data into the ROLAP structure</strong></td>
+<td><strong><code>MERGE</code></strong> statement; <strong>UPDATE / INSERT</strong> statement</td>
+</tr>
+<tr>
+<td><strong>Generating reports</strong></td>
+<td><code>SELECT … GROUP BY CUBE</code>; <code>SELECT … GROUP BY ROLLUP</code>; <code>SELECT … GROUP BY GROUPING SETS</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="151-create-dimension-from-the-slide-oracle-style-syntax">15.1 <code>CREATE DIMENSION</code> (from the slide — Oracle-style syntax)</h3>
+<pre><code class="language-sql">-- 1. First create the table
+CREATE TABLE HOTEL ( ... );
+
+-- 2. Then declare the dimension
+CREATE DIMENSION HOTELS_DIM
+  LEVEL Hotel     IS HOTEL.Hotel_code
+  LEVEL Province  IS HOTEL.Province_code
+  LEVEL Hotelline IS HOTEL.Hotelline_code
+  HIERARCHY Hotel_Rollup
+    ( Hotel CHILD OF Province CHILD OF Hotelline )
+  ATTRIBUTE Hotel     DETERMINES (Hotel_name, Hotel_address, Hotel_city, ...)
+  ATTRIBUTE Province  DETERMINES Province_name
+  ATTRIBUTE Hotelline DETERMINES Hotelline_desc;
+</code></pre>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong>The table comes first:</strong> <code>HOTEL</code> holds columns <code>Hotelline_code, Hotelline_desc, Province_code, Province_name, Hotel_key, Hotel_code, Hotel_name, Hotel_address, Hotel_city, Hotel_manager, Hotel_size</code> (the slide's example hotel dimension).</li>
+<li><strong><code>CREATE DIMENSION HOTELS_DIM</code></strong> <strong>declares metadata</strong> about the table — it does <strong>not</strong> create new data.</li>
+<li><strong><code>LEVEL … IS …</code></strong> — defines the <strong>levels</strong> of the dimension (Hotel, Province, Hotelline) and the <strong>column that identifies each level.</strong></li>
+<li><strong><code>HIERARCHY Hotel_Rollup (Hotel CHILD OF Province CHILD OF Hotelline)</code></strong> — states the <strong>roll-up path:</strong> each <strong>hotel</strong> belongs to a <strong>province</strong>, each province to a <strong>hotel line</strong> (lowest → highest).</li>
+<li><strong><code>ATTRIBUTE … DETERMINES …</code></strong> — a <strong>functional dependency</strong> among columns: the hotel code determines the hotel's name, address, city; the province code determines the province name; the hotel-line code determines its description.</li>
+<li><strong>Purpose:</strong> this metadata lets the database <strong>understand the hierarchy</strong> — e.g., for <strong>query rewrite and materialised-view optimisation</strong> and OLAP roll-ups (<em>purpose added</em>).</li>
+<li><strong>Note (added):</strong> <code>CREATE DIMENSION</code> is <strong>vendor-specific (Oracle)</strong>, not standard SQL — in other systems the hierarchy is represented only through the table design and queries.</li>
+</ol>
+<h3 id="152-loading-merge-added-explanation">15.2 Loading — <code>MERGE</code> (added explanation)</h3>
+<pre><code class="language-sql">MERGE INTO HOTEL h
+USING staging_hotel s ON (h.Hotel_code = s.Hotel_code)
+WHEN MATCHED     THEN UPDATE SET h.Hotel_name = s.Hotel_name, h.Hotel_city = s.Hotel_city
+WHEN NOT MATCHED THEN INSERT (Hotel_code, Hotel_name, Hotel_city)
+                      VALUES (s.Hotel_code, s.Hotel_name, s.Hotel_city);
+</code></pre>
+<ul>
+<li><strong><code>MERGE</code></strong> = <strong>"update if the row exists, otherwise insert"</strong> in <strong>one statement</strong> — ideal for <strong>loading dimension tables</strong> from staging data (the Lecture 18 <code>MERGE</code> in Cypher was the same idea: match-or-create).</li>
+</ul>
+<h3 id="153-reports-group-by-rollup-cube-grouping-sets-added-explanation-slide-lists-the-names-only">15.3 Reports — <code>GROUP BY ROLLUP / CUBE / GROUPING SETS</code> (added explanation; slide lists the names only)</h3>
+<p>Using the hotel star schema:</p>
+<pre><code class="language-sql">-- ROLLUP: subtotals going UP the hierarchy (right to left) + grand total
+SELECT h.Province, t.Year, SUM(f.Revenue)
+FROM ... GROUP BY ROLLUP (h.Province, t.Year);
+
+-- CUBE: subtotals for EVERY combination of the listed columns
+SELECT h.Province, t.Year, SUM(f.Revenue)
+FROM ... GROUP BY CUBE (h.Province, t.Year);
+
+-- GROUPING SETS: only the specific groupings you list
+SELECT h.Province, t.Year, SUM(f.Revenue)
+FROM ... GROUP BY GROUPING SETS ((h.Province), (t.Year));
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Clause</th>
+<th>Groupings produced for <code>(Province, Year)</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>ROLLUP (Province, Year)</code></strong></td>
+<td>(Province, Year), (Province), <strong>()</strong> grand total</td>
+</tr>
+<tr>
+<td><strong><code>CUBE (Province, Year)</code></strong></td>
+<td>(Province, Year), (Province), (Year), <strong>()</strong> grand total</td>
+</tr>
+<tr>
+<td><strong><code>GROUPING SETS ((Province), (Year))</code></strong></td>
+<td>(Province) and (Year) only</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Link to concepts:</strong> <strong>ROLLUP</strong> = <strong>roll-up</strong> along a hierarchy; <strong>CUBE</strong> = all combinations — the full <strong>cube</strong> of aggregates.</li>
+<li><strong>Example output (added), ROLLUP on made-up data:</strong> rows for each (Gauteng, 2025), (Gauteng, 2026), a <strong>Gauteng subtotal</strong> row with <code>Year = NULL</code>, similarly for KZN, then a <strong>grand total</strong> row with both <code>NULL</code>.</li>
+</ul>
+<hr />
+<h2 id="16-questions-memo">16. Questions &amp; Memo</h2>
+<h3 id="sections-24-business-environment-operational-vs-informational-bi">Sections 2–4 — Business Environment, Operational vs Informational, BI</h3>
+<p><strong>Q1:</strong> Distinguish operational from informational systems (purpose, users, classification, an example).</p>
+<p><strong>A1:</strong> <strong>Operational:</strong> "make the wheels turn" — record/process transactions as they happen; used by shop-floor workers; <strong>OLTP</strong>; e.g., POS, inventory, general ledger, claims. <strong>Informational:</strong> "watch the wheels turn" — support informed decisions; used by managers and analysts; <strong>OLAP</strong>; e.g., "show me the top-selling products", alerts when a branch sells below target.</p>
+<hr />
+<p><strong>Q2:</strong> What is business intelligence?</p>
+<p><strong>A2:</strong> A class of <strong>applications and technologies</strong> to <strong>gather, provide access to and analyse</strong> data about business operations, giving <strong>in-depth knowledge</strong> of factors such as customer/supplier behaviour and sales/production volumes, to help managers <strong>make better decisions.</strong></p>
+<hr />
+<p><strong>Q3:</strong> Why is a data warehouse a viable solution for informational systems? (three reasons)</p>
+<p><strong>A3:</strong> It holds <strong>data from multiple applications</strong>; contains <strong>current and historical data</strong>; and the data is <strong>designed for analytical tasks</strong> (key measures and business dimensions).</p>
+<hr />
+<h3 id="section-6-definition">Section 6 — Definition</h3>
+<p><strong>Q4:</strong> Define a data warehouse and explain its four characteristics.</p>
+<p><strong>A4:</strong> A <strong>collection of data to support management decisions</strong> that is <strong>subject-oriented</strong> (organised by business subjects like sales), <strong>integrated</strong> (from different operational systems), <strong>non-volatile</strong> (read-oriented; changed only via controlled loading/correction), <strong>time-variant</strong> (time explicitly stored; analysis by day/week/month/quarter/year).</p>
+<hr />
+<h3 id="section-7-8-architecture-and-roles">Section 7 &amp; 8 — Architecture and Roles</h3>
+<p><strong>Q5:</strong> List the main components of the data warehousing environment.</p>
+<p><strong>A5:</strong> <strong>Source data</strong> (internal/external); <strong>data staging (ETL/ELT)</strong>; <strong>enterprise data warehouse</strong>; <strong>metadata</strong>; <strong>data marts</strong>; <strong>information delivery</strong> (data mining, OLAP, reports); <strong>interactive users</strong>; <strong>management &amp; control</strong>; <strong>hardware/OS/DBMS</strong>; <strong>DB personnel.</strong></p>
+<hr />
+<p><strong>Q6:</strong> Explain ETL and how ELT differs.</p>
+<p><strong>A6:</strong> <strong>ETL:</strong> <strong>Extract</strong> from sources, <strong>Transform</strong> (clean/integrate) in a staging area, <strong>Load</strong> into the warehouse. <strong>ELT:</strong> <strong>Extract, Load</strong> raw data first, then <strong>transform inside</strong> the analytical platform — common in <strong>modern cloud</strong> warehouses.</p>
+<hr />
+<p><strong>Q7:</strong> Name the four data-warehousing roles and what each does.</p>
+<p><strong>A7:</strong> <strong>Data transformation specialists</strong> (extraction, integration, transformation); <strong>data warehouse administrators</strong> (what data goes in, when, how); <strong>data modellers</strong> (relational and dimensional modelling); <strong>business analysts</strong> (design/create required reports).</p>
+<hr />
+<h3 id="section-910-dimensional-modelling-data-mart">Section 9–10 — Dimensional Modelling, Data Mart</h3>
+<p><strong>Q8:</strong> Give the subject and dimensions for (a) a supermarket, (b) an airline, (c) a hotel chain.</p>
+<p><strong>A8:</strong> (a) <strong>Sales</strong> — time, branch, product, promotion. (b) <strong>Frequent flyers</strong> — time, customer, flight, fare class, airport. (c) <strong>Hotel occupancy</strong> — time, hotel branch, room type.</p>
+<hr />
+<p><strong>Q9:</strong> Is the time dimension compulsory in a dimensional model? Why is it so common?</p>
+<p><strong>A9:</strong> <strong>No</strong> — not every model needs it; but it is <strong>very common</strong> because <strong>historical, time-based analysis</strong> is important in many businesses.</p>
+<hr />
+<p><strong>Q10 (Analysis):</strong> For "How much revenue did luxury rooms generate month by month in Gauteng by hotel branch?" identify the measure and the dimensions involved.</p>
+<p><strong>A10:</strong> <strong>Measure:</strong> revenue. <strong>Dimensions:</strong> <strong>Room type</strong> (luxury), <strong>Time</strong> (month), <strong>Hotel/location</strong> (Gauteng province, by branch).</p>
+<hr />
+<p><strong>Q11:</strong> What is an information package and how is it used?</p>
+<p><strong>A11:</strong> A table created during requirements gathering, <strong>one per subject</strong>, listing <strong>dimensions with their hierarchies/categories</strong> and the <strong>facts (key measures)</strong>; it is then <strong>converted into dimension tables and a fact table.</strong></p>
+<hr />
+<p><strong>Q12:</strong> What is a data mart and why implement one?</p>
+<p><strong>A12:</strong> A <strong>focused subset</strong> of the warehouse for one department/subject. Reasons (see Section 10.1): <strong>focus on a department's needs, faster queries, quicker/cheaper to build, simpler for users, better access control.</strong></p>
+<hr />
+<h3 id="section-11-star-schema">Section 11 — Star Schema</h3>
+<p><strong>Q13:</strong> Describe the star schema and what a fact table row contains.</p>
+<p><strong>A13:</strong> A <strong>central fact table</strong> linked by <strong>foreign keys</strong> to surrounding <strong>dimension tables</strong> (one-to-many). It provides <strong>ROLAP</strong> — a dimensional view using relational structures. A fact row represents a <strong>business event/observation at a defined granularity</strong>, with <strong>foreign keys to the dimensions</strong> and <strong>one or more measures.</strong></p>
+<hr />
+<p><strong>Q14 (Design):</strong> From the information package (Time: Year/Quarter/Month; Hotel: Hotel line/Province/Branch; Room type: Room type/Size; facts: occupied rooms, vacant rooms, revenue), design the star schema.</p>
+<p><strong>A14:</strong> <strong>Dimension tables:</strong> <code>TIME(Time_Key, Time_code, Year, Quarter, Month)</code>; <code>HOTEL(Hotel_Key, Hotel_code, Hotel_Line, Province, Branch)</code>; <code>RM_TYPE(Room_Key, Room_code, Room_Type, Size)</code>. <strong>Fact table:</strong> <code>OCCUPANCY_FACTS(Time_Key, Hotel_Key, Room_Key, Occupied_rooms, Vacant_rooms, Revenue)</code> with the three keys as <strong>foreign keys.</strong></p>
+<hr />
+<p><strong>Q15 (Code):</strong> Write SQL for "total revenue from luxury rooms by province by month."</p>
+<p><strong>A15:</strong> See Section 11.2 — join <code>OCCUPANCY_FACTS</code> to <code>HOTEL</code>, <code>RM_TYPE</code>, <code>TIME</code>; <code>WHERE Room_Type = 'Luxury'</code>; <code>GROUP BY Province, Year, Month</code>; <code>SUM(Revenue)</code>.</p>
+<hr />
+<h3 id="section-12-13-cube-hierarchies">Section 12 &amp; 13 — Cube, Hierarchies</h3>
+<p><strong>Q16:</strong> What is a data cube? Must it be physically stored as a cube?</p>
+<p><strong>A16:</strong> A <strong>conceptual multidimensional representation</strong> — axes are dimensions, each cell a measure value (e.g., revenue for Feb, Luxury room, Gauteng). It is <strong>not necessarily physically stored</strong> as a cube (ROLAP uses relational tables).</p>
+<hr />
+<p><strong>Q17 (Tracing):</strong> Qtr1 revenue is R20m. Jan is R5m and Feb is R10m. What is Mar? Which operation moves from Qtr1 to the months, and which back?</p>
+<p><strong>A17:</strong> Mar = 20 − 5 − 10 = <strong>R5m.</strong> <strong>Drill-down</strong> goes Qtr1 → months; <strong>roll-up</strong> goes months → Qtr1.</p>
+<hr />
+<p><strong>Q18:</strong> Define roll-up and drill-down with a hierarchy example.</p>
+<p><strong>A18:</strong> <strong>Roll-up</strong> — move <strong>up</strong> a hierarchy to <strong>summarised</strong> data (Branch → Province → Hotel line). <strong>Drill-down</strong> — move <strong>down</strong> to <strong>more detail</strong> (Year → Quarter → Month).</p>
+<hr />
+<h3 id="section-14-15-performance-and-sql">Section 14 &amp; 15 — Performance and SQL</h3>
+<p><strong>Q19:</strong> Explain STARjoin, STARindex and materialised views.</p>
+<p><strong>A19:</strong> <strong>STARjoin:</strong> joins between the central fact table and multiple dimension tables. <strong>STARindex:</strong> specialised indexing (e.g., <strong>bitmap indexes</strong> for low-cardinality dimension attributes) to speed up queries. <strong>Materialised view:</strong> <strong>precomputed, stored query result</strong> that speeds up analytics but <strong>must be refreshed</strong> when underlying data changes.</p>
+<hr />
+<p><strong>Q20:</strong> What does <code>CREATE DIMENSION</code> define in the <code>HOTELS_DIM</code> example?</p>
+<p><strong>A20:</strong> <strong>Levels</strong> (Hotel, Province, Hotelline), the <strong>hierarchy</strong> <code>Hotel CHILD OF Province CHILD OF Hotelline</code>, and <strong>attribute dependencies</strong> (e.g., Hotel determines name/address/city; Province determines province name; Hotelline determines description).</p>
+<hr />
+<p><strong>Q21:</strong> List the SQL statements used to (a) create, (b) load and (c) report from a ROLAP structure.</p>
+<p><strong>A21:</strong> (a) <code>CREATE SEQUENCE</code>, <code>CREATE TABLE</code>, <code>CREATE DIMENSION</code>; (b) <code>MERGE</code>, <code>UPDATE/INSERT</code>; (c) <code>SELECT … GROUP BY CUBE | ROLLUP | GROUPING SETS</code>.</p>
+<hr />
+<p><strong>Q22 (Tracing):</strong> What groupings are produced by <code>GROUP BY ROLLUP (Province, Year)</code> and by <code>GROUP BY CUBE (Province, Year)</code>?</p>
+<p><strong>A22:</strong> <strong>ROLLUP:</strong> (Province, Year), (Province), grand total. <strong>CUBE:</strong> (Province, Year), (Province), (Year), grand total.</p>
+<hr />
+<p><strong>Q23 (Scenario):</strong> A supermarket chain's head office runs heavy sales analyses on the same database its tills use, and the tills slow down. Recommend a solution and explain.</p>
+<p><strong>A23:</strong> Build a <strong>data warehouse (or data mart)</strong> fed by <strong>ETL/ELT</strong> from the POS and inventory systems: it holds <strong>integrated, historical, analysis-oriented</strong> data separate from the <strong>OLTP</strong> system, organised as a <strong>star schema</strong> (sales fact + time/branch/product/promotion dimensions), so managers' <strong>OLAP</strong> queries no longer compete with till transactions.</p>
+<hr />
+<p><em>End of Lecture 23 Notes (Data Warehousing &amp; OLAP 1).</em></p>
+<hr />
+<blockquote>
+<p><strong>Revision Tip:</strong> Likely exam focus: (a) <strong>OLTP vs OLAP</strong> / operational vs informational (purpose, users, examples); (b) the <strong>four characteristics of a data warehouse</strong> (subject-oriented, integrated, non-volatile, time-variant) with examples; (c) the <strong>architecture components</strong>, <strong>ETL vs ELT</strong> and the four <strong>roles</strong>; (d) <strong>converting an information package into a star schema</strong> (fact table with foreign keys + measures; dimension tables with hierarchy levels) and <strong>writing the star-join SQL</strong> for a business question; (e) <strong>roll-up vs drill-down</strong> and the <strong>data cube</strong>; (f) <strong>STARjoin, bitmap/STARindex, materialised views</strong>; and (g) <strong>ROLLUP/CUBE/GROUPING SETS</strong> and <code>CREATE DIMENSION</code>. Scenario questions typically give a business (e.g., hotel chain, supermarket) and ask you to <strong>identify subject, dimensions, hierarchies and measures</strong>, then <strong>design the schema.</strong> Also read the textbook on <strong>data marts</strong> — the slides list it on the agenda but do not spell out the reasons.</p>
+</blockquote></article><div class="article-tools"><a href="lecture-15.html">← Previous</a><a href="lecture-17.html">Next lecture →</a></div></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

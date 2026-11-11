@@ -1,0 +1,295 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>2024 Semester Test · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html">Notes</a><a href="../papers/index.html" aria-current="page">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><nav class="subnav" aria-label="Papers pages"><a href="../papers/index.html">Library</a><a href="../papers/st1-2026.html">Test 1 · 2026</a><a href="../papers/st2-2026.html">Test 2 · 2026</a><a href="../papers/semester-tests.html">Semester tests 2020–25</a><a href="../papers/question-index.html">Exam question index</a><a href="../papers/answer-memo.html">Exam answer memo</a></nav><div class="crumb"><a href="index.html">Papers</a> &rsaquo; <a href="index.html#semester">Semester tests</a> &rsaquo; <strong>2024 Semester Test</strong></div><h1>2024 Semester Test</h1><div class="paper-meta"><div><b>16 Sep 2024</b><span>Date</span></div><div><b>100</b><span>Total marks</span></div><div><b>1 h 30 min</b><span>Time</span></div><div><b>26 on 19 pages</b><span>Questions</span></div></div><div class="paper-actions"><a class="button primary" href="pdf/semester-test-2024.pdf" target="_blank" rel="noopener">Open the PDF &#8599;</a><button type="button" id="expand-all">Show all answers</button><button type="button" id="collapse-all">Hide all answers</button></div><div class="notice"><strong>How to use this page</strong><p>Work each question first, then open the answer. The label beside each answer says where it came from: <span class="src memo">Memo</span> from your supplied exam answer memo, <span class="src guide">Worked guide</span> from your worked guides, or <span class="src written">Study answer</span> written for this site from the question and your course notes. Study answers are not an official memo, so check anything you are unsure of. Questions are extracted automatically from the PDF, so spacing, symbols or option layout can differ from the printed paper; use the PDF for the exact wording and any diagrams.</p></div><div class="qjump"><span>Jump to</span><a href="#q1">1</a><a href="#q2">2</a><a href="#q3">3</a><a href="#q4">4</a><a href="#q5">5</a><a href="#q6">6</a><a href="#q7">7</a><a href="#q8">8</a><a href="#q9">9</a><a href="#q10">10</a><a href="#q11">11</a><a href="#q12">12</a><a href="#q13">13</a><a href="#q14">14</a><a href="#q15">15</a><a href="#q16">16</a><a href="#q17">17</a><a href="#q18">18</a><a href="#q19">19</a><a href="#q20">20</a><a href="#q21">21</a><a href="#q22">22</a><a href="#q23">23</a><a href="#q24">24</a><a href="#q25">25</a><a href="#q26">26</a></div><section class="paper"><h2 class="paper-sec">Section A: Multiple Choice and Fill in the Blanks Questions (20 Marks)</h2><article class="pq" id="q1"><header class="pq-head"><span class="pq-n">Question 1</span><span class="pq-marks">1 mark</span><span class="pq-topic">JPA / JPQL</span><a class="pg" href="pdf/semester-test-2024.pdf#page=3" target="_blank" rel="noopener">PDF p.3 &#8599;</a></header><div class="pq-body"><p>Which of the following is NOT one of the atomic query expressions in JPA (Java</p><p>Persistence API)?</p><ul class="optl"><li><b>a.</b> JPQL Variables</li><li><b>b.</b> JPQL Parameters</li><li><b>c.</b> JPQL Literals</li><li><b>d.</b> JPQL Constants</li></ul></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>D.</strong> The atomic query expressions are JPQL <strong>variables</strong>, <strong>parameters</strong> and <strong>literals</strong>. &ldquo;Constants&rdquo; is not one of them.</p></div></details></article><article class="pq" id="q2"><header class="pq-head"><span class="pq-n">Question 2</span><span class="pq-marks">1 mark</span><span class="pq-topic">JPA / JPQL</span><a class="pg" href="pdf/semester-test-2024.pdf#page=3" target="_blank" rel="noopener">PDF p.3 &#8599;</a></header><div class="pq-body"><p>Given the following entity class definitions in a JPA application:</p><pre><code> @Entity
+ public class Product {
+     @Id
+     private Long id;
+     private String name;
+     private double price;</code></pre><pre><code>     @ManyToOne
+     private Supplier supplier;</code></pre><pre><code>     // Getters and setters
+ }</code></pre><pre><code> @Entity
+ public class Supplier {
+     @Id
+     private Long id;
+     private String name;
+     // Getters and setters
+ }</code></pre><p>Which of the following JPA code snippets correctly retrieves a list of Product entities and their associated Supplier names, whose price is greater than 100, using the</p><p>EntityManager interface?</p><p>a.</p><p>EntityManager em = entityManagerFactory.createEntityManager();</p><pre><code>TypedQuery&lt;Object[]&gt; query = em.createQuery(
+    &quot;SELECT p.name, s.name FROM Product p JOIN p.supplier s
+WHERE p.price &gt; 100&quot;,</code></pre><pre><code>    Object[].class</code></pre><pre><code>);
+List&lt;Object[]&gt; result = query.getResultList();</code></pre><p>b.</p><p>EntityManager em = entityManagerFactory.createEntityManager();</p><pre><code>TypedQuery&lt;Product&gt; query = em.createQuery(
+    &quot;SELECT p FROM Product p WHERE p.price &gt; 100&quot;,</code></pre><pre><code>    Product.class</code></pre><pre><code>);
+List&lt;Product&gt; result = query.getResultList();</code></pre><p>c.</p><p>EntityManager em = entityManagerFactory.createEntityManager();</p><pre><code>TypedQuery&lt;Object[]&gt; query = em.createQuery(
+    &quot;SELECT p.name, p.supplier.name FROM Product p WHERE
+p.price &gt; 100&quot;,</code></pre><pre><code>    Object[].class</code></pre><pre><code>);
+List&lt;Object[]&gt; result = query.getResultList();</code></pre><p>d.</p><p>EntityManager em = entityManagerFactory.createEntityManager();</p><pre><code>TypedQuery&lt;Object[]&gt; query = em.createQuery(
+    &quot;SELECT p.name, p.supplier FROM Product p WHERE p.price &gt;
+100&quot;,</code></pre><pre><code>    Object[].class</code></pre><pre><code>);
+List&lt;Object[]&gt; result = query.getResultList();</code></pre></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>A.</strong> It selects the product name and the supplier name, joining Product to Supplier through the <code>supplier</code> relationship, filters on price and reads the rows as <code>Object[]</code>. b returns only products, and d returns the Supplier entity rather than its name.</p><p>c (<code>p.supplier.name</code> in the select) is also valid JPQL through an implicit join, but the explicit <code>JOIN</code> in a is the form taught.</p></div></details></article><article class="pq" id="q3"><header class="pq-head"><span class="pq-n">Question 3</span><span class="pq-marks">1 mark</span><span class="pq-topic">JPA</span><a class="pg" href="pdf/semester-test-2024.pdf#page=5" target="_blank" rel="noopener">PDF p.5 &#8599;</a></header><div class="pq-body"><p>Which of the following statements correctly retrieves an entity of type Customer with a primary key of 101 using the EntityManager interface in JPA?</p><ul class="optl"><li><b>a.</b> Customer customer = em.get(Customer.class, 101);</li><li><b>b.</b> Customer customer = em.find(Customer.class, 101);</li><li><b>c.</b> Customer customer = em.load(Customer.class, 101);</li><li><b>d.</b> Customer customer = em.retrieve(Customer.class, 101);</li></ul></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>B.</strong> <code>em.find(Customer.class, 101)</code> retrieves an entity by primary key. <code>get</code>, <code>load</code> and <code>retrieve</code> are not EntityManager methods (<code>getReference</code> is the lazy variant).</p></div></details></article><article class="pq" id="q4"><header class="pq-head"><span class="pq-n">Question 4</span><span class="pq-marks">1 mark</span><span class="pq-topic">SQL:2011 UDT</span><a class="pg" href="pdf/semester-test-2024.pdf#page=5" target="_blank" rel="noopener">PDF p.5 &#8599;</a></header><div class="pq-body"><p>In the SQL:2011 standard, what does the keyword “FINAL” signify when defining a</p><p>User-Defined Type (UDT)?</p><ul class="optl"><li><b>a.</b> It allows the UDT to be used as a base type for other UDTs.</li><li><b>b.</b> It specifies that the UDT cannot be subclassed.</li><li><b>c.</b> It indicates that the UDT is only a placeholder and cannot be used to create actual instances.</li><li><b>d.</b> It restricts the UDT from being used in views or tables.</li></ul></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>B.</strong> <code>FINAL</code> means the type cannot be subclassed. <code>NOT FINAL</code> allows subtypes, and <code>INSTANTIABLE</code> controls whether instances can be created.</p></div></details></article><article class="pq" id="q5"><header class="pq-head"><span class="pq-n">Question 5</span><span class="pq-marks">1 mark</span><span class="pq-topic">PostgreSQL ORDBMS</span><a class="pg" href="pdf/semester-test-2024.pdf#page=5" target="_blank" rel="noopener">PDF p.5 &#8599;</a></header><div class="pq-body"><p>Given that the following SQL statements have been executed on a PostgreSQL</p><p>database:</p><pre><code> CREATE TYPE Product AS ( name text, category text, price
+ numeric );
+ CREATE TABLE Warehouse ( product Product, stock integer );</code></pre><pre><code> CREATE FUNCTION totalStockValue( Product, integer ) RETURNS
+ numeric AS
+ $$
+     SELECT $1.price * $2 AS totalValue;
+ $$ LANGUAGE SQL;</code></pre><p>Which one of the following SELECT statements will return a list of products along with their category, stock quantity, and the total stock value from the Warehouse</p><p>table?</p><p>a. SELECT product.name AS product_name, product.category AS category, product.price AS unit_price, stock, totalStockValue(product, stock) FROM   Warehouse;</p><p>b.</p><pre><code>SELECT (Warehouse.product).name AS product_name,
+(Warehouse.product).category AS category,
+       (Warehouse.product).price AS unit_price, stock,</code></pre><p>totalStockValue(Warehouse.product, stock) FROM   Warehouse;</p><p>c.</p><pre><code>SELECT name AS product_name, category AS category,
+       price AS unit_price, stock,
+totalStockValue(product.name, stock)</code></pre><p>FROM   Warehouse;</p><p>d. SELECT product.name AS product_name, product.category AS category,</p><pre><code>       product.price AS unit_price, stock,
+totalStockValue(Warehouse.product, stock)</code></pre><p>FROM   Warehouse;</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>B.</strong> <code>product</code> is a composite column, so its fields must be read with parentheses and the table name: <code>(Warehouse.product).name</code>. The function takes the whole composite plus the stock: <code>totalStockValue(Warehouse.product, stock)</code>. a and d read fields without the parentheses; c passes the wrong type.</p></div></details></article><article class="pq" id="q6"><header class="pq-head"><span class="pq-n">Question 6</span><span class="pq-marks">1 mark</span><span class="pq-topic">PostgreSQL ORDBMS</span><a class="pg" href="pdf/semester-test-2024.pdf#page=6" target="_blank" rel="noopener">PDF p.6 &#8599;</a></header><div class="pq-body"><p>Study the following code. What data type is  ? inventoryItem CREATE TYPE inventoryItem AS ( name text, supplierID integer,</p><p>price numeric);</p><ul class="optl"><li><b>a.</b> Numeric</li><li><b>b.</b> Enumerated</li><li><b>c.</b> Text</li><li><b>d.</b> Composite</li></ul></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>D.</strong> <code>CREATE TYPE ... AS (...)</code> defines a <strong>composite</strong> type, a structured type grouping fields of different types.</p></div></details></article><article class="pq" id="q7"><header class="pq-head"><span class="pq-n">Question 7</span><span class="pq-marks">1 mark</span><span class="pq-topic">PostgreSQL triggers</span><a class="pg" href="pdf/semester-test-2024.pdf#page=7" target="_blank" rel="noopener">PDF p.7 &#8599;</a></header><div class="pq-body"><p>Which of the following statements about trigger functions in PostgreSQL is correct?</p><ul class="optl"><li><b>a.</b> A trigger function can only be executed before an operation like INSERT, UPDATE, or DELETE occurs.</li><li><b>b.</b> A trigger function can access both the old and new values of a row in the case of an</li></ul><p>INSERT operation.</p><ul class="optl"><li><b>c.</b> A trigger function can only be attached to a table and cannot be attached to views.</li><li><b>d.</b> A trigger function can execute after INSERT, UPDATE, or DELETE operations and can access the old row values for UPDATE and DELETE.</li></ul></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>D.</strong> A trigger function can run AFTER INSERT, UPDATE or DELETE, and has access to <code>OLD</code> for UPDATE and DELETE. a is wrong (it can run after), b is wrong (OLD does not exist for INSERT) and c is wrong (INSTEAD OF triggers attach to views).</p></div></details></article><article class="pq" id="q8"><header class="pq-head"><span class="pq-n">Question 8</span><span class="pq-marks">1 mark</span><span class="pq-topic">XQuery</span><a class="pg" href="pdf/semester-test-2024.pdf#page=7" target="_blank" rel="noopener">PDF p.7 &#8599;</a></header><div class="pq-body"><p>Study the following XML file and answer questions 8 and 9 that follow:</p><pre><code> &lt;WAREHOUSE&gt;
+    &lt;DEVICE type=&quot;laptop&quot;&gt;
+       &lt;BRAND&gt;Apple&lt;/BRAND&gt;
+       &lt;MODEL&gt;MacBook Pro&lt;/MODEL&gt;
+       &lt;PRICE&gt;2500&lt;/PRICE&gt;</code></pre><pre><code>       &lt;STOCK&gt;50&lt;/STOCK&gt;
+    &lt;/DEVICE&gt;
+    &lt;DEVICE type=&quot;smartphone&quot;&gt;
+       &lt;BRAND&gt;Samsung&lt;/BRAND&gt;
+       &lt;MODEL&gt;Galaxy S21&lt;/MODEL&gt;
+       &lt;PRICE&gt;799&lt;/PRICE&gt;
+       &lt;STOCK&gt;120&lt;/STOCK&gt;
+    &lt;/DEVICE&gt;
+    &lt;DEVICE type=&quot;laptop&quot;&gt;
+       &lt;BRAND&gt;Dell&lt;/BRAND&gt;
+       &lt;MODEL&gt;XPS 13&lt;/MODEL&gt;
+       &lt;PRICE&gt;1800&lt;/PRICE&gt;
+       &lt;STOCK&gt;30&lt;/STOCK&gt;
+    &lt;/DEVICE&gt;
+    &lt;DEVICE type=&quot;smartphone&quot;&gt;</code></pre><pre><code>       &lt;BRAND&gt;Apple&lt;/BRAND&gt;
+       &lt;MODEL&gt;iPhone 12&lt;/MODEL&gt;
+       &lt;PRICE&gt;999&lt;/PRICE&gt;
+       &lt;STOCK&gt;200&lt;/STOCK&gt;
+    &lt;/DEVICE&gt;
+ &lt;/WAREHOUSE&gt;
+                     Figure 1: devices.xml file</code></pre><p>Which XQuery expression will return the brands of all laptops with a stock count less</p><p>than 40?</p><p>a.</p><p>for $d in /WAREHOUSE/DEVICE[@type=&quot;laptop&quot;]</p><pre><code>where $d/STOCK &lt; 40
+return $d/BRAND</code></pre><p>b.</p><p>for $d in /WAREHOUSE/DEVICE</p><pre><code>where $d/@type = &quot;laptop&quot; and $d/STOCK &lt; 40
+return $d/BRAND</code></pre><p>c.</p><p>for $d in /WAREHOUSE/DEVICE</p><p>where $d/STOCK &lt; 40</p><p>return $d/BRAND[@type=&quot;laptop&quot;] d.</p><p>for $d in /WAREHOUSE/DEVICE[STOCK &lt; 40]</p><p>where $d/@type = &quot;laptop&quot;</p><p>return $d/BRAND</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>B.</strong> The Dell XPS 13 is the only laptop with stock under 40, so the result is the BRAND <strong>Dell</strong>. The where clause tests the attribute (<code>@type</code>) and the stock together.</p><p>a and d also return Dell (the same condition placed in a predicate); c is wrong because <code>BRAND</code> has no <code>type</code> attribute, so it returns nothing. b is the standard FLWOR form.</p></div></details></article><article class="pq" id="q9"><header class="pq-head"><span class="pq-n">Question 9</span><span class="pq-marks">1 mark</span><span class="pq-topic">XQuery</span><a class="pg" href="pdf/semester-test-2024.pdf#page=8" target="_blank" rel="noopener">PDF p.8 &#8599;</a></header><div class="pq-body"><p>Which XQuery query will list the models and prices of all devices that are not</p><p>smartphones?</p><p>a.</p><p>for $d in /WAREHOUSE/DEVICE</p><pre><code>where $d/@type != &quot;smartphone&quot;
+return $d/MODEL, $d/PRICE</code></pre><pre><code>b.
+  for $d in /WAREHOUSE/DEVICE
+where $d/@type != &quot;laptop&quot;</code></pre><p>return $d/MODEL, $d/PRICE</p><p>c.</p><pre><code>for $d in /WAREHOUSE/DEVICE[@type!=&quot;smartphone&quot;]
+return $d/MODEL, $d/PRICE</code></pre><p>d.</p><p>for $d in /WAREHOUSE/DEVICE[@type=&quot;laptop&quot;]</p><p>return $d/MODEL, $d/PRICE</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>A.</strong> Devices that are not smartphones are the two laptops; the filter is <code>@type != "smartphone"</code>. b excludes laptops instead, and d returns only laptops.</p><p>c (the same test as a predicate) is logically equivalent.</p><p class="memo-note">Strictly, the unparenthesised <code>return $d/MODEL, $d/PRICE</code> ends the FLWOR at the comma; it would normally be <code>return ($d/MODEL, $d/PRICE)</code>. The intended answer is still a.</p></div></details></article><article class="pq" id="q10"><header class="pq-head"><span class="pq-n">Question 10</span><span class="pq-marks">1 mark</span><span class="pq-topic">PostgreSQL XML</span><a class="pg" href="pdf/semester-test-2024.pdf#page=9" target="_blank" rel="noopener">PDF p.9 &#8599;</a></header><div class="pq-body"><p>The             mapping function in PostgreSQL is used to: table_to_xml a. Create an XML value containing an XML comment with the specified text. b. Map the content of the named table. c. Return the XML Schema documents describing the mappings. d. Map the table columns to the corresponding XML schema.</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>B.</strong> <code>table_to_xml</code> maps the content of the named table to XML. The schema mapping is done by <code>table_to_xmlschema</code>, and <code>xmlcomment</code> creates a comment.</p></div></details></article><article class="pq" id="q11"><header class="pq-head"><span class="pq-n">Question 11</span><span class="pq-marks">1 mark</span><span class="pq-topic">OO concepts</span><a class="pg" href="pdf/semester-test-2024.pdf#page=9" target="_blank" rel="noopener">PDF p.9 &#8599;</a></header><div class="pq-body"><p>__________   refers to the ability of an operation to be applied to different types of objects and is a key feature of object-oriented programming.</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>Polymorphism.</strong></p></div></details></article><article class="pq" id="q12"><header class="pq-head"><span class="pq-n">Question 12</span><span class="pq-marks">1 mark</span><span class="pq-topic">JPA</span><a class="pg" href="pdf/semester-test-2024.pdf#page=9" target="_blank" rel="noopener">PDF p.9 &#8599;</a></header><div class="pq-body"><p>True/False: When using JPA, every operation on a database is associated with an EntityManager.</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>TRUE.</strong> Every JPA database operation goes through an <code>EntityManager</code> (find, persist, remove, createQuery, transactions).</p></div></details></article><article class="pq" id="q13"><header class="pq-head"><span class="pq-n">Question 13</span><span class="pq-marks">1 mark</span><span class="pq-topic">JPA</span><a class="pg" href="pdf/semester-test-2024.pdf#page=10" target="_blank" rel="noopener">PDF p.10 &#8599;</a></header><div class="pq-body"><p>Study the following code snippet below. Write the method call is needed to delete an entity from the database in the following code (do not any spaces in your answer).</p><p>Product product = em.find(Product.class, 1L);</p><p>__________</p><p>em.getTransaction().commit();</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong><code>em.remove(product);</code></strong></p></div></details></article><article class="pq" id="q14"><header class="pq-head"><span class="pq-n">Question 14</span><span class="pq-marks">1 mark</span><span class="pq-topic">JPA</span><a class="pg" href="pdf/semester-test-2024.pdf#page=10" target="_blank" rel="noopener">PDF p.10 &#8599;</a></header><div class="pq-body"><p>Assume an Order entity with id = 100 and status = &quot;Pending&quot; exists in the ObjectDB</p><p>database. The following code is executed:</p><pre><code> Order order = em.find(Order.class, 100L);
+ em.getTransaction().begin();
+ order.setStatus(&quot;Completed&quot;);
+ em.getTransaction().commit();</code></pre><pre><code> Order o = em.find(Order.class, 100L);
+ System.out.println(o.getStatus());</code></pre><p>What will be the output of the code?</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong><code>Completed</code></strong></p><p>The entity is managed by the EntityManager, so changing it inside a transaction and committing saves the change. <code>find</code> then returns the updated entity.</p></div></details></article><article class="pq" id="q15"><header class="pq-head"><span class="pq-n">Question 15</span><span class="pq-marks">1 mark</span><span class="pq-topic">PL/pgSQL</span><a class="pg" href="pdf/semester-test-2024.pdf#page=10" target="_blank" rel="noopener">PDF p.10 &#8599;</a></header><div class="pq-body"><p>Study the following code:</p><pre><code> CREATE OR REPLACE FUNCTION divide_numbers(a NUMERIC, b
+ NUMERIC) RETURNS NUMERIC AS $$
+ BEGIN
+   IF b = 0 THEN
+     ____________ &#x27;Division by zero is not allowed!&#x27;;</code></pre><pre><code>   END IF;
+   RETURN a / b;
+ END;
+ $$ LANGUAGE plpgsql;</code></pre><p>Complete the line of code such that an exception is properly caught</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong><code>RAISE EXCEPTION</code></strong></p><pre><code>IF b = 0 THEN
+    RAISE EXCEPTION 'Division by zero is not allowed!';
+END IF;</code></pre></div></details></article><article class="pq" id="q16"><header class="pq-head"><span class="pq-n">Question 16</span><span class="pq-marks">1 mark</span><span class="pq-topic">SQL functions</span><a class="pg" href="pdf/semester-test-2024.pdf#page=11" target="_blank" rel="noopener">PDF p.11 &#8599;</a></header><div class="pq-body"><p>Two types of SQL user defined functions are row functions and _____ functions.</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>Table</strong> functions.</p><p>Your Lecture 2 notes list two categories of SQL functions: <em>row functions</em> (operate on a row's values) and <em>table functions</em> (return a set of rows).</p></div></details></article><article class="pq" id="q17"><header class="pq-head"><span class="pq-n">Question 17</span><span class="pq-marks">1 mark</span><span class="pq-topic">SQL:2011 UDT</span><a class="pg" href="pdf/semester-test-2024.pdf#page=11" target="_blank" rel="noopener">PDF p.11 &#8599;</a></header><div class="pq-body"><p>According to the SQL:2011 standard, a UDT may be a distinct type or a _______ type.</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>Structured</strong> type. A UDT may be a distinct (simple) type or a structured type.</p></div></details></article><article class="pq" id="q18"><header class="pq-head"><span class="pq-n">Question 18</span><span class="pq-marks">1 mark</span><span class="pq-topic">XML</span><a class="pg" href="pdf/semester-test-2024.pdf#page=11" target="_blank" rel="noopener">PDF p.11 &#8599;</a></header><div class="pq-body"><p>The abbreviation XSD stands for_____</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>XML Schema Definition.</strong></p></div></details></article><article class="pq" id="q19"><header class="pq-head"><span class="pq-n">Question 19</span><span class="pq-marks">1 mark</span><span class="pq-topic">XML Schema</span><a class="pg" href="pdf/semester-test-2024.pdf#page=11" target="_blank" rel="noopener">PDF p.11 &#8599;</a></header><div class="pq-body"><p>Study the following code snippet:</p><p>&lt;xs:emelement name = “phone_number” type = “xs:int” /&gt;</p><p>Name the XML schema data type that is shown in the above code. Enter the name of the type only.</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong><code>int</code></strong> (<code>xs:int</code>), a simple type.</p><p class="memo-note">The printed snippet has a typo (<code>xs:emelement</code> for <code>xs:element</code>).</p></div></details></article><article class="pq" id="q20"><header class="pq-head"><span class="pq-n">Question 20</span><span class="pq-marks">1 mark</span><span class="pq-topic">XPath</span><a class="pg" href="pdf/semester-test-2024.pdf#page=11" target="_blank" rel="noopener">PDF p.11 &#8599;</a></header><div class="pq-body"><p>What is the name of the XML component that identifies node type, e.g. element name or function text()?</p><p>(Spend approximately 30 minutes in this section)</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>Node test.</strong> An XPath step has an axis, a node test (such as an element name or <code>text()</code>) and predicates.</p></div></details></article><h2 class="paper-sec">Section B Application and Theory - Based Questions (40 Marks)</h2><article class="pq" id="q21"><header class="pq-head"><span class="pq-n">Question 21</span><span class="pq-marks">15 marks</span><span class="pq-topic">Object DBMS / JPA</span><a class="pg" href="pdf/semester-test-2024.pdf#page=12" target="_blank" rel="noopener">PDF p.12 &#8599;</a></header><div class="pq-body"><p>Object DBMS</p><p>(a) Define the following terms</p><p>(i) OO data model.</p><p>(ii) OID</p><pre><code>                                                       (4 Marks)</code></pre><p>(b) Explain the differences between SQL and JPQL. With the aid of an example,</p><p>explain why JPQL is considered more “object-oriented” friendly than SQL. (4 Marks)</p><p>(c) You have the following JPQL query that retrieves all products with their associated categories:</p><p>Query q1 = em.createQuery(&quot;SELECT i FROM Invoice i JOIN i.customer c WHERE c.country = :country&quot;);</p><p>(i) Convert the above JPQL query to a  using the JPA API in Java. TypedQuery Assume that Invoice is a JPA entity class and you want to retrieve a list of Invoice entities. (3 Marks)</p><p>(ii) Explain two key benefits of using over using a basic in JPA. TypedQuery             Query (4 Marks)</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>(a)(i) Object-oriented data model:</strong> a model that represents data as objects with identity, attributes (state) and methods (behaviour), organised in classes with inheritance, encapsulation and polymorphism.</p><p><strong>(ii) OID (object identifier):</strong> a unique, system-generated identifier that identifies an object independently of its attribute values, used for references between objects.</p><p><strong>(b)</strong> SQL works on tables, rows and columns and joins tables with foreign keys. JPQL queries <em>entities and their attributes</em>, navigating object relationships directly. Example:</p><pre><code>SQL:  SELECT s.name FROM Employee e JOIN Supplier s ON e.supplier_id = s.id WHERE e.salary &gt; 5000
+JPQL: SELECT e.supplier.name FROM Employee e WHERE e.salary &gt; 5000</code></pre><p>JPQL navigates <code>e.supplier.name</code> using object references, with no join condition or table and column names, and it is independent of the storage schema.</p><p><strong>(c)(i)</strong></p><pre><code>TypedQuery&lt;Invoice&gt; q1 = em.createQuery(
+    "SELECT i FROM Invoice i JOIN i.customer c WHERE c.country = :country", Invoice.class);
+q1.setParameter("country", country);
+List&lt;Invoice&gt; invoices = q1.getResultList();</code></pre><p><strong>(ii)</strong> Two benefits of <code>TypedQuery</code> over a plain <code>Query</code>: (1) <em>type safety</em>: the result type is known at compile time, so you get <code>List&lt;Invoice&gt;</code> with no casting and errors are caught earlier; (2) <em>cleaner code</em>: no <code>Object</code> casts and better IDE support and readability.</p></div></details></article><article class="pq" id="q22"><header class="pq-head"><span class="pq-n">Question 22</span><span class="pq-marks">15 marks</span><span class="pq-topic">PL/pgSQL / arrays</span><a class="pg" href="pdf/semester-test-2024.pdf#page=12" target="_blank" rel="noopener">PDF p.12 &#8599;</a></header><div class="pq-body"><p>ORDBMS</p><p>Study the following SQL statements and answer the following questions:</p><pre><code> CREATE TABLE employee_hours (
+     emp_id serial PRIMARY KEY,
+     hours_worked_per_week numeric[]
+ );</code></pre><pre><code> INSERT INTO employee_hours (hours_worked_per_week) VALUES
+     (ARRAY[40, 42, 38, 36]),
+     (ARRAY[35, 37, 39, 40]),
+     (ARRAY[45, 43, 47, 46]);</code></pre><p>You have executed the above statements in PostgreSQL, and they ran successfully.</p><pre><code>  (a)  Complete the following function such that it calculates the total number of
+         hours worked over all weeks and displays the following result:</code></pre><pre><code>                     Figure 2 - Query output</code></pre><pre><code> CREATE FUNCTION total_hours_worked(numbers numeric[])
+ RETURNS ________________
+ DECLARE
+     total numeric := 0;
+     num numeric;
+ BEGIN
+     ___________ num IN ARRAY numbers
+     LOOP
+         total := total + num;
+     ___________;</code></pre><pre><code>     _____________;
+ END;
+ $$ _______________;</code></pre><pre><code>                                                       (10 marks)</code></pre><p>(b)  Write the Select statement query that will output the result shown in Figure 2.</p><p>(2 Marks)</p><p>(c) Provide an example where a PL/pgSQL function would be more appropriate than a</p><p>SQL function and explain why. (3 Marks)</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>(a)</strong> Blanks completed:</p><pre><code>CREATE FUNCTION total_hours_worked(numbers numeric[])
+RETURNS numeric AS $$
+DECLARE
+    total numeric := 0;
+    num numeric;
+BEGIN
+    FOREACH num IN ARRAY numbers
+    LOOP
+        total := total + num;
+    END LOOP;
+    RETURN total;
+END;
+$$ LANGUAGE plpgsql;</code></pre><p><strong>(b)</strong></p><pre><code>SELECT emp_id, total_hours_worked(hours_worked_per_week) AS total_hours
+FROM employee_hours;</code></pre><p>For the data given this returns 156, 151 and 181 hours.</p><p><strong>(c)</strong> Use PL/pgSQL when you need procedural logic that a single SQL statement cannot express: variables, loops, conditionals or exception handling. Example: summing only the positive values in an array, or validating input and raising an error, as in the loop above. A plain SQL function is just one query and cannot loop over an array element by element.</p><p class="memo-note">The printed answer area lists the question parts out of order (the marks column was merged into the text). Part (a) is the function and (b) is the select.</p></div></details></article><article class="pq" id="q23"><header class="pq-head"><span class="pq-n">Question 23</span><span class="pq-marks">10 marks</span><span class="pq-topic">XQuery</span><a class="pg" href="pdf/semester-test-2024.pdf#page=13" target="_blank" rel="noopener">PDF p.13 &#8599;</a></header><div class="pq-body"><p>Semi structured and XML</p><p>You are working with an XML dataset that contains information about an airline&#x27;s flight schedule. The XML includes details such as flight number, departure city,</p><p>destination city, departure time, arrival time, and whether the flight is on time or delayed. Below is a sample of the XML structure:</p><pre><code> &lt;FLIGHTSCHEDULE&gt;
+    &lt;FLIGHT&gt;
+       &lt;FLIGHTNO&gt;AA101&lt;/FLIGHTNO&gt;
+       &lt;DEPARTURECITY&gt;New York&lt;/DEPARTURECITY&gt;
+       &lt;DESTINATIONCITY&gt;London&lt;/DESTINATIONCITY&gt;
+       &lt;DEPARTURETIME&gt;2024-09-15T08:30:00&lt;/DEPARTURETIME&gt;
+       &lt;ARRIVALTIME&gt;2024-09-15T20:30:00&lt;/ARRIVALTIME&gt;</code></pre><pre><code>       &lt;STATUS&gt;On Time&lt;/STATUS&gt;
+    &lt;/FLIGHT&gt;
+    &lt;FLIGHT&gt;
+       &lt;FLIGHTNO&gt;BA202&lt;/FLIGHTNO&gt;
+       &lt;DEPARTURECITY&gt;London&lt;/DEPARTURECITY&gt;
+       &lt;DESTINATIONCITY&gt;Paris&lt;/DESTINATIONCITY&gt;
+       &lt;DEPARTURETIME&gt;2024-09-15T10:00:00&lt;/DEPARTURETIME&gt;
+       &lt;ARRIVALTIME&gt;2024-09-15T12:00:00&lt;/ARRIVALTIME&gt;
+       &lt;STATUS&gt;Delayed&lt;/STATUS&gt;
+    &lt;/FLIGHT&gt;
+    &lt;FLIGHT&gt;
+       &lt;FLIGHTNO&gt;DL303&lt;/FLIGHTNO&gt;
+       &lt;DEPARTURECITY&gt;Los Angeles&lt;/DEPARTURECITY&gt;
+       &lt;DESTINATIONCITY&gt;Tokyo&lt;/DESTINATIONCITY&gt;
+       &lt;DEPARTURETIME&gt;2024-09-15T16:45:00&lt;/DEPARTURETIME&gt;
+       &lt;ARRIVALTIME&gt;2024-09-16T08:00:00&lt;/ARRIVALTIME&gt;
+       &lt;STATUS&gt;On Time&lt;/STATUS&gt;
+    &lt;/FLIGHT&gt;
+ &lt;/FLIGHTSCHEDULE&gt;</code></pre><p>Using FLWOR queries in XQuery, answer the following questions:</p><ul class="optl"><li><b>a.</b> Write a XQuery FLWOR expression to return a list of all flights that are currently delayed. Display the flight number, departure city, and destination city. (3 Marks)</li><li><b>b.</b> Write a XQuery FLWOR expression to return all flights sorted by their departure</li></ul><p>time in ascending order. Display the flight number, departure time, and destination city. (5 Marks)</p><p>(c) Explain the purpose of the &quot;Where&quot; clause in a FLWOR query and how it filters</p><p>results. (2 Marks)</p><p>(Spend approximately 45 minutes in this section)</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>(a)</strong></p><pre><code>for $f in //FLIGHT
+where $f/STATUS = "Delayed"
+return &lt;flight&gt;{ $f/FLIGHTNO, $f/DEPARTURECITY, $f/DESTINATIONCITY }&lt;/flight&gt;</code></pre><p>Result: BA202, London, Paris.</p><p><strong>(b)</strong></p><pre><code>for $f in //FLIGHT
+order by $f/DEPARTURETIME ascending
+return &lt;flight&gt;{ $f/FLIGHTNO, $f/DEPARTURETIME, $f/DESTINATIONCITY }&lt;/flight&gt;</code></pre><p>Order: AA101 (08:30), BA202 (10:00), DL303 (16:45). ISO date-times sort correctly as text.</p><p><strong>(c)</strong> The <code>where</code> clause filters the bound tuples: only the items for which the condition is true continue to <code>order by</code> and <code>return</code>. It is like the WHERE clause in SQL and is evaluated for each binding of the <code>for</code> variable.</p></div></details></article><h2 class="paper-sec">Section C: Scenario Based Questions (40 Marks)</h2><article class="pq" id="q24"><header class="pq-head"><span class="pq-n">Question 24</span><span class="pq-marks">15 marks</span><span class="pq-topic">OODBMS / JPA</span><a class="pg" href="pdf/semester-test-2024.pdf#page=15" target="_blank" rel="noopener">PDF p.15 &#8599;</a></header><div class="pq-body"><p>OODBMS</p><p>Study the following scenario and answer the following questions:</p><p>You are tasked with developing a pet adoption management system for a local</p><p>animal shelter. Each pet in the system is represented as an entity with the following attributes:</p><p>name: A string representing the name of the pet. species: A string representing the species of the pet (e.g., dog, cat, rabbit).</p><p>age: An integer representing the age of the pet. adopted: A boolean value indicating whether the pet has been adopted or not. The system is built using JPA (Java Persistence API) and ObjectDB as the</p><p>database. The goal is to implement some CRUD operations to manage the pets in the shelter.</p><p>Below is an example of the main method used to test the functionality:</p><pre><code> public class Main {
+     public static void main(String[] args) {
+         PetDAO petDAO = new PetDAO();
+         Pet newPet = new Pet(&quot;Buddy&quot;, &quot;dog&quot;, 3, false);
+         petDAO.addPet(newPet);
+         // Rest of the program
+     }
+ }</code></pre><pre><code>  (a) Write the Pet entity class that includes the required members, using JPA</code></pre><pre><code>    annotations to map the class to the ObjectDB table. (PS: there is no need to
+    include the getters and setters) (5 Marks)</code></pre><pre><code>  (b) Implement the   method in the     class, which takes a object
+               addPet            PetDAO               Pet
+    as input and stores it in the database. The method should ensure that the is
+                                                         pet
+    persisted correctly. Provide the method implementation. (3 Marks)
+  You would like to view a list of all pets currently available for adoption. To do this,</code></pre><pre><code>    you need to write a method            that retrieves all pets where
+                        listAvailablePets
+    the adopted field is false.</code></pre><ul class="optl"><li><b>c.</b> Explain why using a JPQL (Java Persistence Query Language) query is necessary for this operation and provide the query you would use. (3 Marks)</li><li><b>d.</b> Write the implementation of the         method, which returns listAvailablePets a list of pets available for adoption. (4 Marks)</li></ul></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>(a)</strong></p><pre><code>@Entity
+public class Pet {
+    @Id @GeneratedValue
+    private Long id;
+    private String name;
+    private String species;
+    private int age;
+    private boolean adopted;
+
+    public Pet() {}
+    public Pet(String name, String species, int age, boolean adopted) {
+        this.name = name; this.species = species;
+        this.age = age; this.adopted = adopted;
+    }
+}</code></pre><p><strong>(b)</strong></p><pre><code>public void addPet(Pet pet) {
+    EntityManager em = emf.createEntityManager();
+    try {
+        em.getTransaction().begin();
+        em.persist(pet);
+        em.getTransaction().commit();
+    } finally {
+        em.close();
+    }
+}</code></pre><p><strong>(c)</strong> A query is needed because <code>find</code> only retrieves one entity by primary key; to retrieve all pets that satisfy a condition you must query. JPQL works on the entity and its attributes, not on tables and columns.</p><pre><code>SELECT p FROM Pet p WHERE p.adopted = false</code></pre><p><strong>(d)</strong></p><pre><code>public List&lt;Pet&gt; listAvailablePets() {
+    EntityManager em = emf.createEntityManager();
+    try {
+        TypedQuery&lt;Pet&gt; q = em.createQuery(
+            "SELECT p FROM Pet p WHERE p.adopted = false", Pet.class);
+        return q.getResultList();
+    } finally {
+        em.close();
+    }
+}</code></pre><p class="memo-note">Assumes the DAO has an <code>EntityManagerFactory emf</code>, which the question does not show.</p></div></details></article><article class="pq" id="q25"><header class="pq-head"><span class="pq-n">Question 25</span><span class="pq-marks">15 marks</span><span class="pq-topic">PostgreSQL triggers</span><a class="pg" href="pdf/semester-test-2024.pdf#page=16" target="_blank" rel="noopener">PDF p.16 &#8599;</a></header><div class="pq-body"><p>ORDBMS</p><p>Study the following scenario and answer the following questions:</p><p>Palesa has asked for your help to automate the process of updating the stock in the</p><p>inventory table whenever a new order is placed. Specifically, when an order is inserted, the stock of the corresponding item in the inventory table should be</p><p>reduced by the quantity ordered. If the stock falls below 5, the system should set the of the order to          otherwise, it should be set to order_status           LowStockOrder; InStockOrder.);</p><p>Questions:</p><p>(a) Complete the trigger function below that updates the stock in the inventory table and sets the appropriate      in the orders table based on the stock level order_status of the ordered item. (7 Marks)</p><p>CREATE FUNCTION update_stock() RETURNS ______ AS $$</p><pre><code> DECLARE
+     current_stock INT;
+ BEGIN
+     SELECT stock INTO ___________
+     FROM __________
+     WHERE item_id = NEW.item_id;</code></pre><pre><code>     IF current_stock &gt;= NEW.quantity THEN
+         UPDATE inventory
+         SET stock = stock - NEW.quantity
+         WHERE __________ = NEW.item_id;</code></pre><pre><code>         IF current_stock - NEW.quantity &lt; 5 THEN
+             ____________ = &#x27;LowStockOrder&#x27;;
+         ELSE
+             ____________ = &#x27;InStockOrder&#x27;;
+         END IF;
+     ELSE
+         _____________ &#x27;Insufficient stock for item_id %&#x27;,
+ NEW.item_id;
+     END IF;
+     RETURN NEW;</code></pre><pre><code> END;
+ $$ LANGUAGE plpgsql;</code></pre><p>(b) Explain the advantages and disadvantages of using triggers in object relational</p><p>database systems. (4 Marks)</p><p>(c) Complete the following trigger such that it calls the trigger function before a new order is inserted. (4 Marks) update_stock CREATE __________ update_stock_trigger ___________ ON orders FOR ___________ EXECUTE __________ update_stock();</p></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>(a)</strong> Completed function:</p><pre><code>CREATE FUNCTION update_stock() RETURNS TRIGGER AS $$
+DECLARE
+    current_stock INT;
+BEGIN
+    SELECT stock INTO current_stock
+    FROM inventory
+    WHERE item_id = NEW.item_id;
+
+    IF current_stock &gt;= NEW.quantity THEN
+        UPDATE inventory
+        SET stock = stock - NEW.quantity
+        WHERE item_id = NEW.item_id;
+
+        IF current_stock - NEW.quantity &lt; 5 THEN
+            NEW.order_status = 'LowStockOrder';
+        ELSE
+            NEW.order_status = 'InStockOrder';
+        END IF;
+    ELSE
+        RAISE EXCEPTION 'Insufficient stock for item_id %', NEW.item_id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;</code></pre><p><strong>(b)</strong> <em>Advantages:</em> business rules are enforced automatically and consistently in the database whatever application makes the change; they keep derived or related data in sync (such as stock levels), support auditing, and reduce duplicated application code. <em>Disadvantages:</em> logic is hidden from the application, so it is harder to see, test and debug; they can hurt performance, and cascading triggers can cause unexpected side effects; and they are tied to a specific DBMS, which hurts portability.</p><p><strong>(c)</strong></p><pre><code>CREATE TRIGGER update_stock_trigger
+BEFORE INSERT ON orders
+FOR EACH ROW
+EXECUTE FUNCTION update_stock();</code></pre><p class="memo-note">It must be a <code>BEFORE</code> trigger because the function changes <code>NEW.order_status</code> before the row is stored. The printed skeleton for part (c) is garbled by the PDF extraction; the full statement above is the answer.</p></div></details></article><article class="pq" id="q26"><header class="pq-head"><span class="pq-n">Question 26</span><span class="pq-marks">10 marks</span><span class="pq-topic">PostgreSQL XML / arrays</span><a class="pg" href="pdf/semester-test-2024.pdf#page=17" target="_blank" rel="noopener">PDF p.17 &#8599;</a></header><div class="pq-body"><p>Semi-structured Data and XML</p><p>Study the following scenario and answer the following questions:</p><p>You are working with an employee performance database where the performance evaluations are stored as XML data, along with an array of quarterly performance</p><p>scores in a PostgreSQL database. The company tracks various aspects of an employee&#x27;s work, such as completed projects, feedback ratings, and salary, using a mixture of XML and array data types.</p><p>The following SQL statements were successfully executed in PostgreSQL:</p><pre><code> CREATE TABLE EmployeePerformance (
+     empId CHAR(4) PRIMARY KEY,
+     empName VARCHAR(100),
+     performanceData XML,
+     quarterlyScores numeric[]</code></pre><p>);</p><pre><code> INSERT INTO EmployeePerformance (empId, empName,
+ performanceData, quarterlyScores)
+ VALUES (&#x27;E001&#x27;, &#x27;John Doe&#x27;,
+     XML(&#x27;&lt;PERFORMANCE year=&quot;2023&quot;&gt;
+             &lt;PROJECTS&gt;5&lt;/PROJECTS&gt;
+             &lt;RATING&gt;4.5&lt;/RATING&gt;
+             &lt;SALARY&gt;60000&lt;/SALARY&gt;
+         &lt;/PERFORMANCE&gt;&#x27;),</code></pre><pre><code>     ARRAY[8.5, 7.0, 9.0, 8.0]
+ );</code></pre><pre><code> INSERT INTO EmployeePerformance (empId, empName,
+ performanceData, quarterlyScores)
+ VALUES (&#x27;E002&#x27;, &#x27;Jane Smith&#x27;,
+     XML(&#x27;&lt;PERFORMANCE year=&quot;2023&quot;&gt;
+             &lt;PROJECTS&gt;6&lt;/PROJECTS&gt;
+             &lt;RATING&gt;4.8&lt;/RATING&gt;
+             &lt;SALARY&gt;65000&lt;/SALARY&gt;
+         &lt;/PERFORMANCE&gt;&#x27;),
+     ARRAY[9.0, 8.5, 8.0, 9.5]);</code></pre><p>The table stores:</p><p>empId: A unique identifier for each employee. empName: The name of the employee. performanceData: XML data that stores the number of completed projects, the</p><p>performance rating, and the salary for the year. quarterlyScores: An array that contains the employee&#x27;s performance scores for</p><p>each quarter.</p><p>(a) Write a query to extract the employee&#x27;s performance rating from the</p><p>performanceData XML field for each employee. Use the xpath() function to do this. (3 Marks)</p><p>(b) Complete the following PL/pgSQL function that calculates the average</p><p>performance score for each employee based on the quarterlyScores array. The function should return the average score. (3 Marks)</p><pre><code> CREATE FUNCTION calculate_avg_score(scores numeric[])
+ RETURNS numeric AS $$</code></pre><pre><code> DECLARE
+    total numeric := 0;
+    count int := 0;
+    average numeric;
+ BEGIN
+    FOR score IN SELECT unnest(_____)
+    LOOP
+        total := total + score;
+        count := count + 1;
+    END LOOP;</code></pre><pre><code>    IF count &gt; 0 THEN
+        average := _______;
+    ELSE
+        average := NULL;
+    END IF;
+    RETURN _______;
+ END;
+ $$ LANGUAGE plpgsql;</code></pre><p>(c) Write a query using the xpath() function to extract the salary from the performanceData XML field for employees who have a performance rating greater than</p><p>4.6. The query should return the employee ID, name, and salary. (4 Marks)</p><pre><code>                                         End of Semester Test Paper</code></pre></div><details class="ans"><summary>Show answer <span class="src written" title="Written for this site from the question and course notes. Not an official memo; check anything you are unsure of">Study answer</span></summary><div class="ans-body"><p><strong>(a)</strong> <code>xpath()</code> returns an XML array, so unnest it and cast to numeric if you want a number:</p><pre><code>SELECT empId, empName,
+       (xpath('/PERFORMANCE/RATING/text()', performanceData))[1]::text AS rating
+FROM EmployeePerformance;</code></pre><p>Result: E001 4.5, E002 4.8.</p><p><strong>(b)</strong> Blanks completed:</p><pre><code>CREATE FUNCTION calculate_avg_score(scores numeric[])
+RETURNS numeric AS $$
+DECLARE
+    total numeric := 0;
+    count int := 0;
+    average numeric;
+    score numeric;
+BEGIN
+    FOR score IN SELECT unnest(scores)
+    LOOP
+        total := total + score;
+        count := count + 1;
+    END LOOP;
+    IF count &gt; 0 THEN
+        average := total / count;
+    ELSE
+        average := NULL;
+    END IF;
+    RETURN average;
+END;
+$$ LANGUAGE plpgsql;</code></pre><p>For John: (8.5 + 7.0 + 9.0 + 8.0) / 4 = 8.125.</p><p><strong>(c)</strong></p><pre><code>SELECT empId, empName,
+       (xpath('/PERFORMANCE/SALARY/text()', performanceData))[1]::text AS salary
+FROM EmployeePerformance
+WHERE ((xpath('/PERFORMANCE/RATING/text()', performanceData))[1]::text)::numeric &gt; 4.6;</code></pre><p>Only Jane Smith (rating 4.8, salary 65000) qualifies.</p><p class="memo-note">The printed function declares <code>score</code> nowhere, so a <code>score numeric;</code> declaration is added so a loop over <code>unnest</code> runs; as printed, the <code>FOR ... IN SELECT</code> loop would need it.</p></div></details></article></section></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

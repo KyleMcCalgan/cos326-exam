@@ -1,0 +1,850 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — MongoDB (2) — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html" aria-current="page">Notes</a><a href="../papers/index.html">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>MongoDB: fundamentals</h1><p>Lecture 14 &middot; Course notes</p></div><button class="study" data-id="lecture-07.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All notes</a><button class="bookmark" data-id="lecture-07.html"> Bookmark</button></div><div class="related"><span class="related-label">Use this topic</span><a href="../reference/coding-patterns.html#pattern-mongodb">MongoDB pattern</a><a href="../reference/mongodb-indexing.html">Operators & indexing</a><a href="../papers/question-index.html#3-mongodb-lectures-1416">Exam questions</a><a href="../papers/answer-memo.html#2-mongodb-l1416">Memo</a><a href="../papers/st2-2026.html#mongo">Test 2 · Q34</a><a href="../practice/essays.html#practice-mongo">Practise</a></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview-and-recap">1. Lecture Overview and Recap</a></li><li><a href="#2-mongodb-document-database">2. MongoDB Document Database</a></li><li><a href="#3-mongodb-data-types">3. MongoDB Data Types</a></li><li><a href="#4-crud-operations">4. CRUD Operations</a></li><li><a href="#5-querying-read-find">5. Querying (READ) — find()</a></li><li><a href="#6-crud-operations-update">6. CRUD Operations: UPDATE</a></li><li><a href="#7-crud-operations-delete">7. CRUD Operations: DELETE</a></li><li><a href="#8-indexing">8. Indexing</a></li><li><a href="#9-quick-reference">9. Quick Reference</a></li><li><a href="#10-questions-memo">10. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview-and-recap">1. Lecture Overview and Recap</h2>
+<ul>
+<li><strong>In this lecture:</strong><ul>
+<li>The <strong>MongoDB document database.</strong></li>
+<li><strong>CRUD operations</strong> (Create, Read, Update, Delete).</li>
+<li><strong>MongoDB data types.</strong></li>
+<li><strong>Indexing.</strong></li>
+</ul>
+</li>
+<li><strong>Recap (previous lecture):</strong><ol>
+<li>What is Big Data?</li>
+<li>Sources of Big Data.</li>
+<li>NoSQL databases and data models for big data.</li>
+<li>The MongoDB NoSQL document database.</li>
+</ol>
+</li>
+<li><strong>Reference (ClickUP):</strong> Moniruzzaman, A.B.M. &amp; Hossain, S.A. (2013). <em>NoSQL database: new era of databases for big data analytics – classification, characteristics and comparison.</em> International Journal of Database Theory and Application, 6(4).</li>
+</ul>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
+<p>Compare with the previous module: in Lectures 9–12 the "flexible" data was <strong>XML</strong> (queried with XPath/XQuery or <code>xpath()</code> in PostgreSQL). MongoDB stores flexible data as <strong>JSON-like documents</strong> and queries it with its own method-style language (<code>find</code>, <code>insertOne</code>, ...) — no XPath and no SQL.</p>
+<hr />
+<h2 id="2-mongodb-document-database">2. MongoDB Document Database</h2>
+<h3 id="21-definition-of-mongodb">2.1 Definition of MongoDB</h3>
+<ol>
+<li>MongoDB is a:<ul>
+<li><strong>Document-oriented database</strong> designed to support <strong>high-performance, highly available and horizontally scalable</strong> applications.</li>
+<li>Database that works on the concepts of <strong>collections and documents.</strong></li>
+</ul>
+</li>
+<li>A MongoDB <strong>database</strong> is a <strong>logical container for collections.</strong></li>
+<li>A MongoDB <strong>DBMS</strong> can <strong>run on a single server or be distributed across clusters</strong> for <strong>horizontal scaling.</strong></li>
+</ol>
+<h3 id="22-collections">2.2 Collections</h3>
+<ol start="4">
+<li>A MongoDB <strong>collection</strong> is a:<ul>
+<li><strong>Group of MongoDB documents.</strong></li>
+<li><strong>Exists within a single database.</strong></li>
+<li><strong>Does not enforce a schema.</strong></li>
+<li>Documents within a collection <strong>can have different fields.</strong></li>
+<li><strong>Typically</strong> all documents in a collection are of <strong>similar or related purpose.</strong></li>
+<li><strong>Analogous to tables</strong> in relational databases, <strong>but MongoDB uses a flexible schema by default.</strong></li>
+</ul>
+</li>
+</ol>
+<h4 id="example-from-the-slides-a-collection-of-documents"> Example (from the slides) — A Collection of Documents</h4>
+<p>Each document is a set of <strong>field: value</strong> pairs; values can be strings, numbers, <strong>arrays</strong>, etc.:</p>
+<pre><code class="language-js">{
+  name:   &quot;al&quot;,
+  age:    18,
+  status: &quot;D&quot;,
+  groups: [ &quot;politics&quot;, &quot;news&quot; ]
+}
+</code></pre>
+<p>The slide stacks three such documents (each with fields <code>name</code>, <code>age</code>, <code>status</code>, <code>groups</code>) to show <strong>a collection = a group of documents.</strong></p>
+<h3 id="23-terminology-relational-vs-mongodb-added-for-clarity">2.3 Terminology — Relational vs. MongoDB (added for clarity)</h3>
+<table>
+<thead>
+<tr>
+<th>Relational</th>
+<th>MongoDB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Database</td>
+<td>Database (logical container for collections)</td>
+</tr>
+<tr>
+<td>Table</td>
+<td>Collection</td>
+</tr>
+<tr>
+<td>Row / tuple</td>
+<td>Document</td>
+</tr>
+<tr>
+<td>Column / attribute</td>
+<td>Field</td>
+</tr>
+<tr>
+<td>Fixed schema (all rows same columns)</td>
+<td>Flexible schema (documents may differ)</td>
+</tr>
+<tr>
+<td>Primary key</td>
+<td><code>_id</code> field (automatically added if omitted)</td>
+</tr>
+<tr>
+<td>Atomic values only (1NF)</td>
+<td>Arrays and embedded documents allowed</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
+<p>In one <code>students</code> collection these two documents are both valid — the second has an extra field and the first does not:</p>
+<pre><code class="language-js">{ name: &quot;Thando&quot;, age: 20 }
+{ name: &quot;Marlize&quot;, age: 21, modules: [&quot;COS326&quot;, &quot;COS332&quot;] }
+</code></pre>
+<p>A relational <code>Student</code> table would force both rows to have identical columns (and <code>modules</code> would need a separate table to stay in 1NF).</p>
+<h3 id="24-mongodb-atlas-cloud-database-platform">2.4 MongoDB Atlas — Cloud Database Platform</h3>
+<ul>
+<li><strong>MongoDB Atlas</strong> is MongoDB's <strong>fully managed cloud database service</strong>, designed for <strong>scalability, security and global distribution.</strong></li>
+<li><strong>Key features:</strong><ul>
+<li><strong>Multi-cloud support:</strong> deploy on <strong>AWS, Azure or Google Cloud.</strong></li>
+<li><strong>Built-in security:</strong> encryption, access controls and auditing.</li>
+<li><strong>Scalability:</strong> horizontal scaling and global clusters.</li>
+<li><strong>Automation:</strong> automated backups, monitoring, deployment and scaling.</li>
+<li><strong>Integrated capabilities:</strong> Compass, Charts, Atlas Search and Atlas Services.</li>
+</ul>
+</li>
+<li><strong>Use cases:</strong> real-time analytics; mobile and web apps; IoT and telemetry; <strong>forensic data pipelines</strong> (e.g., secure evidence storage, audit trails).</li>
+<li><strong>Getting started:</strong> sign up at mongodb.com/atlas → create a <strong>free-tier cluster</strong> → connect via <strong>Compass, mongosh or application drivers.</strong></li>
+</ul>
+<h3 id="25-database-environments">2.5 Database Environments</h3>
+<h4 id="mongodb-compass">MongoDB Compass</h4>
+<ul>
+<li>A <strong>GUI</strong> for <strong>querying, aggregating and analysing</strong> MongoDB data in a visual environment.</li>
+<li><strong>Free to use and source available</strong>; runs on <strong>macOS, Windows and Linux.</strong></li>
+</ul>
+<h4 id="demo-session">Demo Session</h4>
+<ul>
+<li>The lecture included a <strong>live demonstration</strong> of launching MongoDB and performing some operations (the commands are in Sections 3–6 below).</li>
+</ul>
+<h4 id="mongo-shell-mongosh">Mongo Shell (<code>mongosh</code>)</h4>
+<ul>
+<li>The <strong>command-line</strong> environment for MongoDB, using <strong>JavaScript-style helpers.</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Command (helper)</th>
+<th>Purpose</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>show</code></td>
+<td>List things: <code>show dbs</code>, <code>show collections</code></td>
+<td><code>show dbs</code></td>
+</tr>
+<tr>
+<td><code>use</code></td>
+<td><strong>Switch to a database</strong>, or create/use it <strong>when data is first stored</strong> (MongoDB creates the database when data is first stored in it)</td>
+<td><code>use mydb</code></td>
+</tr>
+<tr>
+<td><code>db</code></td>
+<td>Show the <strong>name of the currently selected database</strong></td>
+<td><code>db</code></td>
+</tr>
+<tr>
+<td><code>help</code></td>
+<td>Show help</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Slide screenshot (mongosh session) — reading it:</strong></p>
+<pre><code>&gt; show dbs
+admin   40.00 KiB
+config  108.00 KiB
+local   40.00 KiB
+test1   112.00 KiB
+&gt; use test1
+'switched to db test1'
+&gt; show collections
+mine
+newmine
+</code></pre>
+<ol>
+<li><code>show dbs</code> lists the databases: <code>admin</code>, <code>config</code>, <code>local</code> are <strong>system databases</strong>; <code>test1</code> is the user's database.</li>
+<li><code>use test1</code> switches to it; <code>show collections</code> lists its two collections, <code>mine</code> and <code>newmine</code>.</li>
+</ol>
+<h4 id="mongosh-helpers-vs-javascript-equivalents-from-the-slides"> mongosh Helpers vs. JavaScript Equivalents (from the slides)</h4>
+<table>
+<thead>
+<tr>
+<th>mongosh helper</th>
+<th>JavaScript equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>show dbs</code> / <code>show databases</code></td>
+<td><code>db.adminCommand({ listDatabases: 1 })</code></td>
+</tr>
+<tr>
+<td><code>use &lt;db_name&gt;</code> e.g. <code>use mydb</code></td>
+<td><code>db = db.getSiblingDB('&lt;db_name&gt;')</code> e.g. <code>db = db.getSiblingDB('mydb')</code></td>
+</tr>
+<tr>
+<td><code>show collections</code></td>
+<td><code>db.getCollectionNames()</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Why it matters:</strong> helpers like <code>show</code> and <code>use</code> are <strong>only available in the interactive shell</strong>; in scripts or application code you use the <strong>JavaScript equivalents.</strong></li>
+</ul>
+<hr />
+<h2 id="3-mongodb-data-types">3. MongoDB Data Types</h2>
+<h3 id="31-data-types-1">3.1 Data Types (1)</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description (from the slides)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>String</strong></td>
+<td>Most commonly used type. Must be <strong>UTF-8 valid.</strong></td>
+</tr>
+<tr>
+<td><strong>Integer</strong></td>
+<td><strong>32-bit (Int32)</strong> and <strong>64-bit (Int64)</strong> integer BSON types.</td>
+</tr>
+<tr>
+<td><strong>Boolean</strong></td>
+<td><code>true</code> / <code>false</code>.</td>
+</tr>
+<tr>
+<td><strong>Double</strong></td>
+<td><strong>Floating-point</strong> values.</td>
+</tr>
+<tr>
+<td><strong>Array</strong></td>
+<td>Arrays/lists/<strong>multiple values under one key.</strong></td>
+</tr>
+<tr>
+<td><strong>Timestamp</strong></td>
+<td>BSON type <strong>primarily used internally</strong> by MongoDB (replication/oplog). <strong>Use <code>Date</code> for application date/time values.</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-data-types-2">3.2 Data Types (2)</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description (from the slides)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Embedded document</strong></td>
+<td>Used for <strong>documents nested inside other documents.</strong></td>
+</tr>
+<tr>
+<td><strong>ObjectId</strong></td>
+<td>Used for the <strong>unique <code>_id</code> identifier</strong> of a document (see note below).</td>
+</tr>
+<tr>
+<td><strong>Null</strong></td>
+<td>Stores a <strong>null</strong> value.</td>
+</tr>
+<tr>
+<td><strong>Date</strong></td>
+<td>Stores <strong>date/time</strong> values. In mongosh use <strong><code>new Date()</code></strong> or <strong><code>ISODate()</code></strong> to create BSON Date values.</td>
+</tr>
+<tr>
+<td><strong>Binary data</strong></td>
+<td>Stores <strong>binary data.</strong></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td>Stores <strong>JavaScript code</strong> in a document. <strong>Rare and discouraged for security reasons.</strong></td>
+</tr>
+<tr>
+<td><strong>Regular expression</strong></td>
+<td>Stores a <strong>regular expression.</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p> <strong>Note on the slide:</strong> the slide's description of ObjectID reads "used to store a document nested inside another document" — that is actually the definition of an <strong>embedded document</strong> (the line above it). <strong>ObjectId</strong> is the <strong>12-byte unique identifier</strong> MongoDB generates for <code>_id</code> (e.g., <code>ObjectId("64f77f99cf3b7de1d4d48756")</code>, as seen in the demo output). Know the correct meaning for the exam.</p>
+</blockquote>
+<h4 id="example-added-for-clarity-one-document-using-many-types"> Example (added for clarity) — One Document Using Many Types</h4>
+<pre><code class="language-js">{
+  _id:      ObjectId(&quot;507f1f77bcf86cd799439011&quot;),   // ObjectId
+  name:     &quot;Thando Mandela&quot;,                        // String
+  age:      25,                                      // Integer (Int32)
+  gpa:      3.7,                                     // Double
+  enrolled: true,                                    // Boolean
+  dob:      ISODate(&quot;2000-10-01&quot;),                   // Date
+  modules:  [&quot;COS326&quot;, &quot;COS332&quot;],                    // Array
+  address:  { city: &quot;Pretoria&quot;, code: &quot;0002&quot; },      // Embedded document
+  notes:    null                                     // Null
+}
+</code></pre>
+<hr />
+<h2 id="4-crud-operations">4. CRUD Operations</h2>
+<h3 id="41-crud-summary-mongodb-vs-relational-from-the-slides">4.1 CRUD Summary — MongoDB vs. Relational (from the slides)</h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>MongoDB</th>
+<th>Relational equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Select database</td>
+<td><code>use mydb</code></td>
+<td>Select database/schema</td>
+</tr>
+<tr>
+<td>Create collection</td>
+<td><code>db.createCollection("students")</code></td>
+<td><code>CREATE TABLE students (...)</code></td>
+</tr>
+<tr>
+<td>Insert document</td>
+<td><code>db.students.insertOne({...})</code></td>
+<td><code>INSERT INTO students ...</code></td>
+</tr>
+<tr>
+<td>Read documents</td>
+<td><code>db.students.find(...)</code></td>
+<td><code>SELECT ... WHERE ...</code></td>
+</tr>
+<tr>
+<td>Update document(s)</td>
+<td><code>updateOne()</code> / <code>updateMany()</code></td>
+<td><code>UPDATE ... WHERE ...</code></td>
+</tr>
+<tr>
+<td>Delete document(s)</td>
+<td><code>deleteOne()</code> / <code>deleteMany()</code></td>
+<td><code>DELETE ... WHERE ...</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note (from the slide):</strong> these are <strong>conceptual equivalents, not exact one-to-one translations.</strong></p>
+</blockquote>
+<h3 id="42-create-documents-and-collections">4.2 CREATE — Documents and Collections</h3>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Create a document</strong> (a JavaScript object in a variable)</td>
+<td><code>doc = { name: "value", x: 3 }</code></td>
+</tr>
+<tr>
+<td><strong>Create a collection</strong> explicitly, then insert</td>
+<td><code>db.createCollection("myCollection")</code> then <code>db.myCollection.insertOne({ name: "value", x: 3 })</code></td>
+</tr>
+<tr>
+<td><strong>Implicitly create</strong> a collection (no <code>createCollection</code> needed)</td>
+<td><code>db.myCollection.insertOne(doc)</code> <strong>or</strong> <code>db.myCollection.insertOne({ name: "value", x: 3 })</code></td>
+</tr>
+<tr>
+<td><strong>Drop</strong> a collection</td>
+<td><code>db.myCollection.drop()</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li>A <strong>document</strong> is just a JSON-like object; assigning it to a variable (<code>doc = {...}</code>) does <strong>not</strong> store it in the database.</li>
+<li><code>createCollection</code> is <strong>optional</strong> — inserting into a collection that does not exist <strong>creates it automatically.</strong></li>
+<li><code>drop()</code> removes the <strong>whole collection</strong> (all its documents).</li>
+</ol>
+<h4 id="demo-output-from-the-slide-screenshot"> Demo Output (from the slide screenshot)</h4>
+<pre><code>db&gt; db.myCollection.insertOne({name: &quot;mongo&quot;, x:3})
+{ acknowledged: true,
+  insertedId: ObjectId(&quot;64f77f99cf3b7de1d4d48756&quot;) }
+</code></pre>
+<ul>
+<li><strong><code>acknowledged: true</code></strong> — the server confirmed the write.</li>
+<li><strong><code>insertedId</code></strong> — the <code>_id</code> MongoDB <strong>generated automatically</strong> because we did not supply one.</li>
+</ul>
+<h3 id="43-insert-insertone-and-insertmany">4.3 INSERT — <code>insertOne()</code> and <code>insertMany()</code></h3>
+<ul>
+<li>Inserts <strong>into a specific collection</strong>; <strong>if the collection doesn't exist, it is created.</strong></li>
+<li>You <strong>can specify a unique ID</strong> (<code>_id</code>), <strong>or MongoDB assigns one.</strong></li>
+<li><strong>Multiple documents</strong> can be inserted using <strong>array notation</strong> <code>[ {...}, {...} ]</code>.</li>
+</ul>
+<pre><code class="language-js">// 1. MongoDB assigns the _id
+db.myCollection.insertOne( { name: &quot;mongo&quot;, x: 3 } )
+
+// 2. We supply our own _id
+db.myCollection.insertOne( {
+    _id:  ObjectId(&quot;507f1f77bcf86cd799439011&quot;),
+    name: &quot;mongo&quot;,
+    x:    3 } )
+
+// 3. Several documents at once (array of documents)
+db.myCollection.insertMany( [
+    { name: &quot;mongo&quot;, x: 3 },
+    { name: &quot;Neo4j&quot;, x: 4 }
+] )
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong><code>insertOne(doc)</code></strong> takes <strong>one document</strong>; <strong><code>insertMany([ ... ])</code></strong> takes <strong>an array of documents.</strong></li>
+<li>Every document needs a <strong>unique <code>_id</code></strong> (the primary key). Supplying a duplicate <code>_id</code> gives an error; omitting it lets MongoDB generate an <code>ObjectId</code>.</li>
+<li><em>(Slide tip: in the shell, placing the cursor on a bracket highlights its matching bracket — useful for spotting mismatched <code>{ }</code> and <code>[ ]</code> in longer inserts.)</em></li>
+<li><strong>Slide typo:</strong> the second slide example is missing a comma after the <code>_id</code> line. Fields in a document must be <strong>comma-separated.</strong></li>
+</ol>
+<h4 id="demo-result-what-the-collection-holds-after-the-lecture-inserts"> Demo Result — what the collection holds after the lecture inserts</h4>
+<pre><code>db&gt; db.myCollection.find()
+[
+  { _id: ObjectId(&quot;64f77f32cf3b7de1d4d48755&quot;), name: 'value', x: 3 },
+  { _id: ObjectId(&quot;64f77f99cf3b7de1d4d48756&quot;), name: 'mongo', x: 3 },
+  { _id: ObjectId(&quot;64f77fa7cf3b7de1d4d48757&quot;), name: 'Neo4j', x: 4 }
+]
+</code></pre>
+<p><em>(These three documents are the dataset for all the query examples that follow.)</em></p>
+<hr />
+<h2 id="5-querying-read-find">5. Querying (READ) — <code>find()</code></h2>
+<h3 id="51-find-basics">5.1 <code>find()</code> Basics</h3>
+<ul>
+<li><strong>List a collection's contents:</strong> <code>db.myCollection.find()</code></li>
+<li><strong>If <code>_id</code> is omitted, MongoDB/drivers automatically generate one</strong>, typically an <strong>ObjectId.</strong></li>
+<li><strong>Use <code>it</code></strong> (shell helper) to <strong>show more results</strong> when <code>find()</code> returns more documents than fit on the screen.</li>
+<li><strong><code>findOne(...)</code></strong> returns <strong>only one document</strong> (the first match) instead of a cursor of many.</li>
+</ul>
+<h3 id="52-relational-comparison-operators">5.2 Relational (Comparison) Operators</h3>
+<p><strong>General form:</strong> <code>db.myCollection.find( &lt;selection criterion&gt; )</code></p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Syntax</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Equality</strong></td>
+<td><code>{ &lt;key&gt;: &lt;value&gt; }</code></td>
+<td><code>db.myCollection.find({ x: 3 })</code></td>
+</tr>
+<tr>
+<td><strong>Less than</strong></td>
+<td><code>{ &lt;key&gt;: { $lt: &lt;value&gt; } }</code></td>
+<td><code>db.myCollection.find({ x: { $lt: 3 } })</code></td>
+</tr>
+<tr>
+<td><strong>Less than or equal</strong></td>
+<td><code>{ &lt;key&gt;: { $lte: &lt;value&gt; } }</code></td>
+<td><code>db.myCollection.find({ x: { $lte: 3 } })</code></td>
+</tr>
+<tr>
+<td><strong>Greater than</strong></td>
+<td><code>{ &lt;key&gt;: { $gt: &lt;value&gt; } }</code></td>
+<td><code>db.myCollection.find({ x: { $gt: 3 } })</code></td>
+</tr>
+<tr>
+<td><strong>Greater than or equal</strong></td>
+<td><code>{ &lt;key&gt;: { $gte: &lt;value&gt; } }</code></td>
+<td><code>db.myCollection.find({ x: { $gte: 3 } })</code></td>
+</tr>
+<tr>
+<td><strong>Not equal</strong></td>
+<td><code>{ &lt;key&gt;: { $ne: &lt;value&gt; } }</code></td>
+<td><code>db.myCollection.find({ x: { $ne: 3 } })</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Applied to the demo data</strong> (x values: <code>value</code>→3, <code>mongo</code>→3, <code>Neo4j</code>→4):</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Documents returned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>find({ x: 3 })</code></td>
+<td><code>value</code>, <code>mongo</code></td>
+</tr>
+<tr>
+<td><code>find({ x: { $lt: 3 } })</code></td>
+<td><em>none</em></td>
+</tr>
+<tr>
+<td><code>find({ x: { $lte: 3 } })</code></td>
+<td><code>value</code>, <code>mongo</code></td>
+</tr>
+<tr>
+<td><code>find({ x: { $gt: 3 } })</code></td>
+<td><code>Neo4j</code></td>
+</tr>
+<tr>
+<td><code>find({ x: { $gte: 3 } })</code></td>
+<td>all three</td>
+</tr>
+<tr>
+<td><code>find({ x: { $ne: 3 } })</code></td>
+<td><code>Neo4j</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading the syntax:</strong> the <strong>first <code>{ }</code></strong> is the filter document; inside it, a field name maps to <strong>either a plain value (equality) or an operator document</strong> (<code>{ $gt: 3 }</code>). Operators always start with <strong><code>$</code></strong>.</p>
+<h3 id="53-logical-operators-and-or-in">5.3 Logical Operators — AND, OR, <code>$in</code></h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Syntax</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AND</strong></td>
+<td><code>$and: [ {&lt;key1&gt;:&lt;value1&gt;}, {&lt;key2&gt;:&lt;value2&gt;}, ... ]</code></td>
+<td><code>db.myCollection.find({ $and: [ { name: "mongo" }, { x: 3 } ] })</code></td>
+</tr>
+<tr>
+<td><strong>OR</strong></td>
+<td><code>$or: [ {&lt;key1&gt;:&lt;value1&gt;}, {&lt;key2&gt;:&lt;value2&gt;}, ... ]</code></td>
+<td><code>db.myCollection.find({ $or: [ { name: "mongo" }, { name: "Neo4j" } ] })</code></td>
+</tr>
+<tr>
+<td><strong>Alternative OR</strong> (same field, several values)</td>
+<td><code>{ &lt;key&gt;: { $in: [ val1, val2, ... ] } }</code></td>
+<td><code>db.myCollection.find({ name: { $in: [ "mongo", "Neo4j" ] } })</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong><code>$and</code> / <code>$or</code> take an array</strong> of condition documents.</li>
+<li><code>$and</code> example → documents where <code>name</code> is <code>"mongo"</code> <strong>and</strong> <code>x</code> is 3 → returns the <code>mongo</code> document only.</li>
+<li><code>$or</code> example → <code>name</code> is <code>"mongo"</code> <strong>or</strong> <code>"Neo4j"</code> → returns two documents.</li>
+<li><strong><code>$in</code></strong> is a shorthand for an OR over <strong>one field</strong> with a list of allowed values — equivalent to the <code>$or</code> above, and shorter.</li>
+</ol>
+<h4 id="additional-example-added-for-clarity"> Additional Example (added for clarity)</h4>
+<p>A comma-separated filter is an <strong>implicit AND</strong>: <code>find({ name: "mongo", x: 3 })</code> does the same as the <code>$and</code> example. <code>$and</code> is needed mainly when you must <strong>repeat the same field</strong>, e.g. <code>{ $and: [ { x: { $gt: 1 } }, { x: { $lt: 4 } } ] }</code>.</p>
+<h3 id="54-projection-choosing-which-fields-to-return">5.4 Projection — Choosing Which Fields to Return</h3>
+<p><strong>Syntax:</strong></p>
+<pre><code class="language-js">db.myCollection.find( { &lt;criterion&gt; },
+                      { &lt;field1&gt;: &lt;selector&gt;, &lt;field2&gt;: &lt;selector&gt;, ... } )
+</code></pre>
+<ul>
+<li><strong>Selector = 1</strong> → <strong>include</strong> the field.</li>
+<li><strong>Selector = 0</strong> → <strong>exclude</strong> the field.</li>
+<li><strong>Rule:</strong> you <strong>generally cannot mix inclusion and exclusion</strong> in the same projection, <strong>except for <code>_id</code>.</strong></li>
+</ul>
+<p><strong>Example (from the slide):</strong></p>
+<pre><code class="language-js">db.myCollection.find( { x: { $gt: 2 } }, { name: 1, _id: 0 } )
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li>First argument <code>{ x: { $gt: 2 } }</code> — <strong>filter</strong>: only documents with <code>x &gt; 2</code>.</li>
+<li>Second argument <code>{ name: 1, _id: 0 }</code> — <strong>projection</strong>: return the <code>name</code> field and <strong>suppress <code>_id</code></strong> (which is otherwise <strong>always included by default</strong>).</li>
+<li>Mixing <code>name: 1</code> (include) with <code>_id: 0</code> (exclude) is <strong>allowed because <code>_id</code> is the exception.</strong></li>
+<li><strong>Result on the demo data:</strong> <code>{ name: 'value' }</code>, <code>{ name: 'mongo' }</code>, <code>{ name: 'Neo4j' }</code>.</li>
+<li><strong>SQL analogy:</strong> projection ≈ the <code>SELECT</code> column list; the filter ≈ <code>WHERE</code>.</li>
+</ol>
+<h3 id="55-sorting">5.5 Sorting</h3>
+<p><strong>Syntax:</strong></p>
+<pre><code class="language-js">&lt;find query&gt;.sort( { &lt;field1&gt;: &lt;order&gt;, &lt;field2&gt;: &lt;order&gt;, ... } )
+</code></pre>
+<ul>
+<li><strong>Order = 1</strong> → <strong>ascending.</strong></li>
+<li><strong>Order = -1</strong> → <strong>descending.</strong></li>
+</ul>
+<p><strong>Example (from the slide):</strong></p>
+<pre><code class="language-js">db.myCollection.find( { x: { $gt: 2 } } ).sort( { name: 1 } )
+</code></pre>
+<ul>
+<li>Finds documents with <code>x &gt; 2</code> and <strong>sorts them by <code>name</code> ascending</strong> (≈ SQL <code>ORDER BY name ASC</code>).</li>
+<li>Several fields can be listed; <strong>earlier fields take priority</strong> (e.g., <code>.sort({ x: -1, name: 1 })</code> = highest <code>x</code> first, ties broken by <code>name</code> A→Z).</li>
+</ul>
+<hr />
+<h2 id="6-crud-operations-update">6. CRUD Operations: UPDATE</h2>
+<p><strong>Syntax (as on the slide):</strong></p>
+<pre><code class="language-js">updateOne( { &lt;field&gt;: { &lt;criterion&gt; } },
+           { $set: { &lt;action&gt; } } )
+</code></pre>
+<ul>
+<li><strong>First argument</strong> = <strong>filter</strong> (which document(s)).</li>
+<li><strong>Second argument</strong> = <strong>update operation</strong>; <strong><code>$set</code> modifies specific fields.</strong></li>
+<li><strong><code>updateOne()</code></strong> affects <strong>the first matching document.</strong></li>
+<li><strong><code>updateMany()</code></strong> modifies <strong>all matching documents.</strong></li>
+</ul>
+<pre><code class="language-js">db.myCollection.updateOne ( { x: 3 }, { $set: { name: &quot;mongodb&quot; } } )
+db.myCollection.updateMany( { x: 3 }, { $set: { name: &quot;mongodb&quot; } } )
+</code></pre>
+<p><strong>Walkthrough on the demo data</strong> (two documents have <code>x: 3</code>):</p>
+<ul>
+<li><strong><code>updateOne</code></strong> → only the <strong>first</strong> <code>x: 3</code> document (<code>value</code>) gets <code>name: "mongodb"</code>.</li>
+<li><strong><code>updateMany</code></strong> → <strong>both</strong> <code>x: 3</code> documents (<code>value</code> and <code>mongo</code>) become <code>name: "mongodb"</code>.</li>
+<li><code>$set</code> changes <strong>only the named field(s)</strong>; <strong>other fields are left alone.</strong> <em>(Without <code>$set</code>, a plain replacement document would overwrite the whole document — a common beginner error.)</em></li>
+</ul>
+<blockquote>
+<p><strong>Note on the slide:</strong> the syntax box shows a <code>{ multi: &lt;selector&gt; }</code> option (selector <code>true</code> = more than one document). That belongs to the <strong>older <code>update()</code> method.</strong> With <strong><code>updateOne</code> / <code>updateMany</code></strong> you simply choose the method — no <code>multi</code> option is needed.</p>
+</blockquote>
+<hr />
+<h2 id="7-crud-operations-delete">7. CRUD Operations: DELETE</h2>
+<ul>
+<li><strong><code>deleteOne( { &lt;criterion&gt; } )</code></strong> — deletes <strong>one</strong> (the first matching) document.</li>
+<li><strong><code>deleteMany( { &lt;criterion&gt; } )</code></strong> — deletes <strong>all matching</strong> documents.</li>
+<li><strong><code>deleteMany( { } )</code></strong> with an <strong>empty filter</strong> — <strong>deletes all documents</strong> in the collection (the collection itself and its indexes remain).</li>
+</ul>
+<pre><code class="language-js">// statement 1: delete one document
+db.myCollection.deleteOne( { x: 3 } )
+
+// statement 2: delete all documents (empty filter matches everything)
+db.myCollection.deleteMany( { } )
+</code></pre>
+<blockquote>
+<p> <strong>Don't confuse:</strong> <code>deleteMany({})</code> <strong>empties</strong> the collection but keeps it; <strong><code>drop()</code></strong> (Section 4.2) <strong>removes the collection itself.</strong> Relational analogy: <code>DELETE FROM t;</code> vs <code>DROP TABLE t;</code>.</p>
+</blockquote>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
+<p><code>db.myCollection.deleteMany( { x: { $lt: 4 } } )</code> — deletes every document with <code>x &lt; 4</code> (here both <code>x: 3</code> documents), leaving <code>Neo4j</code>.</p>
+<hr />
+<h2 id="8-indexing">8. Indexing</h2>
+<ul>
+<li><strong>Indexes</strong> can be created on collections to <strong>improve the performance of frequently used queries.</strong></li>
+<li>Indexes:<ul>
+<li><strong>Speed up <code>find</code>, <code>update</code> and <code>remove</code> queries.</strong></li>
+<li><strong>Speed up <code>sort</code> queries.</strong></li>
+<li><strong>Improve performance and scalability.</strong></li>
+</ul>
+</li>
+<li><strong>Trade-off:</strong> indexes <strong>improve read performance</strong> but <strong>add storage and write overhead.</strong> (Every insert/update must also maintain the index.)</li>
+</ul>
+<h3 id="81-creating-indexes-createindex">8.1 Creating Indexes — <code>createIndex()</code></h3>
+<table>
+<thead>
+<tr>
+<th>Index type</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Single-field</strong>, ascending (<code>1</code>)</td>
+<td><code>db.myCollection.createIndex( { name: 1 } )</code></td>
+</tr>
+<tr>
+<td><strong>Single-field</strong>, descending (<code>-1</code>)</td>
+<td><code>db.myCollection.createIndex( { name: -1 } )</code></td>
+</tr>
+<tr>
+<td><strong>Composite</strong> (several fields)</td>
+<td><code>db.myCollection.createIndex( { name: 1, x: -1 } )</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong><code>1</code> = ascending, <code>-1</code> = descending.</strong></li>
+<li>A <strong>composite index</strong> orders by <code>name</code> ascending first, then by <code>x</code> descending within equal names. It supports queries on <code>name</code> alone or on <code>name</code> <strong>and</strong> <code>x</code>, and sorts matching that order.</li>
+</ul>
+<h3 id="82-checking-whether-an-index-is-used-explain">8.2 Checking Whether an Index Is Used — <code>explain()</code></h3>
+<pre><code class="language-js">db.myCollection.find( { name: &quot;mongo&quot; } ).explain(&quot;executionStats&quot;)
+</code></pre>
+<ul>
+<li><strong><code>explain()</code></strong> shows the <strong>query plan</strong> and <strong>whether an index is being used.</strong></li>
+<li>Recommended to check whether a query performs an <strong>index scan</strong> (<code>IXSCAN</code>) rather than a <strong>collection scan</strong> (<code>COLLSCAN</code> — reads every document).</li>
+</ul>
+<h4 id="example-added-for-clarity_3"> Example (added for clarity)</h4>
+<p>With 1 000 000 documents, <code>find({ name: "mongo" })</code> <strong>without</strong> an index must examine all 1 000 000 documents (collection scan). After <code>createIndex({ name: 1 })</code>, MongoDB jumps straight to the matching entries (index scan) and <code>explain("executionStats")</code> shows a tiny number of documents examined. The cost: the index takes extra disk space, and each insert/update/delete must also update it.</p>
+<hr />
+<h2 id="9-quick-reference">9. Quick Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>List databases</td>
+<td><code>show dbs</code></td>
+</tr>
+<tr>
+<td>Switch to / create database</td>
+<td><code>use mydb</code></td>
+</tr>
+<tr>
+<td>Current database</td>
+<td><code>db</code></td>
+</tr>
+<tr>
+<td>List collections</td>
+<td><code>show collections</code></td>
+</tr>
+<tr>
+<td>Create collection</td>
+<td><code>db.createCollection("c")</code></td>
+</tr>
+<tr>
+<td>Insert one / many</td>
+<td><code>db.c.insertOne({...})</code> / <code>db.c.insertMany([...])</code></td>
+</tr>
+<tr>
+<td>Find all / one</td>
+<td><code>db.c.find()</code> / <code>db.c.findOne({...})</code></td>
+</tr>
+<tr>
+<td>Filter</td>
+<td><code>db.c.find({ x: { $gt: 3 } })</code></td>
+</tr>
+<tr>
+<td>AND / OR / IN</td>
+<td><code>$and: [...]</code> / <code>$or: [...]</code> / <code>{ f: { $in: [...] } }</code></td>
+</tr>
+<tr>
+<td>Projection</td>
+<td><code>db.c.find({}, { name: 1, _id: 0 })</code></td>
+</tr>
+<tr>
+<td>Sort</td>
+<td><code>.sort({ name: 1 })</code> (1 asc, -1 desc)</td>
+</tr>
+<tr>
+<td>Update one / many</td>
+<td><code>db.c.updateOne(filter, { $set: {...} })</code> / <code>updateMany(...)</code></td>
+</tr>
+<tr>
+<td>Delete one / many</td>
+<td><code>db.c.deleteOne(filter)</code> / <code>deleteMany(filter)</code></td>
+</tr>
+<tr>
+<td>Remove all docs</td>
+<td><code>db.c.deleteMany({})</code></td>
+</tr>
+<tr>
+<td>Drop collection</td>
+<td><code>db.c.drop()</code></td>
+</tr>
+<tr>
+<td>Create index</td>
+<td><code>db.c.createIndex({ name: 1 })</code></td>
+</tr>
+<tr>
+<td>Query plan</td>
+<td><code>db.c.find({...}).explain("executionStats")</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-questions-memo">10. Questions &amp; Memo</h2>
+<p><em>(Dataset for the code-tracing questions: collection <code>myCollection</code> holds <code>{name:'value', x:3}</code>, <code>{name:'mongo', x:3}</code>, <code>{name:'Neo4j', x:4}</code>.)</em></p>
+<h3 id="section-2-concepts">Section 2 — Concepts</h3>
+<p><strong>Q1:</strong> Define MongoDB and state what a MongoDB database and a collection are.</p>
+<p><strong>A1:</strong> MongoDB is a <strong>document-oriented database</strong> designed for <strong>high-performance, highly available, horizontally scalable</strong> applications, built on <strong>collections and documents.</strong> A <strong>database</strong> is a <strong>logical container for collections.</strong> A <strong>collection</strong> is a <strong>group of documents</strong> within a single database; it <strong>does not enforce a schema</strong>, so documents in it can have different fields.</p>
+<hr />
+<p><strong>Q2:</strong> Give three differences between a MongoDB collection and a relational table.</p>
+<p><strong>A2:</strong> Any three: a collection <strong>does not enforce a schema</strong> (flexible; a table has a fixed schema); documents in a collection <strong>can have different fields</strong> (all table rows have the same columns); documents can contain <strong>arrays and embedded documents</strong> (table values must be atomic); collections are <strong>created implicitly</strong> on first insert (tables need <code>CREATE TABLE</code>).</p>
+<hr />
+<p><strong>Q3:</strong> Name two ways MongoDB can be deployed/scaled, and mention three features of MongoDB Atlas.</p>
+<p><strong>A3:</strong> MongoDB can run on a <strong>single server</strong> or be <strong>distributed across clusters</strong> for <strong>horizontal scaling.</strong> Atlas features (any three): multi-cloud support (AWS, Azure, Google Cloud); built-in security (encryption, access control, auditing); horizontal scaling/global clusters; automation (backups, monitoring, deployment, scaling); integrated tools (Compass, Charts, Atlas Search).</p>
+<hr />
+<p><strong>Q4:</strong> What is MongoDB Compass, and what is <code>mongosh</code>?</p>
+<p><strong>A4:</strong> <strong>Compass</strong> is a free, source-available <strong>GUI</strong> for querying, aggregating and analysing data visually (macOS, Windows, Linux). <strong><code>mongosh</code></strong> is the <strong>command-line shell</strong> using JavaScript-style helpers (<code>show</code>, <code>use</code>, <code>db</code>, <code>help</code>).</p>
+<hr />
+<p><strong>Q5:</strong> Give the JavaScript equivalent of <code>use mydb</code> and of <code>show collections</code>, and explain why they exist.</p>
+<p><strong>A5:</strong> <code>use mydb</code> ≡ <strong><code>db = db.getSiblingDB('mydb')</code></strong>; <code>show collections</code> ≡ <strong><code>db.getCollectionNames()</code></strong>. The shell <strong>helpers only work interactively</strong>; the JavaScript equivalents work in <strong>scripts and application code.</strong></p>
+<hr />
+<p><strong>Q6:</strong> When is a database actually created after <code>use mydb</code>?</p>
+<p><strong>A6:</strong> <strong>When data is first stored in it.</strong> <code>use</code> only switches to (or names) the database; MongoDB creates it on first insert.</p>
+<hr />
+<h3 id="section-3-data-types">Section 3 — Data Types</h3>
+<p><strong>Q7:</strong> Which type should you use for application date/time values — Timestamp or Date? Why?</p>
+<p><strong>A7:</strong> <strong>Date</strong> (created with <code>new Date()</code> or <code>ISODate()</code>). The <strong>Timestamp</strong> BSON type is <strong>primarily internal</strong> to MongoDB (replication/oplog).</p>
+<hr />
+<p><strong>Q8:</strong> Distinguish an <strong>embedded document</strong> from an <strong>ObjectId</strong>.</p>
+<p><strong>A8:</strong> An <strong>embedded document</strong> is a <strong>document nested inside another document</strong> (e.g., <code>address: { city: "Pretoria" }</code>). An <strong>ObjectId</strong> is the <strong>unique identifier</strong> MongoDB generates for a document's <code>_id</code> when one isn't supplied.</p>
+<hr />
+<p><strong>Q9:</strong> Why is the <strong>Code</strong> data type discouraged?</p>
+<p><strong>A9:</strong> Storing <strong>executable JavaScript</strong> in documents is <strong>rare and discouraged for security reasons.</strong></p>
+<hr />
+<h3 id="sections-4-5-create-and-read">Sections 4 &amp; 5 — Create and Read</h3>
+<p><strong>Q10:</strong> Must you call <code>createCollection</code> before inserting? Explain.</p>
+<p><strong>A10:</strong> <strong>No.</strong> <code>insertOne</code>/<code>insertMany</code> on a non-existent collection <strong>creates it implicitly.</strong> <code>createCollection</code> is optional.</p>
+<hr />
+<p><strong>Q11:</strong> What is the difference between <code>insertOne</code> and <code>insertMany</code>, and what happens if you omit <code>_id</code>?</p>
+<p><strong>A11:</strong> <code>insertOne</code> inserts <strong>one document</strong>; <code>insertMany</code> takes an <strong>array of documents</strong>. If <code>_id</code> is omitted, MongoDB <strong>automatically generates a unique <code>_id</code></strong> (an <code>ObjectId</code>). A supplied <code>_id</code> must be unique.</p>
+<hr />
+<p><strong>Q12 (Code Tracing):</strong> What does <code>db.myCollection.find({ x: { $gt: 3 } })</code> return?</p>
+<p><strong>A12:</strong> Only the <strong><code>Neo4j</code></strong> document (<code>x: 4</code>). The <code>x: 3</code> documents are excluded because 3 is not strictly greater than 3.</p>
+<hr />
+<p><strong>Q13 (Code Tracing):</strong> What does <code>db.myCollection.find({ x: { $ne: 3 } })</code> return, and what does <code>find({ x: { $lt: 3 } })</code> return?</p>
+<p><strong>A13:</strong> <code>$ne: 3</code> → the <strong><code>Neo4j</code></strong> document. <code>$lt: 3</code> → <strong>nothing</strong> (an empty result), since no document has <code>x</code> below 3.</p>
+<hr />
+<p><strong>Q14 (Code Writing):</strong> Write queries for (a) documents where <code>name</code> is <code>"mongo"</code> <strong>and</strong> <code>x</code> is 3; (b) documents named <code>"mongo"</code> or <code>"Neo4j"</code> using <code>$or</code>; (c) the same as (b) using <code>$in</code>.</p>
+<p><strong>A14:</strong></p>
+<pre><code class="language-js">// (a)
+db.myCollection.find({ $and: [ { name: &quot;mongo&quot; }, { x: 3 } ] })
+// (b)
+db.myCollection.find({ $or: [ { name: &quot;mongo&quot; }, { name: &quot;Neo4j&quot; } ] })
+// (c)
+db.myCollection.find({ name: { $in: [ &quot;mongo&quot;, &quot;Neo4j&quot; ] } })
+</code></pre>
+<hr />
+<p><strong>Q15 (Code Tracing):</strong> What does <code>db.myCollection.find({ x: { $gt: 2 } }, { name: 1, _id: 0 })</code> return?</p>
+<p><strong>A15:</strong> The <strong><code>name</code> field only</strong> (no <code>_id</code>) of every document with <code>x &gt; 2</code> — all three: <code>{name:'value'}</code>, <code>{name:'mongo'}</code>, <code>{name:'Neo4j'}</code>.</p>
+<hr />
+<p><strong>Q16:</strong> Explain the rule about mixing 1 and 0 in a projection.</p>
+<p><strong>A16:</strong> You <strong>generally cannot mix inclusion (1) and exclusion (0)</strong> in one projection, <strong>except for <code>_id</code></strong>, which can be excluded (<code>_id: 0</code>) while other fields are included.</p>
+<hr />
+<p><strong>Q17 (Code Writing):</strong> Return all documents with <code>x &gt;= 3</code>, sorted by <code>name</code> in descending order, showing only <code>name</code> and <code>x</code>.</p>
+<p><strong>A17:</strong></p>
+<pre><code class="language-js">db.myCollection.find( { x: { $gte: 3 } }, { name: 1, x: 1, _id: 0 } )
+                .sort( { name: -1 } )
+</code></pre>
+<hr />
+<p><strong>Q18:</strong> What does <code>findOne()</code> do and how does it differ from <code>find()</code>?</p>
+<p><strong>A18:</strong> <code>findOne()</code> returns <strong>a single document</strong> (the first match); <code>find()</code> returns <strong>a cursor over all matching documents</strong> (use <code>it</code> in the shell to see more).</p>
+<hr />
+<h3 id="sections-6-7-update-and-delete">Sections 6 &amp; 7 — Update and Delete</h3>
+<p><strong>Q19 (Code Tracing):</strong> After <code>db.myCollection.updateOne({ x: 3 }, { $set: { name: "mongodb" } })</code>, how many documents change? What if <code>updateMany</code> is used?</p>
+<p><strong>A19:</strong> <code>updateOne</code> changes <strong>one</strong> document — the <strong>first</strong> with <code>x: 3</code>. <code>updateMany</code> changes <strong>both</strong> <code>x: 3</code> documents.</p>
+<hr />
+<p><strong>Q20:</strong> What does <code>$set</code> do, and what would happen if you omitted it and passed a plain document?</p>
+<p><strong>A20:</strong> <code>$set</code> <strong>modifies only the specified fields</strong> and leaves the rest intact. Without an update operator (plain replacement), the whole document would be <strong>replaced</strong> — or the update rejected, depending on the method used — so <code>$set</code> is the safe way to change individual fields.</p>
+<hr />
+<p><strong>Q21:</strong> Distinguish <code>deleteMany({})</code>, <code>deleteOne({ x: 3 })</code> and <code>drop()</code>.</p>
+<p><strong>A21:</strong> <code>deleteOne({ x: 3 })</code> deletes <strong>one</strong> matching document. <code>deleteMany({})</code> deletes <strong>all documents</strong> (empty filter matches everything) but <strong>leaves the (empty) collection</strong>. <code>drop()</code> removes the <strong>entire collection</strong>.</p>
+<hr />
+<h3 id="section-8-indexing">Section 8 — Indexing</h3>
+<p><strong>Q22:</strong> State three benefits and one cost of indexes.</p>
+<p><strong>A22:</strong> <strong>Benefits:</strong> speed up <code>find</code>, <code>update</code> and <code>remove</code>; speed up <code>sort</code>; improve performance and scalability. <strong>Cost:</strong> <strong>extra storage and write overhead</strong> (indexes must be maintained on every write).</p>
+<hr />
+<p><strong>Q23 (Code Writing):</strong> Create (a) an ascending index on <code>name</code>; (b) a composite index on <code>name</code> ascending and <code>x</code> descending.</p>
+<p><strong>A23:</strong></p>
+<pre><code class="language-js">db.myCollection.createIndex( { name: 1 } )
+db.myCollection.createIndex( { name: 1, x: -1 } )
+</code></pre>
+<hr />
+<p><strong>Q24:</strong> How do you check whether a query uses an index, and what two outcomes might you see?</p>
+<p><strong>A24:</strong> Use <code>.explain("executionStats")</code>, e.g. <code>db.myCollection.find({ name: "mongo" }).explain("executionStats")</code>. The plan shows an <strong>index scan</strong> (index used — efficient) or a <strong>collection scan</strong> (every document read — slow on large collections).</p>
+<hr />
+<h3 id="comparison-question">Comparison Question</h3>
+<p><strong>Q25:</strong> Compare MongoDB's <code>find</code> with SQL's <code>SELECT</code>: map the filter, projection and sort.</p>
+<p><strong>A25:</strong> <strong>Filter</strong> (first argument) ≈ <code>WHERE</code> (e.g., <code>{ x: { $gt: 3 } }</code> ≈ <code>WHERE x &gt; 3</code>). <strong>Projection</strong> (second argument) ≈ the <code>SELECT</code> column list (<code>{ name: 1, _id: 0 }</code> ≈ <code>SELECT name</code>). <strong><code>.sort({ f: 1 })</code></strong> ≈ <code>ORDER BY f ASC</code> (<code>-1</code> ≈ <code>DESC</code>). These are conceptual equivalents, not exact translations.</p>
+<hr />
+<p><em>End of Lecture 14 Notes.</em></p>
+<hr />
+<blockquote>
+<p><strong>Revision Tip:</strong> The exam is likely to test (a) <strong>tracing <code>find()</code> queries</strong> with <code>$gt/$lt/$ne</code>, <code>$and/$or/$in</code>, projection and sort against a small collection, (b) <strong>writing CRUD commands</strong> (<code>insertOne/Many</code>, <code>updateOne/Many</code> with <code>$set</code>, <code>deleteOne/Many</code>), (c) the <strong>difference between <code>deleteMany({})</code> and <code>drop()</code></strong> and between <code>updateOne</code> and <code>updateMany</code>, (d) <strong>flexible schema vs. relational schema</strong> (collections vs. tables, documents vs. rows), (e) <strong>indexes</strong>: syntax, composite indexes, the read-vs-write trade-off and <code>explain()</code>. Link this lecture to the Big Data / NoSQL data-model overview in Lecture 13 (document stores vs. key-value, column, graph) and contrast MongoDB's flexible JSON-like documents with the XML approach from Lectures 9–12.</p>
+</blockquote></article><div class="article-tools"><a href="lecture-06.html">← Previous</a><a href="lecture-08.html">Next lecture →</a></div></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

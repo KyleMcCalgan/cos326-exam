@@ -1,0 +1,639 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Exam answer memo · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html">Notes</a><a href="../papers/index.html" aria-current="page">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><nav class="subnav" aria-label="Papers pages"><a href="../papers/index.html">Library</a><a href="../papers/st1-2026.html">Test 1 · 2026</a><a href="../papers/st2-2026.html">Test 2 · 2026</a><a href="../papers/semester-tests.html">Semester tests 2020–25</a><a href="../papers/question-index.html">Exam question index</a><a href="../papers/answer-memo.html" aria-current="page">Exam answer memo</a></nav><div class="eyebrow">PAPERS / EXAM PAPERS 2020–2024 / ANSWER MEMO</div><h1>Exam answer memo</h1><p class="lead">Independent worked answers to the exam questions listed in the question index. A study memo, not an official faculty memorandum.</p><article class="prose">
+<p><strong>Companion:</strong> <a href="question-index.html">Question reference index</a><br />
+<strong>Papers:</strong> November 2020, 2021, 2022, 2023, 2024.<br />
+<strong>Focus:</strong> Lectures 11–18; highest priority Neo4j/Cypher, MongoDB, XQuery/FLWOR, PostgreSQL XML, and Big Data/NoSQL.<br />
+<strong>Status:</strong> Independent worked study memo, <strong>not an official faculty memorandum</strong>. Solutions are grounded in the supplied examination questions and course notes. Where a question is ambiguous or incomplete, this is marked explicitly.</p>
+<blockquote>
+<p><strong>How to use:</strong> Find the paper/year and question in the <a href="question-index.html">index</a>, attempt it, then consult the matching answer below. For long scenario questions, examine the input data in the linked PDF first. Some scanned 2022/2023 multiple-choice option text and some older questions are not fully extractable; this memo provides the answer rule or a verified sample rather than inventing an option letter.</p>
+</blockquote>
+<h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#1-neo4j-and-cypher-l1718">Neo4j and Cypher (L17–18)</a></li>
+<li><a href="#2-mongodb-l1416">MongoDB (L14–16)</a></li>
+<li><a href="#3-xquery-and-flwor-l11">XQuery and FLWOR (L11)</a></li>
+<li><a href="#4-postgresql-xml-l12">PostgreSQL XML (L12)</a></li>
+<li><a href="#5-big-data-and-nosql-l13">Big Data and NoSQL (L13)</a></li>
+<li><a href="#6-earlier-lecture-quick-answers">Earlier-lecture quick answers</a></li>
+<li><a href="#7-revision-rules-and-identified-exam-pitfalls">Revision rules and identified exam pitfalls</a></li>
+</ol>
+<h2 id="1-neo4j-and-cypher-l1718">1. Neo4j and Cypher (L17–18)</h2>
+<h3 id="2024-q32-heritagesa-graph-scenario-7-marks-paper-pp-1516">2024 Q32 — HeritageSA graph scenario (7 marks) · <a href="pdf/exam-2024.pdf#page=15">paper pp. 15–16</a></h3>
+<p><strong>(a) Add annual visitor counts to sites:</strong></p>
+<pre><code class="language-cypher">MATCH (sRobbenIsland:Site {name: &quot;Robben Island&quot;})
+SET sRobbenIsland.visitorsPerYear = 300000
+RETURN sRobbenIsland;
+
+MATCH (sApartheidMuseum:Site {name: &quot;Apartheid Museum&quot;})
+SET sApartheidMuseum.visitorsPerYear = 150000
+RETURN sApartheidMuseum;
+</code></pre>
+<p><strong>(b) People honoured in Apartheid Museum and year:</strong></p>
+<pre><code class="language-cypher">MATCH (p:Person)-[r:HONOURED_IN]-&gt;(:Site {name: &quot;Apartheid Museum&quot;})
+RETURN p.name, r.year;
+</code></pre>
+<p>Expected names <strong>Nelson Mandela (2001)</strong> and <strong>Desmond Tutu (2010)</strong>.</p>
+<p><strong>(c) Heritage sites linked to Cape Town:</strong></p>
+<pre><code class="language-cypher">MATCH (:City {name: &quot;Cape Town&quot;})-[:HAS_SITE]-&gt;(s:Site)
+RETURN s.name;
+</code></pre>
+<p>Expected: <strong>Robben Island</strong>. The <code>HAS_SITE</code> edge is directed City → Site. <code>s.name</code> is a stored node property; <code>r.year</code> is a stored <strong>relationship</strong> property.</p>
+<h3 id="2023-q32-peopledepartments-graph-7-marks-paper-p-18">2023 Q32 — People/departments graph (7 marks) · <a href="pdf/exam-2023.pdf#page=18">paper p. 18</a></h3>
+<p>Given Mpho (33), Tebatso (28), Aviwe (24), James (33); <code>WORKS</code> goes from Aviwe → Accounting, Tebatso → HR, Mpho → HR; James → Mpho is <code>MARRIED</code>.</p>
+<p><strong>(a) Change Aviwe’s age to 25:</strong></p>
+<pre><code class="language-cypher">MATCH (p:Person {name: &quot;Aviwe&quot;})
+SET p.age = 25
+RETURN p;
+</code></pre>
+<p><strong>(b) Count relationships in the graph:</strong></p>
+<pre><code class="language-cypher">MATCH ()-[r]-&gt;()
+RETURN count(r) AS relationshipCount;
+</code></pre>
+<p>Expected <strong>4</strong> (one <code>MARRIED</code>, three <code>WORKS</code>).</p>
+<p><strong>(c) Average age of all persons:</strong></p>
+<pre><code class="language-cypher">MATCH (p:Person)
+RETURN avg(p.age) AS averageAge;
+</code></pre>
+<p>After (a), result <code>(33 + 28 + 25 + 33)/4 = 29.75</code>; <strong>before</strong> the update, it is <code>29.5</code>. The order of answering the subquestions matters if you execute the updates.</p>
+<p><strong>(d) People working in HR:</strong></p>
+<pre><code class="language-cypher">MATCH (p:Person)-[:WORKS]-&gt;(:Department {name: &quot;Human Resources&quot;})
+RETURN p.name;
+</code></pre>
+<p>Expected: <strong>Tebatso, Mpho</strong> (order unspecified).</p>
+<h3 id="2022-q33-football-club-points-6-marks-paper-p-20">2022 Q33 — Football club points (6 marks) · <a href="pdf/exam-2022.pdf#page=20">paper p. 20</a></h3>
+<p><strong>(a) Set Sundowns to 25 and Kaizer Chiefs to 20:</strong></p>
+<pre><code class="language-cypher">MATCH (s:Club {name: &quot;Sundowns&quot;}) SET s.points = 25;
+MATCH (k:Club {name: &quot;Kaizer Chiefs&quot;}) SET k.points = 20;
+</code></pre>
+<p><strong>(b) Calculate the difference:</strong></p>
+<pre><code class="language-cypher">MATCH (s:Club {name: &quot;Sundowns&quot;})
+MATCH (k:Club {name: &quot;Kaizer Chiefs&quot;})
+RETURN s.points - k.points AS pointsDifference;
+</code></pre>
+<p>Expected <strong>5</strong>. <code>abs(s.points - k.points)</code> is an alternative if the question intends the <strong>absolute</strong> difference. These two distinct <code>MATCH</code> clauses bind <code>s</code> and <code>k</code> for the same result row.</p>
+<h3 id="2024-q25-customers-purchasing-products-7-marks-paper-p-11">2024 Q25 — Customers purchasing products (7 marks) · <a href="pdf/exam-2024.pdf#page=11">paper p. 11</a></h3>
+<p><strong>(a)</strong> <code>[:PURCHASED]</code> is a directed relationship connecting a <code>Customer</code> node to a <code>Product</code> they bought. Retrieve buyers of TV:</p>
+<pre><code class="language-cypher">MATCH (c:Customer)-[:PURCHASED]-&gt;(:Product {name: &quot;TV&quot;})
+RETURN c.name;
+</code></pre>
+<p>Expected <strong>Jane</strong>.</p>
+<p><strong>(b) Total products purchased by customers:</strong></p>
+<pre><code class="language-cypher">MATCH (:Customer)-[r:PURCHASED]-&gt;(:Product)
+RETURN count(r) AS totalPurchased;
+</code></pre>
+<p>Expected <strong>2</strong> purchase relationships in the supplied data. This counts relationships, not unique product names.</p>
+<h3 id="2024-q6-ndivhuwos-grade-a-friends-paper-pp-56">2024 Q6 — Ndivhuwo’s grade-A friends · <a href="pdf/exam-2024.pdf#page=5">paper pp. 5–6</a></h3>
+<pre><code class="language-cypher">MATCH (:Student {name: &quot;Ndivhuwo&quot;})-[:FRIEND_WITH]-&gt;(f:Student {grade: &quot;A&quot;})
+RETURN f.name;
+</code></pre>
+<p>Expected <strong>Katlego</strong> from the given graph. Equivalent <code>WHERE f.grade = "A"</code> is valid. <strong>Paper caveat:</strong> several printed answer options add spaces inside the name literal (<code>" Ndivhuwo "</code>); such spaces are part of the actual string and would not match <code>"Ndivhuwo"</code> under exact equality. Use the correct conceptual pattern above.</p>
+<h3 id="2023-q6-nandis-friends-paper-p-7">2023 Q6 — Nandi’s friends · <a href="pdf/exam-2023.pdf#page=7">paper p. 7</a></h3>
+<pre><code class="language-cypher">MATCH (:Person {name: &quot;nandi&quot;})-[:FRIENDS]-&gt;(f)
+RETURN f.name;
+</code></pre>
+<p>Expected <strong>ayanda</strong> and <strong>dineo</strong>. Parentheses surround nodes; <strong>square brackets</strong> surround relationships; outgoing direction is <code>-&gt;</code>. The variable of the destination node supplies <code>f.name</code>.</p>
+<h3 id="2022-q6-2021-q4-who-johan-follows-2022-pp-89-2021-pp-23">2022 Q6 / 2021 Q4 — Who Johan follows · <a href="pdf/exam-2022.pdf#page=8">2022 pp. 8–9</a> · <a href="pdf/exam-2021-online.pdf#page=2">2021 pp. 2–3</a></h3>
+<pre><code class="language-cypher">MATCH (:Person {name: &quot;Johan&quot;})-[:FOLLOWS]-&gt;(followed)
+RETURN followed.name, followed.from, followed.hobby;
+</code></pre>
+<p>Return <strong>destination node</strong> properties, not Johan’s own. In the paper’s specified four-edge graph, Johan follows <strong>Thandi and Neo</strong>. Do not confuse a variable introduced in the <code>CREATE</code> query (<code>psJ</code>) with a durable database ID; each statement defines new variables.</p>
+<h3 id="2022-q7-people-supporting-sundowns-paper-p-9">2022 Q7 — People supporting Sundowns · <a href="pdf/exam-2022.pdf#page=9">paper p. 9</a></h3>
+<pre><code class="language-cypher">MATCH (p:Person)-[:SUPPORTS]-&gt;(c:Club {name: &quot;Sundowns&quot;})
+RETURN p.name, c.name;
+</code></pre>
+<p>Expected <strong>Xolisa / Sundowns</strong>. The start and end node have different labels.</p>
+<h3 id="2023-q25-cypher-application-questions-paper-pp-1314">2023 Q25 — Cypher application questions · <a href="pdf/exam-2023.pdf#page=13">paper pp. 13–14</a></h3>
+<p>Typical required answers use matching and counting; for people of a given age:</p>
+<pre><code class="language-cypher">MATCH (p:Person)
+WHERE p.age = 25
+RETURN count(p) AS total;
+</code></pre>
+<p>For an <em>unspecified graph</em>, no numeric count can be inferred. Use the question’s exact filter/relationship direction when you open the original page.</p>
+<h3 id="2022-q25-update-and-count-paper-p-15">2022 Q25 — Update and count · <a href="pdf/exam-2022.pdf#page=15">paper p. 15</a></h3>
+<p>Core patterns:</p>
+<pre><code class="language-cypher">MATCH (p:Person {name: &quot;Thandi&quot;}) SET p.age = 21 RETURN p;
+MATCH (p:Person) WHERE p.age &gt; 20 RETURN count(p);
+</code></pre>
+<p>These demonstrate the requested skills; <strong>check the paper’s exact property names and predicate before copying verbatim</strong>.</p>
+<h3 id="2024-q7-q1516-2023-q7-and-q16-short-cypher-answers">2024 Q7, Q15–16; 2023 Q7 and Q16 — Short Cypher answers</h3>
+<table>
+<thead>
+<tr>
+<th>Paper/question</th>
+<th>Answer and reasoning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="pdf/exam-2024.pdf#page=6">2024 Q7, p. 6</a></td>
+<td>A shortest-path query finds a minimum-hop connection; use <code>shortestPath((a)-[*]-(b))</code> for a single shortest path when permitted by the Cypher version/query context.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2024.pdf#page=9">2024 Q15, p. 9</a></td>
+<td><code>REMOVE n.property</code> removes a property; <code>REMOVE n:Label</code> removes a label; <strong>neither deletes the node</strong>.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2024.pdf#page=9">2024 Q16, p. 9</a></td>
+<td><code>RETURN DISTINCT p.name</code> removes duplicate returned name values.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2023.pdf#page=8">2023 Q7, p. 8</a></td>
+<td><code>SET</code> is the clause used to add or update properties.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2023.pdf#page=10">2023 Q16, p. 10</a></td>
+<td><code>MATCH p=(a)--&gt;(b)--&gt;(c) RETURN ..., length(p)</code> matches a <strong>two-relationship</strong> directed path. <code>length(p)</code> returns <strong>2</strong>.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2021-online.pdf#page=4">2021 Q7, p. 4</a></td>
+<td>A property graph has nodes and relationships, both able to store key-value properties.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2020-online.pdf#page=5">2020 Q16, Q18, Q32</a></td>
+<td>Graph databases model highly connected entities and traversals; directed relationships are typed; a graph need not be stored as an adjacency matrix. Check the precise T/F wording in the paper.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="merge-on-match-on-create-lecture-relevant-not-a-verified-standalone-past-paper-question">MERGE / ON MATCH / ON CREATE — lecture-relevant, not a verified standalone past-paper question</h3>
+<pre><code class="language-cypher">MERGE (s:Student {studentNo: &quot;123&quot;})
+ON CREATE SET s.name = &quot;Emma&quot;, s.age = 19
+ON MATCH SET s.lastSeen = date()
+RETURN s;
+</code></pre>
+<ul>
+<li><code>MERGE</code> searches for the <strong>whole pattern</strong> and creates it if missing.</li>
+<li><code>ON CREATE SET</code> executes <strong>only when newly created</strong>.</li>
+<li><code>ON MATCH SET</code> executes <strong>only when matched</strong>.</li>
+<li>If duplicate matches already exist, <code>MERGE</code> does not clean them up; use uniqueness constraints on identifiers where appropriate.</li>
+<li>Repeating <code>MATCH (s:Student {name: "Emma"})</code> can yield <strong>multiple Emmas</strong>, each potentially producing multiple rows from connected relationships.</li>
+</ul>
+<hr />
+<h2 id="2-mongodb-l1416">2. MongoDB (L14–16)</h2>
+<h3 id="2024-q31-wildlifesa-practical-7-marks-paper-pp-1415">2024 Q31 — WildlifeSA practical (7 marks) · <a href="pdf/exam-2024.pdf#page=14">paper pp. 14–15</a></h3>
+<p>The supplied sighting uses a <strong>date string</strong> formatted <code>YYYY-MM-DD</code>, not a BSON Date. Answers below preserve that source representation.</p>
+<p><strong>(a) Species and location only, January 2024:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;conservationDB&quot;).animalSightings.find(
+  { date: { $gte: &quot;2024-01-01&quot;, $lt: &quot;2024-02-01&quot; } },
+  { _id: 0, species: 1, location: 1 }
+)
+</code></pre>
+<p>For ISO-formatted date strings, lexicographic range comparison works. If <code>date</code> were stored as a BSON Date, use <code>ISODate(...)</code> bounds instead.</p>
+<p><strong>(b) All fields, ranger Nomsa Khumalo:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;conservationDB&quot;).animalSightings.find({
+  &quot;ranger.name&quot;: &quot;Nomsa Khumalo&quot;
+})
+</code></pre>
+<p><strong>(c) Delete all Impala sightings:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;conservationDB&quot;).animalSightings.deleteMany({species: &quot;Impala&quot;})
+</code></pre>
+<p>The source explicitly equates “not endangered” with the given <code>species: "Impala"</code> filter; do not generalise the deletion to all unlabelled species.</p>
+<h3 id="2023-q31-librarybooks-7-marks-paper-pp-1618">2023 Q31 — Library/books (7 marks) · <a href="pdf/exam-2023.pdf#page=16">paper pp. 16–18</a></h3>
+<p><strong>(a) Insert <em>The Catcher in the Rye</em>:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;library&quot;).books.insertOne({
+  title: &quot;The Catcher in the Rye&quot;,
+  genre: &quot;Fiction&quot;,
+  publicationYear: 1951,
+  authors: [{ name: &quot;J.D. Salinger&quot;, birthYear: 1919 }]
+})
+</code></pre>
+<p><strong>(b) Update <em>The Great Gatsby</em>’s year:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;library&quot;).books.updateOne(
+  {title: &quot;The Great Gatsby&quot;},
+  {$set: {publicationYear: 1926}}
+)
+</code></pre>
+<p><strong>(c) Delete <em>The Hobbit</em>:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;library&quot;).books.deleteOne({title: &quot;The Hobbit&quot;})
+</code></pre>
+<h3 id="2022-q32-food-ratings-arrays-6-marks-paper-pp-1920">2022 Q32 — Food ratings arrays (6 marks) · <a href="pdf/exam-2022.pdf#page=19">paper pp. 19–20</a></h3>
+<p><strong>(a) Exact array [5, 8, 9] in this order:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;foods&quot;).myfavourites.find({ratings: [5, 8, 9]})
+</code></pre>
+<p>Expected documents <strong>cake</strong> and <strong>steak</strong> (IDs 5 and 8).</p>
+<p><strong>(b) Array contains 5 anywhere:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;foods&quot;).myfavourites.find({ratings: 5})
+</code></pre>
+<p>All <strong>four</strong> source documents contain 5.</p>
+<p><strong>(c) At least one SAME element is greater than 5 and less than 9:</strong></p>
+<pre><code class="language-javascript">db.getSiblingDB(&quot;foods&quot;).myfavourites.find({
+  ratings: { $elemMatch: { $gt: 5, $lt: 9 } }
+})
+</code></pre>
+<p>Expected <strong>cake, biscuits and steak</strong>, which contain 8. <strong>Chicken</strong> only has <code>[5,9]</code>, so does not match. <code>$elemMatch</code> is essential to bind both conditions to a single array element.</p>
+<h3 id="2024-q24-orders-aggregation-7-marks-paper-p-11">2024 Q24 — Orders aggregation (7 marks) · <a href="pdf/exam-2024.pdf#page=11">paper p. 11</a></h3>
+<p><strong>(a)</strong> A collection is a group of MongoDB documents (BSON documents) in one database, analogous to a relational table but normally schema-flexible. Each document contains fields and values, and may contain embedded documents and arrays.</p>
+<p><strong>(b)</strong> The supplied pipeline:</p>
+<pre><code class="language-javascript">db.orders.aggregate([
+  { $match: { status: &quot;completed&quot; } },
+  { $group: {
+      _id: &quot;$customerId&quot;,
+      totalAmount: { $sum: &quot;$amount&quot; },
+      totalOrders: { $count: {} }
+  }},
+  { $sort: { totalAmount: -1 } }
+])
+</code></pre>
+<ol>
+<li><code>$match</code> retains completed orders only.</li>
+<li><code>$group</code> groups by customer ID, sums spending and counts orders.</li>
+<li><code>$sort</code> orders customers by total spending <strong>descending</strong>.</li>
+<li>Each output document contains <code>_id</code> (customer ID), <code>totalAmount</code> and <code>totalOrders</code>.</li>
+</ol>
+<p><strong>Important nuance:</strong> <code>$count: {}</code> is a valid <strong>group accumulator</strong> in supported MongoDB versions; <code>$sum: 1</code> is the common alternative taught in L15. No numeric output can be calculated because this question does not provide actual order records.</p>
+<h3 id="2024-q4-total-inventory-value-paper-p-5">2024 Q4 — Total inventory value · <a href="pdf/exam-2024.pdf#page=5">paper p. 5</a></h3>
+<p><code>$group: {_id: null, total_stock_value: {$sum: {$multiply: ["$stock","$price"]}}}</code> groups <strong>all</strong> products together. Calculation: Bike <code>20 × 200 = 4000</code>; Helmet <code>100 × 50 = 5000</code>; Gloves <code>50 × 15 = 750</code>. <strong>Total = 9750</strong>.</p>
+<pre><code class="language-javascript">{ _id: null, total_stock_value: 9750 }
+</code></pre>
+<p><strong>Correct multiple-choice value: 9750</strong> (the paper's option C).</p>
+<h3 id="2023-q4-electronics-total-price-paper-p-6">2023 Q4 — Electronics total price · <a href="pdf/exam-2023.pdf#page=6">paper p. 6</a></h3>
+<p>Filter to Electronics, then group by <code>$category</code> and sum <code>$price</code>: Laptop <code>1200</code> + Smartphone <code>800</code> = <strong>2000</strong>. Toaster is excluded.</p>
+<pre><code class="language-javascript">{ _id: &quot;Electronics&quot;, total_price: 2000 }
+</code></pre>
+<h3 id="2022-q4-2021-q6-2020-q33-aggregate-likes-by-blog-title">2022 Q4 / 2021 Q6 / 2020 Q33 — Aggregate likes by blog title</h3>
+<p><a href="pdf/exam-2022.pdf#page=6">2022 pp. 6–7</a> · <a href="pdf/exam-2021-online.pdf#page=3">2021 pp. 3–4</a> · <a href="pdf/exam-2020-online.pdf#page=8">2020 pp. 8–9</a></p>
+<pre><code class="language-javascript">db.blogsCollection.aggregate([
+  { $match: { title: &quot;NoSQL Overview&quot; } },
+  { $group: { _id: &quot;$title&quot;, num_likes: { $sum: &quot;$likes&quot; } } }
+])
+</code></pre>
+<p>Given the supplied three-blog dataset with one matching document (<code>likes: 200</code>), expected:</p>
+<pre><code class="language-javascript">{ _id: &quot;NoSQL Overview&quot;, num_likes: 200 }
+</code></pre>
+<p><code>$group</code> is the valid name, <strong>not</strong> <code>$group by</code>; <code>$sum</code> is the accumulator, <strong>not</strong> <code>$add</code> in this context. <code>_id: "$title"</code> accesses a document field; <code>_id: "title"</code> would use literal text.</p>
+<h3 id="2023-q24-2022-q24-mongodb-data-and-aggregation-application">2023 Q24 / 2022 Q24 — MongoDB data and aggregation application</h3>
+<p><a href="pdf/exam-2023.pdf#page=12">2023 pp. 12–13</a> · <a href="pdf/exam-2022.pdf#page=14">2022 pp. 14–15</a></p>
+<p>These application questions build on the same document / aggregation skills. Core correct patterns are:</p>
+<pre><code class="language-javascript">// Filter a collection
+db.salesCollection.find({category: &quot;Electronics&quot;})
+
+// Group and sum sales values
+db.salesCollection.aggregate([
+  {$group: {_id: &quot;$category&quot;, total: {$sum: &quot;$amount&quot;}}}
+])
+</code></pre>
+<p><strong>Caution:</strong> These are illustrative patterns, <strong>not claimed to be verbatim solutions</strong> to every subpart; consult the linked papers for exact required fields and any numerical source data.</p>
+<h3 id="2024-q5-update-andries-paper-p-5">2024 Q5 — Update Andries · <a href="pdf/exam-2024.pdf#page=5">paper p. 5</a></h3>
+<pre><code class="language-javascript">db.students.updateOne({name: &quot;Andries&quot;}, {$set: {age: 24}})
+</code></pre>
+<p>Correct option <strong>A</strong>. The first object filters, the second specifies the update operation.</p>
+<h3 id="2024-q1314-2022-q5-and-q1415-2023-q1314-small-shell-questions">2024 Q13–14, 2022 Q5 and Q14–15, 2023 Q13–14 — Small shell questions</h3>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Correct answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="pdf/exam-2024.pdf#page=8">2024 Q13, p. 8</a></td>
+<td><code>db.collectionName.drop()</code> removes a <strong>collection</strong>.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2024.pdf#page=9">2024 Q14, p. 9</a></td>
+<td><code>cursor.hasNext()</code> checks whether the cursor has another document. <code>cursor.next()</code> reads it.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2022.pdf#page=8">2022 Q5, p. 8</a></td>
+<td><code>insertMany([...])</code> inserts multiple documents.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2022.pdf#page=11">2022 Q14, pp. 11–12</a></td>
+<td><code>db.collectionName.drop()</code> removes the collection; <code>deleteMany({})</code> removes its documents but retains the collection.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2022.pdf#page=11">2022 Q15, pp. 11–12</a></td>
+<td>For wildcard indexing: <code>db.collectionName.createIndex({"$**": 1})</code> if asked for a wildcard index across field paths.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2023.pdf#page=9">2023 Q13, p. 9</a></td>
+<td><code>find()</code> queries a collection.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2023.pdf#page=9">2023 Q14, p. 9</a></td>
+<td><code>show collections</code> lists collections in the active database.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2020-online.pdf#page=3">2020 Q10–11, pp. 3–4</a></td>
+<td>MongoDB has embedded and normalised/reference-based modelling; BSON documents are the stored representation and JSON-like objects express query predicates.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2021-online.pdf#page=1">2021 Q1, p. 1</a></td>
+<td>Basic MongoDB queries are JSON-like query documents; BSON is the storage/wire representation.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2021-q17-q35-2020-q28-mongodb-theory">2021 Q17, Q35 / 2020 Q28 — MongoDB theory</h3>
+<ul>
+<li><a href="pdf/exam-2021-online.pdf#page=6">2021 Q17, p. 6</a> / <a href="pdf/exam-2020-online.pdf#page=7">2020 Q28, p. 7</a>: Aggregation transforms/matches/groups/summarises document data; pipeline stages are evaluated in order.</li>
+<li><a href="pdf/exam-2021-online.pdf#page=12">2021 Q35, p. 12</a>: Embedded model puts related data inside a document (fewer joins/lookups, may duplicate or enlarge data); normalised/reference model stores relationships via references across documents (less duplication, may require additional lookups).</li>
+</ul>
+<h3 id="lecture-16-mongo-shell-functions-supplement-to-past-questions">Lecture 16 — Mongo shell functions (supplement to past questions)</h3>
+<pre><code class="language-javascript">function totalLikes(dbName, collectionName, title) {
+  const col = db.getSiblingDB(dbName).getCollection(collectionName);
+  const results = col.aggregate([
+    {$match: {title: title}},
+    {$group: {_id: &quot;$title&quot;, total: {$sum: &quot;$likes&quot;}}}
+  ]);
+  while (results.hasNext()) printjson(results.next());
+}
+</code></pre>
+<p><code>getSiblingDB()</code> selects another database <strong>without changing the <code>db</code> variable</strong>; <code>col</code> stores the collection reference; <code>results</code> stores a cursor. Mongosh JavaScript functions are not automatically server-side database functions. A Java application normally uses the MongoDB Java driver, not a mongosh-defined JavaScript function.</p>
+<hr />
+<h2 id="3-xquery-and-flwor-l11">3. XQuery and FLWOR (L11)</h2>
+<h3 id="2022-q31-students-and-third-year-modules-3-marks-paper-pp-1819">2022 Q31 — Students and third-year modules (3 marks) · <a href="pdf/exam-2022.pdf#page=18">paper pp. 18–19</a></h3>
+<p>The requested query lists names of students studying third-year modules <strong>and aged under 22</strong>. The sample uses a <code>student</code> element with <code>module</code> attribute such as <code>COS314</code>, <code>&lt;name&gt;</code>, <code>&lt;age&gt;</code>.</p>
+<pre><code class="language-xquery">for $s in //student
+where starts-with(string($s/@module), &quot;COS3&quot;)
+      and number($s/age) &lt; 22
+return $s/name
+</code></pre>
+<p><strong>Assumption:</strong> In this module’s sample, third-year modules are represented by <code>COS3xx</code> codes. If the XML separately defines a <code>year</code> attribute or other module classification, filter that explicit field instead. <code>starts-with(..., "COS3")</code> is a reasonable interpretation of the given module-code convention, not a general rule for every university.</p>
+<h3 id="2022-q3-staff-in-ascending-staff-number-order-paper-pp-46">2022 Q3 — Staff in ascending staff-number order · <a href="pdf/exam-2022.pdf#page=4">paper pp. 4–6</a></h3>
+<p>A complete valid FLWOR form:</p>
+<pre><code class="language-xquery">for $s in //STAFF
+let $num := $s/STAFFNO
+let $fn := $s/NAME/FNAME
+let $ln := $s/NAME/LNAME
+order by $num ascending
+return
+  &lt;STAFFDATA&gt;
+    &lt;STAFFNO&gt;{data($num)}&lt;/STAFFNO&gt;
+    &lt;FNAME&gt;{data($fn)}&lt;/FNAME&gt;
+    &lt;LNAME&gt;{data($ln)}&lt;/LNAME&gt;
+  &lt;/STAFFDATA&gt;
+</code></pre>
+<p>Critical rule: <code>$s/STAFFNO</code> starts from the <strong>current staff element</strong>; <code>/STAFFNO</code> incorrectly starts at the document root. <code>for</code> loops over nodes; <code>let</code> binds a value/sequence; <code>order by</code> sorts; <code>return</code> constructs result XML.</p>
+<h3 id="2023-q3-customers-above-credit-limit-paper-pp-45">2023 Q3 — Customers above credit limit · <a href="pdf/exam-2023.pdf#page=4">paper pp. 4–5</a></h3>
+<pre><code class="language-xquery">for $c in //CUSTOMER
+where number($c/CREDLIMIT) &gt; 10000
+return (
+  $c/ACCOUNTNO,
+  $c/NAME,
+  $c/CREDLIMIT
+)
+</code></pre>
+<p>The source has customers James Brown (<code>30000</code>) and Lebogang Tshabalala (<code>12000</code>), so <strong>both</strong> satisfy the filter. A valid FLWOR clause uses <code>for $c in</code>, XPath <code>/</code>, and <code>where ... &gt; 10000</code> (not malformed slashes or literal <code>$</code> signs in paths).</p>
+<h3 id="2022-q11-distinct-branches-with-salary-predicate-paper-p-11">2022 Q11 — Distinct branches with salary predicate · <a href="pdf/exam-2022.pdf#page=11">paper p. 11</a></h3>
+<p>The paper gives a query shaped like:</p>
+<pre><code class="language-xquery">for $b in distinct-values(//@branchNo)
+let $staff := //STAFF[@branchNo = $b]
+where some $salary in $staff/SALARY
+      satisfies ($salary &gt; 15000)
+return &lt;BRANCHNO&gt;{$b}&lt;/BRANCHNO&gt;
+</code></pre>
+<p><strong>Meaning:</strong> For each distinct branch number, retrieve its staff, keep branches with <strong>at least one</strong> salary over 15,000, and return that branch once. <code>some ... satisfies</code> is an <strong>existential</strong> condition, not “all staff.”</p>
+<h3 id="2021-q41-2020-q43-stafflist-flwor-applications">2021 Q41 / 2020 Q43 — STAFFLIST FLWOR applications</h3>
+<p><a href="pdf/exam-2021-online.pdf#page=14">2021 pp. 14–15</a> · <a href="pdf/exam-2020-online.pdf#page=13">2020 pp. 13–14</a></p>
+<p>Core template that handles filtering, ordering, and output:</p>
+<pre><code class="language-xquery">for $s in //STAFF
+where number($s/SALARY) &gt; 15000
+order by $s/STAFFNO
+return &lt;STAFFRESULT&gt;{ $s/STAFFNO, $s/NAME }&lt;/STAFFRESULT&gt;
+</code></pre>
+<p><strong>Not asserted to reproduce each older question verbatim:</strong> these questions should be checked against their exact predicates/return structures on the specified pages.</p>
+<hr />
+<h2 id="4-postgresql-xml-l12">4. PostgreSQL XML (L12)</h2>
+<h3 id="2024-q30-sum-customer-xml-purchase-amounts-5-marks-paper-pp-1314">2024 Q30 — Sum customer XML purchase amounts (5 marks) · <a href="pdf/exam-2024.pdf#page=13">paper pp. 13–14</a></h3>
+<p>Each <code>purchaseHistory</code> has multiple <code>PURCHASE/AMOUNT</code> elements. <code>xpath()</code> returns an <strong>XML array</strong>; expand it using <code>unnest()</code> and convert text values to numbers before summing.</p>
+<pre><code class="language-sql">SELECT c.customerId, c.customerName,
+       SUM((x.amount_xml::text)::numeric) AS totalPurchaseAmount
+FROM CustomerSales AS c
+CROSS JOIN LATERAL unnest(
+    xpath('/PURCHASES/PURCHASE/AMOUNT/text()', c.purchaseHistory)
+) AS x(amount_xml)
+GROUP BY c.customerId, c.customerName
+ORDER BY c.customerId;
+</code></pre>
+<p>Expected:</p>
+<table>
+<thead>
+<tr>
+<th>customerId</th>
+<th>customerName</th>
+<th style="text-align: right;">totalPurchaseAmount</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C001</td>
+<td>Alice Johnson</td>
+<td style="text-align: right;">350.00</td>
+</tr>
+<tr>
+<td>C002</td>
+<td>Bob Smith</td>
+<td style="text-align: right;">120.00</td>
+</tr>
+</tbody>
+</table>
+<p><code>CROSS JOIN LATERAL</code> applies <code>unnest(xpath(...))</code> independently to each customer's XML, producing one numeric amount per purchase. For customers without any purchase nodes this query returns no row; use a <code>LEFT JOIN LATERAL</code> if zero-purchase customers must remain.</p>
+<h3 id="2024-q3-create-fullname-xml-paper-pp-45">2024 Q3 — Create FullName XML · <a href="pdf/exam-2024.pdf#page=4">paper pp. 4–5</a></h3>
+<p>Correct functional form:</p>
+<pre><code class="language-sql">SELECT XMLELEMENT(NAME &quot;FullName&quot;, concat(first_name, ' ', last_name))
+FROM Staff;
+</code></pre>
+<p>The paper’s closest listed option is <strong>C</strong> (<code>xmlelement(NAME "FullName", concat(first_name,last_name))</code>), but that version produces joined words <strong>without an inserted space</strong>. If a natural full name needs a space, explicitly include <code>' '</code>. <code>XMLCONCAT</code> concatenates XML <em>values</em>, not ordinary name strings.</p>
+<h3 id="2024-q23-xml-catalog-xpath-paper-p-10">2024 Q23 — XML catalog XPath · <a href="pdf/exam-2024.pdf#page=10">paper p. 10</a></h3>
+<p><strong>(a)</strong> Select names of products whose category is Electronics:</p>
+<pre><code class="language-xpath">/catalog/product[category = 'Electronics']/name
+</code></pre>
+<p>Result: <code>&lt;name&gt;Laptop&lt;/name&gt;</code>.</p>
+<p><strong>(b)</strong> Select all products in either category:</p>
+<pre><code class="language-xpath">/catalog/product[category = 'Electronics' or category = 'Books']
+</code></pre>
+<p>Both <code>Book</code> and <code>Laptop</code> products match. <code>text()</code> could be appended if the question asks for text rather than elements.</p>
+<h3 id="2020-q39-2021-q38-xmlstaff-xpath-2020-pp-1112-2021-pp-1314">2020 Q39 / 2021 Q38 — XMLStaff XPath · <a href="pdf/exam-2020-online.pdf#page=11">2020 pp. 11–12</a> · <a href="pdf/exam-2021-online.pdf#page=13">2021 pp. 13–14</a></h3>
+<p>Useful correct patterns for the staff XML column:</p>
+<pre><code class="language-sql">-- Return STAFFNO element(s), as xml[]
+SELECT xpath('/STAFF/STAFFNO', staffData) FROM XMLStaff;
+
+-- Text node instead of the element tag
+SELECT xpath('/STAFF/STAFFNO/text()', staffData) FROM XMLStaff;
+
+-- Attribute rather than child element
+SELECT xpath('/STAFF/@branchNo', staffData) FROM XMLStaff;
+
+-- Convert the array of matches into result rows
+SELECT unnest(xpath('/STAFF/STAFFNO/text()', staffData)) FROM XMLStaff;
+</code></pre>
+<p><code>xpath()</code> returns <strong><code>xml[]</code></strong>. The root is <code>/STAFF</code> when each column value stores one <code>&lt;STAFF&gt;</code> element; if the column stores an entire <code>&lt;STAFFLIST&gt;</code> document, use <code>/STAFFLIST/STAFF/...</code> instead.</p>
+<h3 id="2020-q3-store-xml-as-a-column-paper-pp-12">2020 Q3 — Store XML as a column · <a href="pdf/exam-2020-online.pdf#page=1">paper pp. 1–2</a></h3>
+<p><strong>Description:</strong> Store the whole XML document/fragment as the value of a column (often a native <code>xml</code> type) in one or more rows.</p>
+<p><strong>Strengths:</strong> easy and fast to insert the whole document; straightforward to retrieve intact; preserves hierarchical structure; good when documents are mostly read or archived as whole units.</p>
+<p><strong>Weaknesses:</strong> difficult or inefficient to search individual inner fields repeatedly; document parsing overhead; small internal updates can require replacing the entire document; ordinary relational indexes on internal XML elements are not directly available.</p>
+<h3 id="2020-q31-2021-q34-xml-shredding-2020-p-8-2021-pp-1112">2020 Q31 / 2021 Q34 — XML shredding · <a href="pdf/exam-2020-online.pdf#page=8">2020 p. 8</a> · <a href="pdf/exam-2021-online.pdf#page=11">2021 pp. 11–12</a></h3>
+<p>Shredding decomposes an XML tree into table rows/columns (often one row per repeated element). <strong>Advantage:</strong> ordinary SQL queries/indexes can target individual values. <strong>Disadvantages:</strong> additional schema design and hierarchy/order metadata may be needed to reconstruct XML; updates to hierarchical structures can be more involved.</p>
+<h3 id="2023-q23q30-2022-q23-xml-related-questions">2023 Q23/Q30; 2022 Q23 — XML-related questions</h3>
+<ul>
+<li><a href="pdf/exam-2023.pdf#page=11">2023 Q23, pp. 11–12</a>: Distinguish well-formed XML, hierarchy and path navigation from table storage. Use the document's exact root/element names.</li>
+<li><a href="pdf/exam-2023.pdf#page=15">2023 Q30, pp. 15–16</a>: XSD describes structure <strong>and types</strong>. A simple type contains scalar content; a complex type contains child elements/attributes; <code>minOccurs</code>/<code>maxOccurs</code> constrain cardinality; DTD is less expressive about data types.</li>
+<li><a href="pdf/exam-2022.pdf#page=13">2022 Q23, pp. 13–14</a>: For <code>STAFFLIST</code>, <code>STAFF</code> is a repeated element, <code>branchNo</code> is an <strong>attribute</strong> (<code>@branchNo</code>), and <code>STAFFNO</code>/<code>SALARY</code> are <strong>elements</strong>.</li>
+</ul>
+<hr />
+<h2 id="5-big-data-and-nosql-l13">5. Big Data and NoSQL (L13)</h2>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Model answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="pdf/exam-2020-online.pdf#page=1">2020 Q2, p. 1</a> / <a href="pdf/exam-2021-online.pdf#page=14">2021 Q39, p. 14</a></td>
+<td>NoSQL systems can support large/rapidly changing heterogeneous data, flexible schemas, horizontal scaling and distributed storage/processing across clusters.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2020-online.pdf#page=2">2020 Q4, p. 2</a></td>
+<td><strong>False</strong>: “verification” is not one of the familiar Vs; <strong>veracity</strong> concerns trustworthiness.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2020-online.pdf#page=2">2020 Q5, p. 2</a></td>
+<td><strong>False as worded</strong>: distributed NoSQL scalability is characteristically described using many <em>commodity/low-cost</em> servers, not necessarily “powerful server machines.”</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2020-online.pdf#page=6">2020 Q21, p. 6</a> / <a href="pdf/exam-2021-online.pdf#page=6">2021 Q15, p. 6</a></td>
+<td><strong>Key-value store:</strong> access opaque value via key. <strong>Document store:</strong> stores semi-structured records with named fields and supports field-level querying/indexing.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2020-online.pdf#page=6">2020 Q23, p. 6</a> / <a href="pdf/exam-2021-online.pdf#page=2">2021 Q2, p. 2</a></td>
+<td>Four common NoSQL families: <strong>key-value, document, wide-column, graph</strong>.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2024.pdf#page=9">2024 Q18, p. 9</a></td>
+<td><strong>Veracity</strong> means data quality, accuracy and reliability.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2020-online.pdf#page=3">2020 Q10, p. 3</a></td>
+<td>MongoDB design options include <strong>embedded</strong> and <strong>normalised/reference-based</strong> data models.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2021-online.pdf#page=8">2021 Q23–24, p. 8</a></td>
+<td>Not all NoSQL systems make identical transaction guarantees. ACID is a transaction model; avoid blanket claims that all NoSQL systems either always or never support ACID.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2024-q26-parallel-relational-dbms-vs-hadoopmapreduce-only-partial-l13-overlap-paper-p-12">2024 Q26 — Parallel relational DBMS vs Hadoop/MapReduce (only partial L13 overlap) · <a href="pdf/exam-2024.pdf#page=12">paper p. 12</a></h3>
+<ul>
+<li><strong>Parallel RDBMS:</strong> SQL, structured data, relational optimisation, parallel query execution, relational consistency/transactions; traditionally schema-oriented.</li>
+<li><strong>Hadoop/MapReduce:</strong> distributed computation over partitioned datasets; mapper generates intermediate pairs and reducers aggregate per key; tolerates node failures and commodity clusters; suited to large batch processing and varied input formats.</li>
+<li>The accompanying <em>data mining</em> part is <strong>outside the requested L11–18 note focus</strong>; study it only if explicitly included in your current assessment syllabus.</li>
+</ul>
+<hr />
+<h2 id="6-earlier-lecture-quick-answers">6. Earlier-lecture quick answers</h2>
+<p>These are <strong>lower priority for ST2</strong> and correspond to the earlier-content appendix of the question index.</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Answer pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="pdf/exam-2022.pdf#page=3">2022 Q2, pp. 3–4</a></td>
+<td>PostgreSQL composite values need parenthesised dot notation when selecting nested attributes: <code>(StockOnHand.item).name</code>; user-defined <code>stockValue(item, quantity)</code> is a separate SQL function.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2023.pdf#page=3">2023 Q2, pp. 3–4</a> / <a href="pdf/exam-2020-online.pdf#page=3">2020 Q9, p. 3</a></td>
+<td>Array constructor <code>ARRAY['projector','PAsystem','safe']</code>; a composite venue value looks like <code>('IT',4,2)</code>. <strong>Paper caveat:</strong> sample sequence name <code>venueSeq</code> and <code>nextval('venSeq')</code> disagree, so the schema as literally printed has an error.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2024.pdf#page=3">2024 Q2, pp. 3–4</a></td>
+<td>PL/pgSQL uses <code>IF customer_type = 'VIP' THEN ... ELSE ... END IF;</code>; assignment operator is <code>:=</code>, not <code>=</code>. The paper’s rendered arithmetic omits a multiplication operator; correct code uses <code>total_amount * 0.9</code>.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2024.pdf#page=3">2024 Q1, p. 3</a></td>
+<td>JPA bidirectional many-to-many: <code>@ManyToMany</code> on the owning side, <code>@ManyToMany(mappedBy="courses")</code> on the <code>Course.students</code> inverse side (as shown); choose <strong>D</strong> if matching those stated field names.</td>
+</tr>
+<tr>
+<td><a href="pdf/exam-2021-online.pdf#page=3">2021 Q5, p. 3</a></td>
+<td>For db4o update, query existing Driver, mutate retrieved object, then <code>db.store(found)</code>; storing the class name rather than the retrieved instance is wrong.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-revision-rules-and-identified-exam-pitfalls">7. Revision rules and identified exam pitfalls</h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Exam-safe rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cypher <code>(x:Label {key:value})</code></td>
+<td>Variable <code>x</code>, label <code>Label</code>, property filter <code>key:value</code>; <code>x</code> <strong>does not persist</strong> between queries.</td>
+</tr>
+<tr>
+<td>Cypher direction</td>
+<td><code>-&gt;</code> and <code>&lt;-</code> matter; <code>-[:TYPE]-</code> matches either direction.</td>
+</tr>
+<tr>
+<td>Cypher rows</td>
+<td><code>MATCH</code> returns <strong>all matching combinations</strong>; another <code>MATCH</code> may produce more rows or eliminate rows with no continuation.</td>
+</tr>
+<tr>
+<td><code>OPTIONAL MATCH</code></td>
+<td>Keeps unmatched outer rows and supplies nulls.</td>
+</tr>
+<tr>
+<td>Cypher <code>SET</code> / <code>MERGE</code></td>
+<td><code>SET</code> adds/updates; <code>MERGE</code> matches-or-creates; <code>ON MATCH SET</code> and <code>ON CREATE SET</code> are conditional branches.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td>A connected node needs <code>DETACH DELETE</code> (or relationship deletion first).</td>
+</tr>
+<tr>
+<td>Cypher aggregation</td>
+<td>Nonaggregated <code>RETURN</code> expressions determine grouping; <code>count(r)</code> counts matched relationship values.</td>
+</tr>
+<tr>
+<td>MongoDB <code>find()</code></td>
+<td><code>find(filter, projection)</code>; projection <code>1</code> includes and <code>0</code> excludes, except <code>_id:0</code> can accompany inclusions.</td>
+</tr>
+<tr>
+<td>MongoDB nested data</td>
+<td>Dot notation: <code>"ranger.name"</code>. Arrays: <code>ratings: 5</code> means an array contains 5.</td>
+</tr>
+<tr>
+<td><code>$elemMatch</code></td>
+<td>Combines conditions <strong>on the same array element</strong>.</td>
+</tr>
+<tr>
+<td>Aggregation</td>
+<td><code>$match</code> filters, <code>$group</code> computes output with <code>_id</code>, <code>$sort</code> uses <strong>fields available after grouping</strong>.</td>
+</tr>
+<tr>
+<td>MongoDB <code>$</code> in strings</td>
+<td><code>"$likes"</code> reads a field; <code>"likes"</code> is literal text.</td>
+</tr>
+<tr>
+<td>MongoDB shell function</td>
+<td>Lives in current mongosh session or script / <code>.mongoshrc.js</code> and is not automatically a database-stored server procedure.</td>
+</tr>
+<tr>
+<td>XPath <code>@</code> vs <code>/</code></td>
+<td><code>@branchNo</code> accesses an attribute; <code>/SALARY</code> accesses an element.</td>
+</tr>
+<tr>
+<td>PostgreSQL <code>xpath()</code></td>
+<td>Returns <code>xml[]</code> even for one matching node; <code>unnest()</code> expands it into rows.</td>
+</tr>
+<tr>
+<td>FLWOR <code>for</code> vs <code>let</code></td>
+<td><code>for</code> iterates over items; <code>let</code> binds expression/sequence; <code>where</code>, <code>order by</code>, <code>return</code> are clauses.</td>
+</tr>
+<tr>
+<td>Whole-XML vs shredded</td>
+<td>Whole XML retains document form; shredded storage exposes inner fields in ordinary columns.</td>
+</tr>
+<tr>
+<td>Past paper fidelity</td>
+<td>Several uploaded papers contain spelling, spacing and syntax mistakes in sample code/options. Prioritise valid database syntax and mention ambiguities rather than copying errors.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Scope note:</strong> This memo gives detailed worked answers to the high-priority L11+ scenario questions and concise solutions or answer principles for most short relevant questions in the companion index. Where an item explicitly says “illustrative” or “check original,” no exact answer is claimed without a fully verified question statement. It is a study aid, not an answer key issued by the lecturer.</p></article></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

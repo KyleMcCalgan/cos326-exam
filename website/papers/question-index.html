@@ -1,0 +1,657 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Exam question index · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html">Notes</a><a href="../papers/index.html" aria-current="page">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><nav class="subnav" aria-label="Papers pages"><a href="../papers/index.html">Library</a><a href="../papers/st1-2026.html">Test 1 · 2026</a><a href="../papers/st2-2026.html">Test 2 · 2026</a><a href="../papers/semester-tests.html">Semester tests 2020–25</a><a href="../papers/question-index.html" aria-current="page">Exam question index</a><a href="../papers/answer-memo.html">Exam answer memo</a></nav><div class="eyebrow">PAPERS / EXAM PAPERS 2020–2024 / QUESTION INDEX</div><h1>Exam question index</h1><p class="lead">Where each topic appears in the 2020–2024 exam papers, ranked by priority, with a link to the exact PDF page. Use it to find a question, then attempt it before checking the memo.</p><article class="prose">
+<p><strong>Sources:</strong> 2020, 2021, 2022, 2023 and 2024 COS326 November examination papers.<br />
+<strong>Study emphasis:</strong> Lecture <strong>11 onwards</strong>: XQuery/FLWOR, SQL/XML in PostgreSQL, Big Data/NoSQL, MongoDB and Neo4j/Cypher.<br />
+<strong>Purpose:</strong> This is a <strong>navigation and practice checklist</strong>, not an answer memorandum (for that, see the <a href="answer-memo.html">exam answer memo</a>). Question descriptions are summaries; open the original paper for the exact wording, source data, options and subquestions.</p>
+<blockquote><p><strong>Using links:</strong> each <code>Open paper</code> link opens the PDF at the stated page. The question number is the one printed in the paper; page numbers refer to the PDF pages (starting at 1). If a link opens at the start of the PDF, go to the stated page manually.</p></blockquote>
+<h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#1-priority-and-reading-order">Priority and reading order</a></li>
+<li><a href="#2-neo4j-cypher-lectures-1718">Neo4j / Cypher — Lectures 17–18</a></li>
+<li><a href="#3-mongodb-lectures-1416">MongoDB — Lectures 14–16</a></li>
+<li><a href="#4-xquery-flwor-and-xpath-lecture-11">XQuery, FLWOR and XPath — Lecture 11</a></li>
+<li><a href="#5-xml-in-postgresql-sqlxml-lecture-12">XML in PostgreSQL / SQL/XML — Lecture 12</a></li>
+<li><a href="#6-big-data-and-nosql-lecture-13">Big Data and NoSQL — Lecture 13</a></li>
+<li><a href="#7-earlier-semester-revision-lower-priority">Earlier-semester revision — lower priority</a></li>
+<li><a href="#8-recommended-practice-order">Recommended practice order</a></li>
+</ol>
+<h2 id="paper-links">Paper links</h2>
+<ul>
+<li><a href="pdf/exam-2024.pdf">2024 examination</a> (17 pages)</li>
+<li><a href="pdf/exam-2023.pdf">2023 examination</a> (20 pages)</li>
+<li><a href="pdf/exam-2022.pdf">2022 examination</a> (23 pages)</li>
+<li><a href="pdf/exam-2021-online.pdf">2021 examination</a> (15 pages)</li>
+<li><a href="pdf/exam-2020-online.pdf">2020 examination</a> (16 pages)</li>
+</ul>
+<h2 id="1-priority-and-reading-order">1. Priority and reading order</h2>
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Topic</th>
+<th>Relevant lectures</th>
+<th>Why prioritised</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1 — Very high</strong></td>
+<td><strong>Neo4j / Cypher</strong></td>
+<td><strong>L17–18</strong></td>
+<td>Recurs across all five papers; practical graph questions, relationships, updating, aggregations and predicates.</td>
+</tr>
+<tr>
+<td><strong>2 — Very high</strong></td>
+<td><strong>MongoDB</strong></td>
+<td><strong>L14–16</strong></td>
+<td>Frequent coding and result-tracing questions, particularly aggregation and CRUD.</td>
+</tr>
+<tr>
+<td><strong>3 — High</strong></td>
+<td><strong>XML / XPath / XQuery / FLWOR</strong></td>
+<td><strong>L11</strong>, plus L9–10 foundations</td>
+<td>Recurring query-writing and query-tracing questions.</td>
+</tr>
+<tr>
+<td><strong>4 — High</strong></td>
+<td><strong>PostgreSQL SQL/XML</strong></td>
+<td><strong>L12</strong></td>
+<td>Querying XML columns, generating XML, XML storage tradeoffs and XML schemas.</td>
+</tr>
+<tr>
+<td><strong>5 — Medium</strong></td>
+<td><strong>Big Data / NoSQL concepts</strong></td>
+<td><strong>L13</strong></td>
+<td>Foundational theoretical and MCQ questions; exam coverage varies.</td>
+</tr>
+<tr>
+<td><strong>6 — Secondary</strong></td>
+<td>Object-relational, OODBMS and PL/pgSQL</td>
+<td>L1–8</td>
+<td>Earlier lectures; retain for cumulative coverage, but study after L11+.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Priority is a study recommendation based on recurrence and the stated Semester Test 2 emphasis; it is not a prediction or an official test weighting.</strong> Other November examination subjects (for example, data warehousing, data mining, NewSQL and MapReduce) are listed selectively because they are not central to the uploaded L11–18 notes.</p>
+<h2 id="2-neo4j-cypher-lectures-1718">2. Neo4j / Cypher — Lectures 17–18</h2>
+<p><strong>Practice:</strong> <code>CREATE</code>, node labels and properties, direction of relationships, <code>MATCH</code>, inline property matching vs <code>WHERE</code>, multiple matches, <code>RETURN</code>, <code>SET</code>, <code>REMOVE</code>, counting, graph traversals, path patterns and graph scenarios.</p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Year / location</th>
+<th>Question to locate</th>
+<th>What to practise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=15">2024 Q32, pp. 15–16</a></td>
+<td><strong>HeritageSA scenario</strong></td>
+<td>Read a practical graph scenario and write/interpret Cypher.</td>
+</tr>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=18">2023 Q32, p. 18</a></td>
+<td><strong>People and departments</strong></td>
+<td>Update Aviwe's age; count relationships; calculate average age; find people working in Human Resources.</td>
+</tr>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=20">2022 Q33, pp. 20–21</a></td>
+<td><strong>People, football clubs and relationships</strong></td>
+<td><code>SET</code> properties and apply functions/queries to a graph.</td>
+</tr>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=11">2024 Q25, p. 11</a></td>
+<td><strong>Customer Cypher scenario</strong></td>
+<td>Interpret graph creation and graph operations.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=13">2023 Q25, pp. 13–14</a></td>
+<td><strong>Cypher application/theory</strong></td>
+<td>Predicates and query writing, including counting <code>Person</code> nodes with a specified age.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=15">2022 Q25, p. 15</a></td>
+<td><strong>Thandi/Johan/Naledi graph</strong></td>
+<td>Add a new node property and count matching people.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=5">2024 Q6, pp. 5–6</a></td>
+<td><strong>Find grade-A friends of Ndivhuwo</strong></td>
+<td><code>MATCH</code> pattern, direction, label/property constraints and <code>WHERE</code>.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=7">2023 Q6, p. 7</a></td>
+<td><strong>Nandi's friends</strong></td>
+<td>Select the correct directed <code>MATCH ... RETURN</code> syntax.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=8">2022 Q6, pp. 8–9</a></td>
+<td><strong>Who does Johan follow?</strong></td>
+<td>Match outgoing <code>FOLLOWS</code> relationships and return properties of the <em>destination</em>.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=2">2021 Q4, pp. 2–3</a></td>
+<td><strong>Who does Johan follow?</strong></td>
+<td>Very similar graph and return-property selection.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=4">2020 Q15, pp. 4–5</a></td>
+<td><strong>Thandi/Johan/Neo Cypher question</strong></td>
+<td>Interpret existing graph and select the correct pattern query.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=9">2022 Q7, p. 9</a></td>
+<td><strong>People supporting football clubs</strong></td>
+<td>Match nodes with <em>different labels</em> and a typed relationship.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=10">2023 Q16, p. 10</a></td>
+<td><strong>Path of length two</strong></td>
+<td>Interpret <code>MATCH p=(a)--&gt;(b)--&gt;(c)</code> and <code>length(p)</code>.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=6">2024 Q7, pp. 6–7</a></td>
+<td><strong>Shortest connection between people</strong></td>
+<td>Recognise graph path/shortest-path operations.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=9">2024 Q15–16, p. 9</a></td>
+<td><strong>REMOVE and DISTINCT</strong></td>
+<td>Remove labels/properties; eliminate duplicate query results.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=8">2023 Q7, p. 8</a></td>
+<td><strong>Adding properties</strong></td>
+<td>Identify the Cypher <code>SET</code> clause.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=4">2021 Q7, p. 4</a></td>
+<td><strong>Graph-property model</strong></td>
+<td>Nodes, edges and key-value properties.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=5">2020 Q16, p. 5</a></td>
+<td><strong>Graph applications</strong></td>
+<td>Identify application domains.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=5">2020 Q18, p. 5</a></td>
+<td><strong>Graph storage representation</strong></td>
+<td>Evaluate statement about graph storage and adjacency matrices.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=8">2020 Q32, p. 8</a></td>
+<td><strong>Graph structure concepts</strong></td>
+<td>True/false on nodes, edges and graph properties.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Related concepts from our discussions:</strong> <code>MERGE</code>, <code>ON MATCH SET</code>, <code>ON CREATE SET</code>, repeated matches and uniqueness constraints are explicitly covered by L18. They are worth studying even where the questions above use <code>CREATE</code>/<code>MATCH</code>/<code>SET</code> instead of testing <code>MERGE</code> directly. Do not assume every prior paper contains a <code>MERGE</code> question.</p>
+<h2 id="3-mongodb-lectures-1416">3. MongoDB — Lectures 14–16</h2>
+<p><strong>Practice:</strong> collections/documents, <code>find</code>, <code>updateOne</code>, <code>$set</code>, projections, dot notation, array queries, <code>$elemMatch</code>, aggregation <code>$match</code>/<code>$group</code>/<code>$sum</code>/<code>$avg</code>, cursors, indexes and text search.</p>
+<h3 id="31-aggregation-highest-priority">3.1 Aggregation — highest priority</h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Year / location</th>
+<th>Question to locate</th>
+<th>What to practise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=11">2024 Q24, p. 11</a></td>
+<td><strong><code>db.orders.aggregate(...)</code></strong></td>
+<td>Interpret a complete aggregation pipeline and its stages.</td>
+</tr>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=5">2024 Q4, p. 5</a></td>
+<td><strong>Inventory stock value</strong></td>
+<td><code>$group</code>, <code>_id: null</code>, <code>$sum</code> and <code>$multiply</code> to get a combined value.</td>
+</tr>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=12">2023 Q24, pp. 12–13</a></td>
+<td><strong>MongoDB salesCollection</strong></td>
+<td>Interpret/query a collection in an application question; includes MongoDB document characteristics.</td>
+</tr>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=14">2022 Q24, pp. 14–15</a></td>
+<td><strong>Social-media blog likes</strong></td>
+<td>Work with multiple documents, titles and likes; understand grouping/aggregates.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=6">2023 Q4, p. 6</a></td>
+<td><strong>Electronics total price</strong></td>
+<td>Trace <code>$match</code> followed by <code>$group</code>/<code>$sum</code>; determine output.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=6">2022 Q4, pp. 6–7</a></td>
+<td><strong>NoSQL Overview likes</strong></td>
+<td>Choose correct <code>aggregate([{ $match: ... }, { $group: ... }])</code> syntax.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=3">2021 Q6, pp. 3–4</a></td>
+<td><strong>NoSQL Overview likes</strong></td>
+<td>Identify correct <code>$match</code>, <code>$group</code>, <code>$sum</code> and <code>$field</code> syntax.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=8">2020 Q33, pp. 8–9</a></td>
+<td><strong>MongoDB blogs aggregation</strong></td>
+<td>Interpret/choose an aggregation for matching blog likes.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-crud-queries-arrays-and-cursors">3.2 CRUD, queries, arrays and cursors</h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Year / location</th>
+<th>Question to locate</th>
+<th>What to practise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=14">2024 Q31, pp. 14–15</a></td>
+<td><strong>WildlifeSA MongoDB scenario</strong></td>
+<td>Apply MongoDB operations to a larger scenario.</td>
+</tr>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=16">2023 Q31, pp. 16–18</a></td>
+<td><strong>Library/books MongoDB scenario</strong></td>
+<td>Nested authors/documents, queries and deleting the book titled <em>The Hobbit</em>.</td>
+</tr>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=19">2022 Q32, pp. 19–20</a></td>
+<td><strong>Food favourites and ratings arrays</strong></td>
+<td>Query arrays in MongoDB; practical document/array reasoning.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=5">2024 Q5, p. 5</a></td>
+<td><strong>Update Andries's age</strong></td>
+<td><code>updateOne()</code> with a filter and <code>$set</code>.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=9">2024 Q14, p. 9</a></td>
+<td><strong>Cursor method</strong></td>
+<td>Identify <code>hasNext()</code>.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=8">2024 Q13, p. 8</a></td>
+<td><strong>Delete collection</strong></td>
+<td>Shell method <code>.drop()</code>.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=8">2022 Q5, p. 8</a></td>
+<td><strong>Insert several documents</strong></td>
+<td>Identify <code>insertMany()</code>.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=9">2023 Q13–14, p. 9</a></td>
+<td><strong>Collection search; shell command</strong></td>
+<td><code>find()</code> and <code>show collections</code>.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=11">2022 Q14–15, pp. 11–12</a></td>
+<td><strong>MongoDB collection deletion and indexing</strong></td>
+<td>Recognise shell methods and wildcard indexes.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=3">2020 Q10–11, pp. 3–4</a></td>
+<td><strong>MongoDB design and query representation</strong></td>
+<td>Embedded vs normalised models; JSON-style documents.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=1">2021 Q1, p. 1</a></td>
+<td><strong>MongoDB document format</strong></td>
+<td>JSON/BSON query/document concepts.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=6">2021 Q17, p. 6</a></td>
+<td><strong>Types of aggregation queries</strong></td>
+<td>Aggregation concepts.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=12">2021 Q35, p. 12</a></td>
+<td><strong>Embedded vs normalised MongoDB design</strong></td>
+<td>Data-model design concepts.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=7">2020 Q28, p. 7</a></td>
+<td><strong>Aggregation approaches</strong></td>
+<td>True/false on MongoDB aggregation.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lecture 16 specific note:</strong> The examined MongoDB functions/cursors and aggregation questions are especially useful foundations. I did not identify a standalone large question explicitly requiring a <code>.mongoshrc.js</code> shell function or Java MongoDB driver implementation in these five papers. Still revise their purpose and syntax from L16.</p>
+<h2 id="4-xquery-flwor-and-xpath-lecture-11">4. XQuery, FLWOR and XPath — Lecture 11</h2>
+<p><strong>Practice:</strong> <code>for</code>, <code>let</code>, <code>where</code>, <code>order by</code>, <code>return</code>, XPath navigation, accessing attributes with <code>@</code>, constructing XML output, and evaluating query results.</p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Year / location</th>
+<th>Question to locate</th>
+<th>What to practise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=18">2022 Q31, pp. 18–19</a></td>
+<td><strong>BaseX students.xml scenario</strong></td>
+<td>Write XML queries on a realistic dataset containing students and module attributes.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=4">2022 Q3, pp. 4–6</a></td>
+<td><strong>STAFFLIST ordered by staff number</strong></td>
+<td>Select the correct full FLWOR expression, including <code>let</code>, <code>order by</code>, <code>return</code> and XML construction.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=4">2023 Q3, pp. 4–5</a></td>
+<td><strong>Customers above a credit limit</strong></td>
+<td>FLWOR <code>for</code>/<code>where</code>/<code>return</code>; correct XPath and predicate syntax.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=14">2021 Q41, pp. 14–15</a></td>
+<td><strong>STAFFLIST XQuery problem</strong></td>
+<td>Understand XPath/FLWOR paths and query selection.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=13">2020 Q43, pp. 13–14</a></td>
+<td><strong>STAFFLIST XQuery problem</strong></td>
+<td>Apply XPath and FLWOR to staff data.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=11">2022 Q11, p. 11</a></td>
+<td><strong>Branch values / salary predicate</strong></td>
+<td>Read query using <code>distinct-values</code>, <code>let</code>, <code>some ... satisfies</code>, <code>@branchNo</code> and <code>return</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> Lectures 9–10 introduce basic XPath/XSD concepts, but <strong>Lecture 11</strong> makes these examinable as more complex FLWOR queries. Do not skip the basic XML path syntax when revising L11.</p>
+<h2 id="5-xml-in-postgresql-sqlxml-lecture-12">5. XML in PostgreSQL / SQL/XML — Lecture 12</h2>
+<p><strong>Practice:</strong> native <code>xml</code> columns, <code>xpath()</code>, <code>/text()</code>, <code>@attribute</code>, <code>unnest()</code>, generating XML, storing whole documents vs shredding, SQL/XML output and XSD.</p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Year / location</th>
+<th>Question to locate</th>
+<th>What to practise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Very high</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=13">2024 Q30, pp. 13–14</a></td>
+<td><strong>Retail customer/purchase XML scenario</strong></td>
+<td>Apply SQL/XML or XML representations to a business scenario.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=4">2024 Q3, pp. 4–5</a></td>
+<td><strong>Generate <code>&lt;FullName&gt;</code></strong></td>
+<td>Choose correct <code>XMLELEMENT()</code>/SQL string concatenation approach.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=11">2023 Q23, pp. 11–12</a></td>
+<td><strong>Store XML document / XML application question</strong></td>
+<td>Interpret semi-structured XML data and associated query concepts.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2023.pdf#page=15">2023 Q30, pp. 15–16</a></td>
+<td><strong>XML schema scenario</strong></td>
+<td>DTD vs XML Schema; identify element types in an XSD.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=11">2020 Q39, pp. 11–12</a></td>
+<td><strong>XMLStaff <code>xml</code> column</strong></td>
+<td>Query XML inside PostgreSQL; extract elements/attributes from the column.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=13">2021 Q38, pp. 13–14</a></td>
+<td><strong>XMLStaff <code>xml</code> column</strong></td>
+<td>PostgreSQL XML extraction query / XPath reading.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=1">2020 Q3, pp. 1–2</a></td>
+<td><strong>Store full XML in a column</strong></td>
+<td>Explain strengths, weaknesses and retrieval tradeoffs.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=8">2020 Q31, p. 8</a></td>
+<td><strong>Shredded XML representation</strong></td>
+<td>Explain data distributed across relational columns/tables and pros/cons.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=11">2021 Q34, pp. 11–12</a></td>
+<td><strong>Shredded XML approach</strong></td>
+<td>Conceptual storage method and tradeoffs.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=10">2024 Q23, pp. 10–11</a></td>
+<td><strong>XML catalog</strong></td>
+<td>Inspect structured XML elements and answer document questions.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2022.pdf#page=13">2022 Q23, pp. 13–14</a></td>
+<td><strong>STAFFLIST XML document</strong></td>
+<td>Recognise elements, attributes and XML organisation.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Not every PDF uses <code>xpath()</code> explicitly.</strong> Where the question asks about XML storage, XSD or constructing XML, those are related concepts rather than exact substitutes for the Lecture 12 <code>xpath(..., staffData)</code> examples.</p>
+<h2 id="6-big-data-and-nosql-lecture-13">6. Big Data and NoSQL — Lecture 13</h2>
+<p><strong>Practice:</strong> Big Data characteristics (Vs), distributed systems, document vs key-value vs graph models, NoSQL motivation and foundational vocabulary.</p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Year / location</th>
+<th>Question to locate</th>
+<th>What to practise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=1">2020 Q2, p. 1</a></td>
+<td><strong>Why NoSQL for Big Data?</strong></td>
+<td>Concise explanation of scalability/flexibility/distributed data.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=14">2021 Q39, p. 14</a></td>
+<td><strong>Why NoSQL for Big Data?</strong></td>
+<td>Similar theoretical short-answer question.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=6">2020 Q21, p. 6</a></td>
+<td><strong>Key-value vs document data models</strong></td>
+<td>Compare structures and use cases.</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=6">2021 Q15, p. 6</a></td>
+<td><strong>Key-value vs document data models</strong></td>
+<td>Repeat conceptual comparison.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=2">2020 Q4–5, p. 2</a></td>
+<td><strong>Big Data characteristics; NoSQL definition</strong></td>
+<td>True/false on Vs and distributed databases.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=2">2021 Q2, p. 2</a></td>
+<td><strong>Four NoSQL categories</strong></td>
+<td>Key-value, document, wide-column and graph.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=6">2020 Q23, p. 6</a></td>
+<td><strong>Four NoSQL categories</strong></td>
+<td>Identify classification of NoSQL models.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=6">2021 Q16, p. 6</a></td>
+<td><strong>Key-value lookup concepts</strong></td>
+<td>Query access and data organisation.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=9">2024 Q18, p. 9</a></td>
+<td><strong>Big Data characteristic: credibility</strong></td>
+<td>Identify veracity.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2024.pdf#page=12">2024 Q26, p. 12</a></td>
+<td><strong>Big Data / MapReduce scenario</strong></td>
+<td>Compare parallel RDBMS and Hadoop/MapReduce; may extend beyond L13 notes.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2020-online.pdf#page=7">2020 Q25/Q30, pp. 7–8</a></td>
+<td><strong>NoSQL and ACID</strong></td>
+<td>Conceptual statements about transaction guarantees.</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td><a href="pdf/exam-2021-online.pdf#page=8">2021 Q23–24, p. 8</a></td>
+<td><strong>NoSQL transaction properties and definition</strong></td>
+<td>Basic distinctions.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-earlier-semester-revision-lower-priority">7. Earlier-semester revision — lower priority</h2>
+<p>These appeared in the examination papers, but are <strong>not the core of the requested L11+ focus</strong>. Use them only after completing the higher-priority material, or if your lecturer confirms these earlier topics are in the test.</p>
+<table>
+<thead>
+<tr>
+<th>Earlier subject</th>
+<th>Useful past-paper references</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL composite types, <code>ENUM</code>, arrays, inheritance</td>
+<td><a href="pdf/exam-2020-online.pdf#page=3">2020 Q9 p. 3</a>; <a href="pdf/exam-2021-online.pdf#page=7">2021 Q22 p. 7</a>; <a href="pdf/exam-2022.pdf#page=3">2022 Q2 pp. 3–4</a>; <a href="pdf/exam-2023.pdf#page=3">2023 Q2 pp. 3–4</a></td>
+<td>Composite-valued columns, array constructors, insert syntax.</td>
+</tr>
+<tr>
+<td>PostgreSQL composite field access</td>
+<td><a href="pdf/exam-2021-online.pdf#page=12">2021 Q36 p. 12</a>; <a href="pdf/exam-2022.pdf#page=3">2022 Q2 pp. 3–4</a></td>
+<td>Parenthesised dot notation for nested composite fields.</td>
+</tr>
+<tr>
+<td>PL/pgSQL functions/procedures</td>
+<td><a href="pdf/exam-2024.pdf#page=3">2024 Q2 pp. 3–4</a>; <a href="pdf/exam-2024.pdf#page=8">2024 Q12 p. 8</a></td>
+<td><code>IF</code>, stored routines and deletion procedures.</td>
+</tr>
+<tr>
+<td>JPA / object persistence</td>
+<td><a href="pdf/exam-2024.pdf#page=3">2024 Q1 p. 3</a>; <a href="pdf/exam-2021-online.pdf#page=3">2021 Q5 p. 3</a></td>
+<td>ORM relationships and object database updating.</td>
+</tr>
+<tr>
+<td>OODBMS and ORDBMS theory</td>
+<td><a href="pdf/exam-2024.pdf#page=10">2024 Q21–22 p. 10</a>; <a href="pdf/exam-2020-online.pdf#page=9">2020 Q34 p. 9</a></td>
+<td>Object database terminology and relational limitations.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Further topics present in full November examinations but not indexed in depth:</strong> NewSQL, data warehouses/OLAP, data mining and certain MapReduce/Hadoop questions. Their appearance in a full exam does not prove they are part of your current Semester Test 2 syllabus.</p>
+<h2 id="8-recommended-practice-order">8. Recommended practice order</h2>
+<h3 id="first-pass-write-queries-do-not-just-read-options">First pass — write queries, do not just read options</h3>
+<ul>
+<li>[ ] <strong>2023 Q32</strong> — practical Cypher (update, count, average, relationship matching)</li>
+<li>[ ] <strong>2022 Q33</strong> — Cypher node/relationship properties</li>
+<li>[ ] <strong>2024 Q32</strong> — larger Neo4j scenario</li>
+<li>[ ] <strong>2024 Q24</strong> — MongoDB aggregation pipeline</li>
+<li>[ ] <strong>2024 Q4</strong> — aggregation with multiplication and sum</li>
+<li>[ ] <strong>2023 Q31</strong> — MongoDB document operations</li>
+<li>[ ] <strong>2022 Q32</strong> — MongoDB arrays</li>
+<li>[ ] <strong>2022 Q31</strong> — BaseX query-writing</li>
+<li>[ ] <strong>2022 Q3</strong> — FLWOR expression reading</li>
+<li>[ ] <strong>2020 Q39</strong> and <strong>2021 Q38</strong> — querying XML in PostgreSQL</li>
+<li>[ ] <strong>2024 Q30</strong> — SQL/XML application scenario</li>
+</ul>
+<h3 id="second-pass-rapid-mcq-and-syntax-checks">Second pass — rapid MCQ and syntax checks</h3>
+<ul>
+<li>[ ] Cypher: 2024 Q6, Q15–16; 2023 Q6–7; 2022 Q6–7</li>
+<li>[ ] MongoDB: 2024 Q5, Q13–14; 2023 Q4; 2022 Q4–5; 2021 Q6</li>
+<li>[ ] XML/XQuery: 2023 Q3, Q23, Q30; 2024 Q3, Q23</li>
+<li>[ ] NoSQL theory: 2020 Q2, Q21, Q23; 2021 Q15, Q39</li>
+</ul>
+<hr />
+<h3 id="scope-and-verification-notes">Scope and verification notes</h3>
+<ul>
+<li>Question references were taken from the <strong>five uploaded examination papers</strong>. On the scanned <strong>2022 and 2023</strong> papers, some questions span pages or contain options/figures as images; the page ranges point to the question and its immediate continuation.</li>
+<li>This is an <strong>index</strong>, so descriptions are deliberately shorter than the original questions and do not supply solutions.</li>
+<li>Priorities reflect <strong>your stated focus (Semester Test 2, Lectures 11–18)</strong> and the patterns in these papers, rather than official test-topic guarantees.</li>
+<li>On a few historical questions, the source paper's code/options contain typos or nonstandard notation. Refer to the original and your lectures when studying; do not assume the printed code is valid as-is.</li>
+</ul></article></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

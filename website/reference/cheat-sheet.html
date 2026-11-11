@@ -1,0 +1,914 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Cheat sheet (Test 2) · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html">Notes</a><a href="../papers/index.html">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html" aria-current="page">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><nav class="subnav" aria-label="Reference pages"><a href="../reference/index.html">Overview</a><a href="../reference/weighted-cheat-sheet.html">Cheat sheet (weighted)</a><a href="../reference/cheat-sheet.html" aria-current="page">Cheat sheet (Test 2)</a><a href="../reference/coding-patterns.html">Coding patterns</a><a href="../reference/mongodb-indexing.html">MongoDB & indexing</a></nav><div class="eyebrow">REFERENCE / CHEAT SHEET / LECTURES 11–18</div><h1>COS 326 — Semester Test 2: exam-style cheat sheet</h1><p class="lead">How this lecturer examines, a quick question decoder, syntax tables and a 20-mark integrated scenario. Overlaps the weighted sheet.</p><article class="prose">
+<p><strong>University of Pretoria | Lectures 11–18 | XML/XQuery, Big Data/NoSQL/MongoDB, Neo4j</strong><br />
+<strong>Purpose:</strong> a short, practical revision reference based on <em>how questions were asked in Semester Test 1 (2026)</em>, not a replacement for the comprehensive lecture notes.</p>
+<blockquote>
+<p><strong>Prediction, not a confirmed test scope or paper format.</strong> ST1 used 20 marks of one-answer MCQs, 15 marks of negatively marked select-all MCQs, 35 marks of short fill-in questions, and a 20-mark multi-part coding scenario (90 marks total). The <em>patterns</em> are evidenced by ST1; the specific ST2 questions below are illustrative. Examples marked <strong>Lecture</strong> reproduce or closely adapt Lectures 11–18; <strong>Practice</strong> examples are newly constructed.</p>
+</blockquote>
+<h2 id="1-how-this-lecturer-examines-what-to-prepare">1. How this lecturer examines — what to prepare</h2>
+<table>
+<thead>
+<tr>
+<th>ST1 question style</th>
+<th>What the question really tests</th>
+<th>Likely ST2 adaptation (practice prediction)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scenario → choose <strong>one</strong> correct statement</td>
+<td>Distinguish closely related concepts</td>
+<td>CAP C/A/P; document vs graph; <code>for</code> vs <code>let</code>; <code>CREATE</code> vs <code>MERGE</code></td>
+</tr>
+<tr>
+<td><strong>Select all</strong> with penalties</td>
+<td>Spot subtle inaccuracies; avoid guessing</td>
+<td>Array matching vs <code>$elemMatch</code>, stages in a pipeline, direction of relationships</td>
+</tr>
+<tr>
+<td>Fill in missing <strong>exact syntax</strong></td>
+<td>Recall names, paths, symbols, case and punctuation</td>
+<td><code>$sum</code>, <code>$gt</code>, <code>$text</code>, <code>WHERE</code>, <code>MATCH</code>, <code>DETACH DELETE</code>, <code>xpath</code>, <code>@branchNo</code></td>
+</tr>
+<tr>
+<td>Given data and a query → <strong>predict result</strong></td>
+<td>Evaluate query mechanically</td>
+<td>MongoDB document counts/totals; Cypher relationship counts; XQuery output</td>
+</tr>
+<tr>
+<td><strong>20-mark scenario</strong> combining subjects</td>
+<td>Write complete, executable pieces, not prose</td>
+<td>Construct FLWOR, MongoDB pipeline, Cypher graph and queries</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Mark-saving habits (grounded in ST1 feedback):</strong> Write an <em>exact</em> requested expression rather than an explanation; check whether the question wants a whole node/document or just a field; include every condition (e.g., <strong>active AND depth &gt; 4000</strong> was a missed condition in ST1); and complete the whole statement, not just the calculation. For multiple-select items, the ST1 marking penalised wrong selections.</p>
+<h3 id="quick-question-decoder">Quick question decoder</h3>
+<table>
+<thead>
+<tr>
+<th>Wording</th>
+<th>First thing to reach for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“Each distinct branch and the average salary”</td>
+<td>XQuery <code>distinct-values(...)</code>, <code>let</code>, <code>avg(...)</code></td>
+</tr>
+<tr>
+<td>“At least one staff member satisfies…”</td>
+<td>XQuery <code>some ... satisfies</code></td>
+</tr>
+<tr>
+<td>“Two XML documents linked by an ID”</td>
+<td>XQuery two <code>for</code> bindings and <code>where</code> equality</td>
+</tr>
+<tr>
+<td>“Generate XML from SQL rows”</td>
+<td><code>xmlelement</code>, <code>xmlattributes</code>, <code>table_to_xml</code></td>
+</tr>
+<tr>
+<td>“Read an element from an XML column”</td>
+<td>PostgreSQL <code>xpath('...', xml_column)</code></td>
+</tr>
+<tr>
+<td>“Match a nested field”</td>
+<td>MongoDB quoted dot path (<code>"access.level"</code>)</td>
+</tr>
+<tr>
+<td>“Two conditions must hold <strong>on one array element</strong>”</td>
+<td>MongoDB <code>$elemMatch</code></td>
+</tr>
+<tr>
+<td>“Total / average per category”</td>
+<td>MongoDB <code>$group</code> + <code>$sum</code> / <code>$avg</code></td>
+</tr>
+<tr>
+<td>“Only groups with totals greater than N”</td>
+<td><code>$match</code> <strong>after</strong> <code>$group</code></td>
+</tr>
+<tr>
+<td>“Search words in a string field”</td>
+<td>MongoDB <code>createIndex(... "text")</code> then <code>$text</code></td>
+</tr>
+<tr>
+<td>“Create a connection between two people”</td>
+<td>Cypher directed relationship <code>-[:TYPE]-&gt;</code></td>
+</tr>
+<tr>
+<td>“Update node/relationship property”</td>
+<td>Cypher <code>MATCH ... SET</code></td>
+</tr>
+<tr>
+<td>“Delete a node and its edges”</td>
+<td>Cypher <code>DETACH DELETE</code></td>
+</tr>
+<tr>
+<td>“How many people does X follow?”</td>
+<td>Directed <code>MATCH</code> + <code>count(...)</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-xml-xquery-lectures-1112">2. XML / XQuery — Lectures 11–12</h2>
+<h3 id="21-flwor-the-template-to-memorise">2.1 FLWOR: the template to memorise</h3>
+<pre><code class="language-xquery">for $s in //STAFF                  (: iterates over matching nodes :)
+let $salary := $s/SALARY           (: binds a value; no extra iteration :)
+where $salary &gt; 15000             (: filters the tuples :)
+order by $s/STAFFNO ascending     (: sorts the output :)
+return $s/NAME                    (: returns a node/sequence :)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Clause / symbol</th>
+<th>Essential distinction / typical trap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>for $x in ...</code></td>
+<td>One binding per item: <strong>iterates</strong></td>
+</tr>
+<tr>
+<td><code>let $x := ...</code></td>
+<td>Binds an expression/result; does <strong>not</strong> itself iterate</td>
+</tr>
+<tr>
+<td><code>where</code></td>
+<td>Filters the current sequence of variable bindings</td>
+</tr>
+<tr>
+<td><code>order by ... ascending/descending</code></td>
+<td>Sorts before <code>return</code></td>
+</tr>
+<tr>
+<td><code>return</code></td>
+<td>Required in FLWOR; constructs the result</td>
+</tr>
+<tr>
+<td><code>//STAFF</code></td>
+<td>Staff elements anywhere under current context</td>
+</tr>
+<tr>
+<td><code>/STAFF/NAME</code></td>
+<td>Child-path navigation (context matters)</td>
+</tr>
+<tr>
+<td><code>@branchNo</code></td>
+<td>Selects an <strong>attribute</strong>, not an element</td>
+</tr>
+<tr>
+<td><code>text()</code></td>
+<td>Selects a text node rather than the element node</td>
+</tr>
+<tr>
+<td><code>{ expression }</code></td>
+<td>Evaluates/inserts XQuery data inside a constructed XML element</td>
+</tr>
+<tr>
+<td><code>$S</code> vs <code>$s</code></td>
+<td>XQuery variables are <strong>case-sensitive</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lecture 11, example:</strong> Names of staff in branch B004 whose salary exceeds 15,000:</p>
+<pre><code class="language-xquery">for $S in //STAFF
+where $S/SALARY &gt; 15000 and $S/@branchNo = &quot;B004&quot;
+return $S/NAME
+</code></pre>
+<p><strong>How to derive it:</strong> (1) identify the repeating element <code>STAFF</code>; (2) filter <strong>on the <code>STAFF</code> element</strong> because both salary and branch belong to it; (3) project the required <code>NAME</code>, not the full staff record.</p>
+<h3 id="22-aggregates-distinct-values-some-every">2.2 Aggregates, distinct values, <code>some</code> / <code>every</code></h3>
+<p><strong>Lecture 11: Average salary for every branch</strong></p>
+<pre><code class="language-xquery">for $B in distinct-values(//@branchNo)
+let $avgSalary := avg(//STAFF[@branchNo = $B]/SALARY)
+return
+  &lt;BRANCH&gt;
+    &lt;BRANCHNO&gt;{$B}&lt;/BRANCHNO&gt;
+    &lt;AVGSALARY&gt;{$avgSalary}&lt;/AVGSALARY&gt;
+  &lt;/BRANCH&gt;
+</code></pre>
+<ul>
+<li><code>distinct-values(//@branchNo)</code> → one value for each unique branch number.</li>
+<li><code>//STAFF[@branchNo = $B]</code> → staff <strong>at the current branch</strong>.</li>
+<li><code>avg(.../SALARY)</code> → average across that branch's staff salary elements.</li>
+<li><code>return</code> → builds one <code>&lt;BRANCH&gt;</code> result per branch.</li>
+</ul>
+<p><strong>Lecture 11: Branches where at least one salary &gt; 15,000</strong></p>
+<pre><code class="language-xquery">for $B in distinct-values(//@branchNo)
+let $S := //STAFF[@branchNo = $B]
+where some $sal in $S/SALARY satisfies ($sal &gt; 15000)
+return &lt;BRANCHNO&gt;{$B}&lt;/BRANCHNO&gt;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Qualifier</th>
+<th>Meaning</th>
+<th>Memorise</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>some $x in ... satisfies (...)</code></td>
+<td><strong>At least one</strong> satisfies</td>
+<td>Existential</td>
+</tr>
+<tr>
+<td><code>every $x in ... satisfies (...)</code></td>
+<td><strong>All</strong> satisfy</td>
+<td>Universal</td>
+</tr>
+<tr>
+<td><code>distinct-values(...)</code></td>
+<td>Removes duplicates</td>
+<td>Unique groups / IDs</td>
+</tr>
+<tr>
+<td><code>avg(...)</code>, <code>sum(...)</code></td>
+<td>Aggregate numeric values</td>
+<td>Apply to the filtered sequence</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-joining-xml-documents-correlated-subqueries">2.3 Joining XML documents / correlated subqueries</h3>
+<p><strong>Lecture 11: Staff plus next-of-kin, joined on <code>STAFFNO</code>:</strong></p>
+<pre><code class="language-xquery">for $S in //STAFF, $NOK in //NOK
+where $S/STAFFNO = $NOK/STAFFNO
+return &lt;STAFFNOK&gt;{$S/NAME, $NOK/NAME}&lt;/STAFFNOK&gt;
+</code></pre>
+<p><strong>Walkthrough:</strong> enumerate candidate staff and NOK pairs → retain pairs with matching <code>STAFFNO</code> → construct XML for each match. A nested <code>for $NOK ...</code> inside the outer <code>return</code> is an alternative <strong>correlated subquery</strong> from the lecture.</p>
+<p><strong>Practice fill-in:</strong> <code>for $x in //STAFF ... return $x/NAME</code> gives one result per <strong>STAFF</strong>; <code>let $x := //STAFF ...</code> binds the <strong>whole sequence</strong>. Swapping <code>for</code> and <code>let</code> can change both the result's shape and number of iterations.</p>
+<h3 id="24-sqlxml-and-postgresql-xml">2.4 SQL/XML and PostgreSQL XML</h3>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Exact form from Lecture 12</th>
+<th>Remember</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XML-typed column</td>
+<td><code>staffData XML</code></td>
+<td>Native XML data type</td>
+</tr>
+<tr>
+<td>XML from scalar SQL value</td>
+<td><code>xmlelement(NAME staffname, fName)</code></td>
+<td>Creates an <strong>element</strong></td>
+</tr>
+<tr>
+<td>XML attribute</td>
+<td><code>xmlattributes(branchNo AS "branchNo")</code></td>
+<td>Goes <em>inside</em> <code>xmlelement</code></td>
+</tr>
+<tr>
+<td>Whole table as XML</td>
+<td><code>table_to_xml('numbers', false, false, '')</code></td>
+<td>Maps rows to XML</td>
+</tr>
+<tr>
+<td>Table's XSD</td>
+<td><code>table_to_xmlschema('numbers', false, false, '')</code></td>
+<td>Produces XML Schema</td>
+</tr>
+<tr>
+<td>Query results as XML</td>
+<td><code>query_to_xml('SELECT ...', false, false, '')</code></td>
+<td>Maps SQL query results</td>
+</tr>
+<tr>
+<td>Query results as XSD</td>
+<td><code>query_to_xmlschema('SELECT ...', false, false, '')</code></td>
+<td>Produces result schema</td>
+</tr>
+<tr>
+<td>XPath on XML column</td>
+<td><code>xpath('/STAFF/STAFFNO', staffData)</code></td>
+<td><strong>Returns an <code>xml[]</code> array</strong></td>
+</tr>
+<tr>
+<td>Values instead of tags</td>
+<td><code>xpath('/STAFF/STAFFNO/text()', staffData)</code></td>
+<td>Selects text nodes (still <code>xml[]</code>)</td>
+</tr>
+<tr>
+<td>XML array → rows</td>
+<td><code>unnest(xpath('/STAFF/STAFFNO/text()', staffData))</code></td>
+<td>Expands XPath matches</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lecture 12: Generate one XML staff element with an attribute:</strong></p>
+<pre><code class="language-sql">SELECT xmlelement(
+  NAME staff,
+  xmlattributes(branchNo AS &quot;branchNo&quot;),
+  concat(fName, lName)
+) AS staffXMLCol
+FROM Staff;
+</code></pre>
+<p><strong>Lecture 12: Retrieve the XML staff number via SQL:</strong></p>
+<pre><code class="language-sql">SELECT docNo,
+       unnest(xpath('/STAFF/STAFFNO/text()', staffData)) AS StaffNumber
+FROM XMLStaff;
+</code></pre>
+<p><strong>Four XML storage approaches — MCQ material:</strong> 1. Whole XML document in one column (simple insertion/retrieval; parsing cost for fine queries); 2. <strong>shredded</strong> across columns/tables (index fields, reconstruct hierarchy); 3. <strong>schema-independent</strong> representation (e.g., DOM-derived model); 4. parsed/internal XML representation. Related PostgreSQL server functions: <code>pg_ls_dir('.')</code> lists <strong>server-side</strong> directory entries, <code>pg_read_file('...')</code> reads a file accessible to the server, and <code>CAST(pg_read_file('...') AS xml)</code> makes it XML-typed. These are privilege-restricted and not client-PC file access.</p>
+<p><strong>Possible fill-in traps:</strong> <code>xpath(...)</code> ≠ <code>XQuery</code> FLWOR; PostgreSQL's <code>xpath()</code> returns an <strong>array</strong>, even if one element matched; <code>XMLATTRIBUTES</code> creates an <strong>attribute</strong>, while <code>XMLELEMENT</code> creates an <strong>element</strong>; <code>RETURN</code> in XQuery is not the same as Cypher's <code>RETURN</code> syntax in every context.</p>
+<hr />
+<h2 id="3-big-data-and-nosql-lecture-13-concept-questions">3. Big Data and NoSQL — Lecture 13 (concept questions)</h2>
+<h3 id="31-five-vs-and-nosql-model-identification">3.1 Five Vs and NoSQL model identification</h3>
+<table>
+<thead>
+<tr>
+<th>V</th>
+<th>Meaning</th>
+<th>Scenario keyword</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Volume</strong></td>
+<td>Quantity/scale of data</td>
+<td>Terabytes, petabytes</td>
+</tr>
+<tr>
+<td><strong>Velocity</strong></td>
+<td>Speed of arrival/processing</td>
+<td>Streaming telemetry</td>
+</tr>
+<tr>
+<td><strong>Variety</strong></td>
+<td>Different data forms</td>
+<td>JSON, video, tables, text</td>
+</tr>
+<tr>
+<td><strong>Value</strong></td>
+<td>Useful insight/business benefit</td>
+<td>Recommendations and patterns</td>
+</tr>
+<tr>
+<td><strong>Veracity</strong></td>
+<td>Accuracy/reliability</td>
+<td>Noisy/untrustworthy sensors</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Core shape</th>
+<th>Best fit / example from lectures</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Key–value</strong></td>
+<td>Key → value</td>
+<td>Fast key lookup; Redis / DynamoDB</td>
+</tr>
+<tr>
+<td><strong>Document</strong></td>
+<td>BSON/JSON-like field–value documents</td>
+<td>Nested data, flexible fields; <strong>MongoDB</strong></td>
+</tr>
+<tr>
+<td><strong>Wide-column</strong></td>
+<td>Rows keyed and organised by column families</td>
+<td>Large distributed tabular-like workload; Cassandra / HBase</td>
+</tr>
+<tr>
+<td><strong>Graph</strong></td>
+<td>Nodes + relationships + properties</td>
+<td>Social connections, recommendations; <strong>Neo4j</strong></td>
+</tr>
+<tr>
+<td><strong>Time series</strong></td>
+<td>Timestamped events in time order</td>
+<td>Sensor readings / price history</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CAP theorem — likely recognition question:</strong> <strong>C</strong> = consistency, <strong>A</strong> = availability, <strong>P</strong> = partition tolerance. <em>During a network partition</em>, a replicated distributed system cannot guarantee <strong>both strong consistency and availability</strong>. This is a <strong>trade-off under partition</strong>—not a claim that a system may possess only two useful qualities at all times. <strong>Eventual consistency</strong> means replicas may disagree temporarily but converge once updates propagate (subject to the system's assumptions).</p>
+<p><strong>Reading topic mentioned in Lecture 13:</strong> <strong>PACELC</strong> extends the discussion: if there is a <strong>Partition</strong>, trade off <strong>Availability/Consistency</strong>; <strong>Else</strong> (no partition), consider <strong>Latency/Consistency</strong>. Label this as reading-extension material, rather than a detailed lecture worked example.</p>
+<hr />
+<h2 id="4-mongodb-lectures-1416-highest-density-command-section">4. MongoDB — Lectures 14–16 (highest-density command section)</h2>
+<h3 id="41-crud-filtering-output-syntax">4.1 CRUD / filtering / output syntax</h3>
+<p>Use <code>db.&lt;collection&gt;.&lt;method&gt;(...)</code> in <code>mongosh</code>. <strong>Query field values are documents, not SQL strings.</strong></p>
+<pre><code class="language-javascript">use mydb                             // mongosh helper
+show collections                     // mongosh helper
+
+db.students.insertOne({name: &quot;Neo&quot;, mark: 78, active: true});
+db.students.insertMany([{name: &quot;A&quot;, mark: 45}, {name: &quot;B&quot;, mark: 80}]);
+
+db.students.find({mark: {$gt: 60}});              // mark &gt; 60
+db.students.find({active: true, mark: {$gte: 70}}); // implicit AND
+db.students.find({$or: [{mark: {$lt: 50}}, {mark: {$gt: 90}}]});
+db.students.find({mark: {$in: [45, 80]}});
+
+db.students.find({mark: {$gte: 70}}, {name: 1, _id: 0})
+           .sort({name: 1});                    // projection + ascending sort
+
+db.students.updateOne({name: &quot;Neo&quot;}, {$set: {mark: 82}});
+db.students.updateMany({active: true}, {$set: {status: &quot;approved&quot;}});
+db.students.deleteOne({name: &quot;A&quot;});
+db.students.deleteMany({active: false});
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Meaning</th>
+<th>Syntax</th>
+<th>Trap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>equals</td>
+<td><code>{x: 3}</code></td>
+<td>Equality usually no <code>$eq</code> required</td>
+</tr>
+<tr>
+<td>greater / greater-or-equal</td>
+<td><code>$gt</code> / <code>$gte</code></td>
+<td><code>gt</code> <strong>not</strong> <code>&gt;</code>, <code>&gt;=</code> within query document</td>
+</tr>
+<tr>
+<td>less / less-or-equal</td>
+<td><code>$lt</code> / <code>$lte</code></td>
+<td>Distinct from <code>$gt</code></td>
+</tr>
+<tr>
+<td>not equals</td>
+<td><code>$ne</code></td>
+<td>Different from <code>$not</code></td>
+</tr>
+<tr>
+<td>OR</td>
+<td><code>$or: [{...}, {...}]</code></td>
+<td><strong>Array</strong> of alternatives</td>
+</tr>
+<tr>
+<td>IN list</td>
+<td><code>$in: [a, b]</code></td>
+<td>Alternatives for one field</td>
+</tr>
+<tr>
+<td>projection include/exclude</td>
+<td><code>{name: 1, _id: 0}</code></td>
+<td><code>1</code> include, <code>0</code> exclude, <code>_id</code> exception</td>
+</tr>
+<tr>
+<td>sorting</td>
+<td><code>.sort({name: 1})</code></td>
+<td><code>1</code> ascending, <code>-1</code> descending</td>
+</tr>
+<tr>
+<td>update property</td>
+<td><code>{$set: {mark: 82}}</code></td>
+<td>Forgetting <code>$set</code> changes semantics</td>
+</tr>
+<tr>
+<td>update one vs all</td>
+<td><code>updateOne</code> / <code>updateMany</code></td>
+<td><code>updateOne</code> is <strong>not</strong> <code>multi: true</code></td>
+</tr>
+<tr>
+<td>remove one vs all</td>
+<td><code>deleteOne</code> / <code>deleteMany</code></td>
+<td><code>deleteMany({})</code> deletes <strong>all documents</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>BSON / concepts:</strong> Database → <strong>collections</strong> → <strong>documents</strong> → <strong>fields</strong>. MongoDB documents are stored in <strong>BSON</strong>; <code>_id</code> uniquely identifies documents and is commonly an <code>ObjectId</code> when autogenerated. <code>Date</code> is suitable for application date/time; <code>Timestamp</code> is primarily an internal MongoDB BSON type. An embedded document is <em>not</em> the same as an ObjectId.</p>
+<h3 id="42-nested-documents-arrays-cursors-common-traps">4.2 Nested documents, arrays, cursors — common traps</h3>
+<p><strong>Lecture 15 examples:</strong></p>
+<pre><code class="language-javascript">// Nested fields: access: {level: 5, group: &quot;dev&quot;}
+db.users.find({&quot;access.level&quot;: 5});
+db.users.find({access: {level: 5, group: &quot;dev&quot;}});
+// First checks one nested field; second compares the embedded document as a whole.
+
+// Given ratings: [5, 8, 9]
+db.inventory.find({ratings: [5, 8, 9]}); // exact array AND order
+db.inventory.find({ratings: 5});         // any array element equals 5
+
+db.inventory.find({ratings: {$gt: 5, $lt: 9}});
+// Two different elements MAY fulfil these two conditions.
+
+db.inventory.find({ratings: {$elemMatch: {$gt: 5, $lt: 9}}});
+// ONE SAME element must be &gt;5 AND &lt;9; for [5,8,9], 8 works.
+
+// Given memos: [{memo: &quot;on time&quot;, by: &quot;shipping&quot;}, ...]
+db.inventory.find({&quot;memos.by&quot;: &quot;shipping&quot;});
+db.inventory.find({&quot;memos.0.by&quot;: &quot;shipping&quot;}); // specifically first element
+</code></pre>
+<p><strong>Practice trap:</strong> Array <code>[5, 9]</code> satisfies <code>{ratings: {$gt: 5, $lt: 9}}</code> via <strong>different</strong> values (9 and 5) but does <strong>not</strong> satisfy <code>$elemMatch</code> with both strict conditions. This is a particularly good select-all / predict-the-output question.</p>
+<p><strong>Cursor (Lecture 15):</strong></p>
+<pre><code class="language-javascript">const c = db.users.find();
+while (c.hasNext()) printjson(c.next());
+// Or: const result = db.users.find().toArray(); printjson(result[0]);
+</code></pre>
+<p><code>hasNext()</code> tests for another result; <code>next()</code> <strong>consumes</strong> a result; <code>toArray()</code> materialises the <strong>remaining</strong> results. JavaScript arrays start at index <strong>0</strong>.</p>
+<h3 id="43-aggregation-pipeline-must-be-able-to-build-and-trace">4.3 Aggregation pipeline — MUST be able to build and trace</h3>
+<p><strong>Lecture 15 dataset (total 7 blog documents):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Title</th>
+<th>Individual <code>likes</code></th>
+<th style="text-align: right;">Group <code>sum</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NoSQL</td>
+<td>400</td>
+<td style="text-align: right;"><strong>400</strong></td>
+</tr>
+<tr>
+<td>MongoDB</td>
+<td>100, 150, 50</td>
+<td style="text-align: right;"><strong>300</strong></td>
+</tr>
+<tr>
+<td>Neo4j</td>
+<td>50, 150, 250</td>
+<td style="text-align: right;"><strong>450</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lecture: Group totals, retain totals greater than 300, sort ascending:</strong></p>
+<pre><code class="language-javascript">db.blogs.aggregate([
+  {$group: {_id: &quot;$title&quot;, num_likes: {$sum: &quot;$likes&quot;}}},
+  {$match: {num_likes: {$gt: 300}}},
+  {$sort: {num_likes: 1}}
+]);
+</code></pre>
+<p><strong>Trace it as the examiner might:</strong>
+1. <code>$group</code> creates <code>{_id: "NoSQL", num_likes: 400}</code>, <code>{_id: "MongoDB", num_likes: 300}</code>, <code>{_id: "Neo4j", num_likes: 450}</code>.
+2. <code>$match</code> keeps only 400 and 450. <strong>300 does not pass <code>$gt: 300</code>.</strong>
+3. <code>$sort</code> ascending returns <strong>NoSQL (400), Neo4j (450)</strong> in that order.</p>
+<p><strong>Alternative Lecture query: only Neo4j, then total:</strong></p>
+<pre><code class="language-javascript">db.blogs.aggregate([
+  {$match: {title: &quot;Neo4j&quot;}},
+  {$group: {_id: &quot;$title&quot;, num_likes: {$sum: &quot;$likes&quot;}}}
+]); // Neo4j, 450
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Stage/operator</th>
+<th>Function</th>
+<th>Common error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$match</code></td>
+<td>Filter documents in current pipeline stage</td>
+<td><strong>Before</strong> grouping filters original docs; <strong>after</strong> grouping filters aggregates</td>
+</tr>
+<tr>
+<td><code>$group</code></td>
+<td>Group by <code>_id</code> expression</td>
+<td><code>"$title"</code> <strong>field reference</strong>, not literal <code>"title"</code></td>
+</tr>
+<tr>
+<td><code>$sum: "$likes"</code></td>
+<td>Sum likes</td>
+<td><code>$sum: 1</code> counts records instead</td>
+</tr>
+<tr>
+<td><code>$avg</code>, <code>$min</code>, <code>$max</code></td>
+<td>Numeric aggregates</td>
+<td>Put inside accumulator in <code>$group</code></td>
+</tr>
+<tr>
+<td><code>$sort: {field: -1}</code></td>
+<td>Descending order</td>
+<td><code>-1</code> descending; <code>1</code> ascending</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44-indexing-text-searches-design-and-applications">4.4 Indexing, text searches, design and applications</h3>
+<pre><code class="language-javascript">db.blogs.createIndex({title: 1});                 // ascending index
+db.blogs.createIndex({title: 1, likes: -1});      // compound index
+db.blogs.find({title: &quot;Neo4j&quot;}).explain(&quot;executionStats&quot;);
+
+db.blogs.createIndex({comments: &quot;text&quot;});       // prerequisite for $text
+db.blogs.find({$text: {$search: &quot;NoSQL&quot;}});      // usually case-insensitive
+db.blogs.createIndex({&quot;$**&quot;: &quot;text&quot;});          // wildcard TEXT index alternative
+</code></pre>
+<p><strong>Text-in-aggregation (Lecture 16):</strong></p>
+<pre><code class="language-javascript">db.blogs.aggregate([
+  {$match: {$text: {$search: &quot;NoSQL&quot;}}}, // must be first for $text
+  {$group: {_id: null, totalLikes: {$sum: &quot;$likes&quot;}}}
+]); // Lecture dataset: totalLikes = 550
+</code></pre>
+<p><strong>Why 550?</strong> Matching comments from NoSQL (400), MongoDB (100) and Neo4j (50) → 400 + 100 + 50 = <strong>550</strong>. A text index is required. A collection supports <strong>at most one text index</strong>, although that index can include several fields. A wildcard text index makes indexing broader and can cost storage/write performance. <strong>Do not create both of the text indexes shown above on the same collection</strong>; treat them as alternative configurations.</p>
+<p><strong>Design questions:</strong> <strong>Embed</strong> when child data belongs to the parent and is normally read together (e.g., account contact details); <strong>reference</strong> for shared entities, complex many-to-many data or large/unbounded child collections. Lecture 15 highlights the <strong>16 MiB document limit</strong>. Indexes improve reads/sorts but add storage and write overhead.</p>
+<p><strong>Lecture 16 client-app details:</strong> <code>mongosh</code> uses JavaScript functions (<code>function computeTotalLikes(dbName, colName, blogTitle) {...}</code>); <code>.mongoshrc.js</code> can load helper functions on shell start. In Java, <strong>MongoClient → MongoDatabase → MongoCollection</strong> via the MongoDB Java Driver (Maven/Gradle preferred). A client-side JS shell function is <strong>not</strong> the same as a PL/pgSQL database trigger.</p>
+<hr />
+<h2 id="5-graph-databases-neo4j-lectures-1718">5. Graph databases / Neo4j — Lectures 17–18</h2>
+<h3 id="51-graph-basics-short-conceptual-marks">5.1 Graph basics: short conceptual marks</h3>
+<ul>
+<li><code>G = (V, E)</code>: <strong>V</strong> vertices/nodes, <strong>E</strong> edges/relationships. Weighted directed edge: <code>(v_i, v_j, w)</code>; weight might be distance/cost.</li>
+<li><strong>Directed</strong> edge <code>A → B</code> is not the same as <code>B → A</code>. <strong>Path</strong> = sequence connected by edges; <strong>cycle</strong> = starts and ends at same vertex, without repeating other vertices.</li>
+<li>Neo4j <strong>node</strong>: properties such as <code>{name: "Thandi"}</code>; a node can have <strong>labels</strong> such as <code>:Person</code> (a classification, not a property).</li>
+<li>Neo4j <strong>relationship</strong>: directed, has a <strong>type</strong> (<code>:FOLLOWS</code>), may have <strong>properties</strong> (<code>since: 2017</code>). Cypher can match a relationship without specifying direction, but every stored relationship has direction.</li>
+<li><strong>Cypher is declarative</strong> and expresses graph patterns; it is not SQL table-join syntax.</li>
+</ul>
+<h3 id="52-cypher-patterns-and-crud-memorise-punctuation">5.2 Cypher patterns and CRUD — memorise punctuation</h3>
+<pre><code class="language-cypher">// CREATE THREE NODES AND THREE DIRECTED RELATIONSHIPS (Lecture 18 example)
+CREATE
+  (t:Person {name: 'Thandi', from: 'Durban'}),
+  (j:Person {name: 'Johan', from: 'Pretoria'}),
+  (n:Person {name: 'Neo', from: 'Cape Town'}),
+  (t)-[:FOLLOWS {since: 2017}]-&gt;(j),
+  (t)-[:FOLLOWS {since: 2016}]-&gt;(n),
+  (j)-[:FOLLOWS {since: 2018}]-&gt;(t);
+
+// READ: who does Thandi follow?
+MATCH (p:Person)-[:FOLLOWS]-&gt;(f:Person)
+WHERE p.name = 'Thandi'
+RETURN f.name;
+
+// UPDATE NODE PROPERTY
+MATCH (p:Person {name: 'Thandi'})
+SET p.age = 21
+RETURN p;
+
+// UPDATE RELATIONSHIP PROPERTY
+MATCH (t:Person {name: 'Thandi'})-[r:FOLLOWS]-&gt;(n:Person {name: 'Neo'})
+SET r.since = 2020
+RETURN r;
+</code></pre>
+<p><strong>Trace:</strong> The <code>CREATE</code> sample has <strong>3 Person nodes</strong> and <strong>3 FOLLOWS relationships</strong>. The read query returns <strong>Johan, Neo</strong> (order unspecified without <code>ORDER BY</code>); it does <strong>not</strong> return Thandi because <code>Johan → Thandi</code> points the opposite way.</p>
+<table>
+<thead>
+<tr>
+<th>Cypher</th>
+<th>What it does</th>
+<th>Critical distinction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CREATE (p:Person {...})</code></td>
+<td>Always creates matching new data</td>
+<td>Running again can make duplicates unless constraints prevent it</td>
+</tr>
+<tr>
+<td><code>MERGE (p:Person {name: 'Thandi'})</code></td>
+<td>Match pattern or create if absent</td>
+<td>Supports <code>ON CREATE SET</code> / <code>ON MATCH SET</code></td>
+</tr>
+<tr>
+<td><code>MATCH (p:Person)</code></td>
+<td>Bind matching labelled nodes</td>
+<td><code>p</code> is a variable, <code>Person</code> a <strong>label</strong></td>
+</tr>
+<tr>
+<td><code>MATCH (a)-[:FOLLOWS]-&gt;(b)</code></td>
+<td>Follow outgoing directed edges</td>
+<td>Swapping <code>(a)</code> and <code>(b)</code> changes meaning</td>
+</tr>
+<tr>
+<td><code>OPTIONAL MATCH</code></td>
+<td>Try pattern and permit null missing matches</td>
+<td>Unlike ordinary <code>MATCH</code>, does not drop every unmatched row</td>
+</tr>
+<tr>
+<td><code>WHERE</code></td>
+<td>Filter matched rows</td>
+<td>Use property with <code>p.name</code></td>
+</tr>
+<tr>
+<td><code>RETURN p</code> vs <code>RETURN p.name</code></td>
+<td>Node vs scalar property</td>
+<td>Distinct output types</td>
+</tr>
+<tr>
+<td><code>SET p.age = 21</code></td>
+<td>Add/update property</td>
+<td>Not the same as <code>REMOVE</code></td>
+</tr>
+<tr>
+<td><code>REMOVE p.hobby</code></td>
+<td>Remove property only</td>
+<td>Does <strong>not</strong> remove node</td>
+</tr>
+<tr>
+<td><code>DELETE r</code></td>
+<td>Delete relationship</td>
+<td>Does not delete connected nodes</td>
+</tr>
+<tr>
+<td><code>DELETE p</code></td>
+<td>Delete unconnected node</td>
+<td>Fails if node still has relationships</td>
+</tr>
+<tr>
+<td><code>DETACH DELETE p</code></td>
+<td>Delete node and attached relationships</td>
+<td>Destructive</td>
+</tr>
+<tr>
+<td><code>ORDER BY p.name ASC</code></td>
+<td>Sort rows</td>
+<td>No implicit guaranteed order</td>
+</tr>
+</tbody>
+</table>
+<p><strong>MERGE template (Lecture 18):</strong></p>
+<pre><code class="language-cypher">MERGE (p:Person {name: 'Thandi'})
+ON MATCH SET p.age = 21
+ON CREATE SET p.from = 'Durban', p.age = 21
+RETURN p;
+</code></pre>
+<p><strong>Uniqueness constraint (Lecture 18):</strong></p>
+<pre><code class="language-cypher">CREATE CONSTRAINT person_name_unique
+FOR (p:Person)
+REQUIRE p.name IS UNIQUE;
+</code></pre>
+<p><strong>Delete only the relationship vs delete a person:</strong></p>
+<pre><code class="language-cypher">MATCH (t:Person {name: 'Thandi'})-[r:FOLLOWS]-&gt;(n:Person {name: 'Neo'})
+DELETE r;
+
+MATCH (p:Person {name: 'Thandi'})
+DETACH DELETE p;
+</code></pre>
+<h3 id="53-cypher-aggregation-likely-countoutput-questions">5.3 Cypher aggregation — likely count/output questions</h3>
+<p>Given the <strong>three-edge sample above</strong> (before any <code>DELETE</code> or subsequent modification):</p>
+<pre><code class="language-cypher">MATCH (p:Person {name: 'Thandi'})-[:FOLLOWS]-&gt;(f)
+RETURN count(f) AS peopleFollowed;   // 2
+
+MATCH (p:Person)-[:FOLLOWS]-&gt;(f)
+RETURN p.name AS person, count(f) AS total;
+// Thandi: 2; Johan: 1 (Neo omitted: no outgoing FOLLOWS)
+
+MATCH (p:Person)
+RETURN collect(p.name) AS names;     // list of three names; order unspecified
+
+MATCH (a)-[r]-&gt;(b)
+RETURN type(r) AS relationType, count(*) AS total;
+// FOLLOWS: 3
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>count(*)</code> / <code>count(f)</code></td>
+<td>Number of matching rows / non-null <code>f</code> values</td>
+</tr>
+<tr>
+<td><code>sum(p.x)</code>, <code>avg(p.x)</code></td>
+<td>Sum / average numeric properties</td>
+</tr>
+<tr>
+<td><code>min(p.x)</code>, <code>max(p.x)</code></td>
+<td>Min / max</td>
+</tr>
+<tr>
+<td><code>collect(p.name)</code></td>
+<td>A <strong>list</strong> of values</td>
+</tr>
+<tr>
+<td><code>count(DISTINCT p.name)</code></td>
+<td>Count distinct values</td>
+</tr>
+<tr>
+<td><code>RETURN p.name, count(f)</code></td>
+<td><strong>Implicit grouping by <code>p.name</code></strong>; no explicit <code>GROUP BY</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Common predict-the-output trap:</strong> A query with <code>MATCH (p)-[:FOLLOWS]-&gt;(f)</code> excludes a person with <strong>zero matching outgoing relationships</strong>. To preserve such a person in the result, start with <code>MATCH (p:Person)</code> and then use <code>OPTIONAL MATCH (p)-[:FOLLOWS]-&gt;(f)</code> before counting.</p>
+<hr />
+<h2 id="6-practice-20-mark-integrated-scenario-model-of-the-st1-essay-format">6. Practice 20-mark integrated scenario — model of the ST1 essay format</h2>
+<blockquote>
+<p><strong>Practice prediction — not an actual past/future question.</strong> An ocean-research company keeps mission summaries in XML, underwater-vehicle telemetry in MongoDB, and links between vehicles and research stations in Neo4j. The following three subtasks intentionally follow ST1's multi-technology style.</p>
+</blockquote>
+<h3 id="a-xmlxquery-6-marks">(a) XML/XQuery — 6 marks</h3>
+<p><strong>Question:</strong> Given <code>&lt;missions&gt;&lt;mission base="DUR"&gt;&lt;missionCode&gt;M1&lt;/missionCode&gt;&lt;depth&gt;4500&lt;/depth&gt;&lt;/mission&gt;...&lt;/missions&gt;</code>, write an XQuery that returns the code of each mission based at <code>DUR</code> deeper than 3000 metres, ordered by code, wrapped in <code>&lt;code&gt;</code> elements.</p>
+<pre><code class="language-xquery">for $m in /missions/mission
+where $m/@base = &quot;DUR&quot; and $m/depth &gt; 3000
+order by $m/missionCode ascending
+return &lt;code&gt;{$m/missionCode/text()}&lt;/code&gt;
+</code></pre>
+<p><strong>Marks to secure:</strong> correct path and <code>for</code> (1); correct attribute (<code>@base</code>) (1); correct depth condition (1); ordering (1); correct element construction (2).</p>
+<h3 id="b-mongodb-7-marks">(b) MongoDB — 7 marks</h3>
+<p><strong>Question:</strong> Collection <code>readings</code> holds documents <code>{vehicle: "A1", temperature: 2, depth: 4200}</code>. Return average temperature per vehicle for readings deeper than 3000m; keep only vehicles with average temperature below 5; sort vehicle IDs ascending.</p>
+<pre><code class="language-javascript">db.readings.aggregate([
+  {$match: {depth: {$gt: 3000}}},
+  {$group: {_id: &quot;$vehicle&quot;, averageTemp: {$avg: &quot;$temperature&quot;}}},
+  {$match: {averageTemp: {$lt: 5}}},
+  {$sort: {_id: 1}}
+]);
+</code></pre>
+<p><strong>Marks to secure:</strong> correct <code>aggregate([ ... ])</code> (1); original-document <code>$match</code> (1); <code>$group</code> field reference <code>_id: "$vehicle"</code> (1); <code>$avg</code> (2); post-group <code>$match</code> (1); <code>$sort</code> (1).</p>
+<h3 id="c-neo4j-7-marks">(c) Neo4j — 7 marks</h3>
+<p><strong>Question:</strong> Create vehicles <code>A1</code> and <code>A2</code>, station <code>DUR</code> and directed <code>REPORTS_TO</code> relationships. Then return all vehicle IDs reporting to DUR; count them.</p>
+<pre><code class="language-cypher">CREATE (a:Vehicle {vehicleId: 'A1'}),
+       (b:Vehicle {vehicleId: 'A2'}),
+       (s:Station {code: 'DUR'}),
+       (a)-[:REPORTS_TO]-&gt;(s),
+       (b)-[:REPORTS_TO]-&gt;(s);
+
+MATCH (v:Vehicle)-[:REPORTS_TO]-&gt;(s:Station {code: 'DUR'})
+RETURN v.vehicleId ORDER BY v.vehicleId;
+
+MATCH (v:Vehicle)-[:REPORTS_TO]-&gt;(s:Station {code: 'DUR'})
+RETURN count(v) AS vehicleCount;
+// vehicle IDs A1, A2; count 2
+</code></pre>
+<p><strong>Marks to secure:</strong> correctly labelled nodes/properties (2); correctly directed edges (2); correct <code>MATCH</code> pattern and property filter (1); projection (1); aggregate count (1).</p>
+<hr />
+<h2 id="7-rapid-recall-15-fill-in-mcq-checks">7. Rapid recall — 15 fill-in / MCQ checks</h2>
+<p>Try to answer before reading the right column. Questions are <strong>practice</strong> based on lecture syntax and ST1's style.</p>
+<table>
+<thead>
+<tr>
+<th>Prompt</th>
+<th>Exact answer / distinction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. XQuery clause which iterates through results</td>
+<td><code>for</code></td>
+</tr>
+<tr>
+<td>2. XQuery qualifier: at least one item satisfies a condition</td>
+<td><code>some ... satisfies</code></td>
+</tr>
+<tr>
+<td>3. XML attribute selection for <code>branchNo</code></td>
+<td><code>@branchNo</code></td>
+</tr>
+<tr>
+<td>4. SQL/XML construct to create an XML attribute</td>
+<td><code>xmlattributes(...)</code></td>
+</tr>
+<tr>
+<td>5. PostgreSQL <code>xpath(...)</code> returns which type?</td>
+<td><code>xml[]</code> array</td>
+</tr>
+<tr>
+<td>6. Network partition: CAP forces trade-off between?</td>
+<td><strong>Consistency and availability</strong></td>
+</tr>
+<tr>
+<td>7. MongoDB strictly greater than 3000</td>
+<td><code>{depth: {$gt: 3000}}</code></td>
+</tr>
+<tr>
+<td>8. MongoDB project title but exclude <code>_id</code></td>
+<td><code>{title: 1, _id: 0}</code></td>
+</tr>
+<tr>
+<td>9. MongoDB: conditions on <strong>same</strong> array element</td>
+<td><code>$elemMatch</code></td>
+</tr>
+<tr>
+<td>10. MongoDB: output grouped totals</td>
+<td><code>$group</code> + <code>$sum</code></td>
+</tr>
+<tr>
+<td>11. MongoDB: filter already-grouped totals</td>
+<td><code>$match</code> <strong>after</strong> <code>$group</code></td>
+</tr>
+<tr>
+<td>12. MongoDB: text-search index declaration</td>
+<td><code>createIndex({comments: "text"})</code></td>
+</tr>
+<tr>
+<td>13. Neo4j: node vs property in <code>RETURN</code></td>
+<td><code>RETURN p</code> vs <code>RETURN p.name</code></td>
+</tr>
+<tr>
+<td>14. Neo4j: deletion including connected edges</td>
+<td><code>DETACH DELETE p</code></td>
+</tr>
+<tr>
+<td>15. Neo4j: get count per person without <code>GROUP BY</code></td>
+<td><code>RETURN p.name, count(f)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="final-five-minute-checks">Final five-minute checks</h3>
+<ul>
+<li>Can I write <strong>one FLWOR</strong> from an XML tree without copying the lecture?</li>
+<li>Can I trace a <strong>MongoDB pipeline</strong> stage by stage and calculate the final totals?</li>
+<li>Can I distinguish <strong>whole nested-document match</strong>, <strong>dot notation</strong>, and <strong><code>$elemMatch</code></strong>?</li>
+<li>Can I read the <strong>direction of every Cypher arrow</strong> and determine how many relationships match?</li>
+<li>Can I produce a <strong>complete</strong> solution with proper brackets, <code>RETURN</code>, property paths, and filters—not just the right concept?</li>
+</ul>
+<p><strong>Scope note:</strong> This covers the available new lectures (11–18), not the earlier Semester Test 1 lectures. The ST1 paper is used to infer <em>question construction</em>, not to claim the same proportions or exact question topics must repeat.</p></article></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

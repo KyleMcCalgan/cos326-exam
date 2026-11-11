@@ -1,0 +1,1275 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Semi-Structured Data and XML (4) — XML in Relational/Object-Relational Databases — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html" aria-current="page">Notes</a><a href="../papers/index.html">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>XML in relational databases</h1><p>Lecture 12 &middot; Course notes</p></div><button class="study" data-id="lecture-05.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All notes</a><button class="bookmark" data-id="lecture-05.html"> Bookmark</button></div><div class="related"><span class="related-label">Use this topic</span><a href="../papers/question-index.html#5-xml-in-postgresql-sqlxml-lecture-12">Exam questions</a><a href="../papers/answer-memo.html#4-postgresql-xml-l12">Memo</a><a href="../reference/cheat-sheet.html#2-xml-xquery-lectures-1112">Cheat sheet</a><a href="../practice/question-bank.html#c1-questions-xquery-flwor-50-marks">Question bank</a></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview-and-where-this-fits">1. Lecture Overview and Where This Fits</a></li><li><a href="#2-storing-xml-data-in-an-rdb-or-ordb-four-general-approaches">2. Storing XML Data in an RDB or ORDB — Four General Approaches</a></li><li><a href="#3-xml-and-sql-standards">3. XML and SQL Standards</a></li><li><a href="#4-creating-a-table-using-the-xml-data-type">4. Creating a Table Using the XML Data Type</a></li><li><a href="#5-sqlxml-functions-reading-for-the-student">5. SQL/XML Functions (Reading for the Student)</a></li><li><a href="#6-sqlxml-operators-generating-xml-from-relational-data">6. SQL/XML Operators — Generating XML from Relational Data</a></li><li><a href="#7-sqlxml-mapping-functions">7. SQL/XML Mapping Functions</a></li><li><a href="#8-postgresql-and-xml-sql-xpath-queries">8. PostgreSQL and XML — SQL + XPath Queries</a></li><li><a href="#9-postgresql-server-side-file-access">9. PostgreSQL Server-Side File Access</a></li><li><a href="#10-importing-xml-data-into-a-postgresql-database">10. Importing XML Data into a PostgreSQL Database</a></li><li><a href="#11-further-reading">11. Further Reading</a></li><li><a href="#12-quick-reference-direction-of-conversion">12. Quick Reference — Direction of Conversion</a></li><li><a href="#13-questions-memo">13. Questions &amp; Memo</a></li><li><a href="#sqlxml-functions-cheat-sheet-cos-326-lecture-12">SQL/XML Functions Cheat Sheet — COS 326 Lecture 12</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview-and-where-this-fits">1. Lecture Overview and Where This Fits</h2>
+<ul>
+<li><strong>Lectures 9–10</strong> introduced XML itself: the data model, XSD, XPath, XQuery/FLWOR and a <strong>native XML database (BaseX)</strong>.</li>
+<li><strong>Lecture 12</strong> asks a different question: <strong>what if our data lives in a relational (RDB) or object-relational (ORDB) database such as PostgreSQL, and we need to store, produce and query XML there?</strong></li>
+<li><strong>Topics covered:</strong><ul>
+<li>XML databases and SQL.</li>
+<li>Storing XML data in an RDB or ORDB (four approaches).</li>
+<li>XML and SQL standards.</li>
+<li>Creating a DB table using the <strong>XML data type</strong>.</li>
+<li><strong>SQL/XML functions, operators and mapping functions.</strong></li>
+<li><strong>PostgreSQL and XML data</strong> (including <code>xpath()</code> and <code>unnest</code>).</li>
+<li><strong>Importing XML data into a PostgreSQL DB.</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
+<p>Contrast the two worlds. In <strong>BaseX</strong> (Lectures 9–10) the <em>whole database</em> is XML and you query it with <code>//STAFFLIST/STAFF[1]/STAFFNO</code>. In <strong>PostgreSQL</strong> (this lecture) the database is relational, XML is just <em>one column type</em> among others, and you must combine <strong>SQL</strong> with <strong>XPath</strong>: <code>SELECT xpath('/STAFF/STAFFNO', staffData) FROM XMLStaff;</code>.</p>
+<hr />
+<h2 id="2-storing-xml-data-in-an-rdb-or-ordb-four-general-approaches">2. Storing XML Data in an RDB or ORDB — Four General Approaches</h2>
+<ol>
+<li><strong>Store the XML document as the value of a column</strong> in one row or several rows.</li>
+<li><strong>Store the XML document in a shredded form</strong> across a number of columns and tables.</li>
+<li><strong>Store the XML document in a schema-independent form.</strong></li>
+<li><strong>Store the XML document in a parsed (internal) form.</strong></li>
+</ol>
+<blockquote>
+<p>The slides give detail for approaches 1–3. Approach 4 is only listed (the DBMS keeps its own internal parsed representation).</p>
+</blockquote>
+<h3 id="21-approach-1-storing-xml-in-a-table-column">2.1 Approach 1 — Storing XML in a Table Column</h3>
+<h4 id="conceptual-example-from-the-slides"> Conceptual Example (from the slides)</h4>
+<table>
+<thead>
+<tr>
+<th>docNo</th>
+<th>docDate</th>
+<th>XMLdoc (whole doc or fragment)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D001</td>
+<td>2020-05-20</td>
+<td><code>&lt;STAFFLIST&gt;&lt;STAFF branchNo="B002"&gt; ... &lt;/STAFF&gt;&lt;/STAFFLIST&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The <strong>XML is stored raw</strong> in a column; the other columns (<code>docNo</code>, <code>docDate</code>) are ordinary relational attributes.</li>
+<li><strong>Data types used for XML data:</strong><ul>
+<li><strong>CLOB</strong> (character large object) — <strong>used in the past.</strong></li>
+<li><strong>Native XML data type:</strong> <strong><code>xml</code> (PostgreSQL)</strong> or <strong><code>XMLType</code> (Oracle).</strong></li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Advantages</th>
+<th>Disadvantages</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Efficient to insert</strong> documents into the database</td>
+<td><strong>General query performance is poor</strong> — the XML must be <strong>parsed on the fly</strong> every time it is queried</td>
+</tr>
+<tr>
+<td><strong>Efficient to retrieve</strong> documents (whole)</td>
+<td><strong>Updates:</strong> the <strong>entire XML document is replaced</strong> (more recently, an XML document can be updated using SQL)</td>
+</tr>
+<tr>
+<td><strong>Easy to apply full-text indexing</strong> to documents</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
+<p>An archive of <strong>invoices received as XML</strong> (never edited, always fetched whole by invoice number) suits Approach 1 perfectly — fast to insert, fast to retrieve. If staff later asked "total salary across all documents", every document would have to be parsed again to dig the <code>&lt;SALARY&gt;</code> values out, which is exactly the poor-query-performance weakness.</p>
+<h3 id="22-approach-2-storing-xml-in-shredded-form">2.2 Approach 2 — Storing XML in Shredded Form</h3>
+<ul>
+<li>The XML is <strong>decomposed ("shredded") into its constituent elements.</strong></li>
+<li>The <strong>data is distributed over a number of attributes (columns)</strong> in <strong>one or more relations.</strong></li>
+<li><strong>Pros / cons:</strong><ul>
+<li> <strong>Easier to index</strong> the values of individual elements.</li>
+<li> Need <strong>additional data capturing the hierarchical nature</strong> of the XML so the <strong>original document can be recomposed.</strong></li>
+<li> <strong>XML updates</strong> are more involved.</li>
+<li> You have to <strong>create an appropriate database structure from the schema</strong> (relational or object-relational).</li>
+</ul>
+</li>
+<li><em>(Reading for the student: Chapter 13.6.)</em></li>
+</ul>
+<h4 id="example-from-the-slides-staff_listxml-shredded-into-a-table"> Example (from the slides) — <code>staff_list.xml</code> shredded into a table</h4>
+<table>
+<thead>
+<tr>
+<th>BRANCHNO</th>
+<th>STAFFNO</th>
+<th>NAME</th>
+<th>FNAME</th>
+<th>LNAME</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B002</td>
+<td>SL20</td>
+<td></td>
+<td>Thando</td>
+<td>Mandela</td>
+</tr>
+<tr>
+<td>B003</td>
+<td>SL21</td>
+<td></td>
+<td>Marlize</td>
+<td>Kruger</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading the example:</strong></p>
+<ol>
+<li>Each <code>&lt;STAFF&gt;</code> element becomes <strong>one row.</strong></li>
+<li>The <strong><code>branchNo</code> attribute</strong>, <code>&lt;STAFFNO&gt;</code>, and the leaf elements <code>&lt;FNAME&gt;</code>/<code>&lt;LNAME&gt;</code> each become <strong>a column.</strong></li>
+<li>The <strong><code>NAME</code> column is empty</strong> — <code>&lt;NAME&gt;</code> is a <em>complex</em> element with no text of its own; it only <strong>groups</strong> <code>FNAME</code> and <code>LNAME</code>. This is the loss of hierarchy that the "additional data" bullet warns about: the tree structure (<code>NAME</code> contains <code>FNAME</code> and <code>LNAME</code>) is no longer stored explicitly.</li>
+<li>Because the values now sit in normal columns, a query like <code>WHERE LNAME = 'Mandela'</code> can use an ordinary <strong>index</strong> — impossible if the XML were one opaque blob.</li>
+</ol>
+<h3 id="23-approach-3-schema-independent-representation">2.3 Approach 3 — Schema-Independent Representation</h3>
+<ul>
+<li><strong>Idea:</strong> create a relation (table) <strong>from the Document Object Model (DOM)</strong> of the XML document, so the table stores <strong>the tree itself</strong> (nodes and their relationships) rather than the specific element names as columns.</li>
+<li>It works for <strong>any</strong> XML document <strong>without needing to know its schema in advance.</strong></li>
+<li><strong>Slide illustration:</strong> the DOM tree of the first staff record:</li>
+</ul>
+<pre><code class="language-xml">&lt;STAFFLIST&gt;
+  &lt;STAFF branchNo=&quot;B002&quot;&gt;
+    &lt;STAFFNO&gt;SL20&lt;/STAFFNO&gt;
+    &lt;NAME&gt;
+      &lt;FNAME&gt;Thando&lt;/FNAME&gt;
+      &lt;LNAME&gt;Mandela&lt;/LNAME&gt;
+    &lt;/NAME&gt;
+    &lt;POSITION&gt;Manager&lt;/POSITION&gt;
+    &lt;DOB&gt;1-Oct-98&lt;/DOB&gt;
+    &lt;SALARY&gt;30000&lt;/SALARY&gt;
+  &lt;/STAFF&gt;
+</code></pre>
+<h4 id="example-added-for-clarity_2"> Example (added for clarity)</h4>
+<p>A generic <strong>node table</strong> could look like this (node, parent, type, name, value) for the record above:</p>
+<table>
+<thead>
+<tr>
+<th>nodeID</th>
+<th>parentID</th>
+<th>nodeType</th>
+<th>name</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>NULL</td>
+<td>element</td>
+<td>STAFFLIST</td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>element</td>
+<td>STAFF</td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>attribute</td>
+<td>branchNo</td>
+<td>B002</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2</td>
+<td>element</td>
+<td>STAFFNO</td>
+<td>SL20</td>
+</tr>
+<tr>
+<td>5</td>
+<td>2</td>
+<td>element</td>
+<td>NAME</td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>5</td>
+<td>element</td>
+<td>FNAME</td>
+<td>Thando</td>
+</tr>
+<tr>
+<td>7</td>
+<td>5</td>
+<td>element</td>
+<td>LNAME</td>
+<td>Mandela</td>
+</tr>
+</tbody>
+</table>
+<p>Any XML document fits this one table (flexible), but reconstructing or querying it needs many <strong>self-joins</strong> on <code>parentID</code>. <em>(Table is an illustration of the idea, not from the slides.)</em></p>
+<h3 id="24-comparison-of-the-approaches">2.4 Comparison of the Approaches</h3>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Approach 1: Column</th>
+<th>Approach 2: Shredded</th>
+<th>Approach 3: Schema-independent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Storage</strong></td>
+<td>Whole document in one column</td>
+<td>Elements spread over columns/tables</td>
+<td>Generic table built from the DOM</td>
+</tr>
+<tr>
+<td><strong>Insert / retrieve whole doc</strong></td>
+<td>Very efficient</td>
+<td>Must decompose / recompose</td>
+<td>Must decompose / recompose</td>
+</tr>
+<tr>
+<td><strong>Query &amp; index individual elements</strong></td>
+<td>Poor (parse on the fly)</td>
+<td>Good</td>
+<td>Possible but join-heavy</td>
+</tr>
+<tr>
+<td><strong>Needs a schema up front?</strong></td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Typical fit</strong></td>
+<td>Documents handled as a unit</td>
+<td>Data-centric XML, frequently queried</td>
+<td>Many different/unknown XML structures</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-xml-and-sql-standards">3. XML and SQL Standards</h2>
+<ul>
+<li>Introduced in <strong>SQL:2003</strong>, and carried through <strong>SQL:2008</strong> and <strong>SQL:2011</strong> (SQL/XML):<ul>
+<li>A <strong>native XML data type: <code>XML</code>.</strong></li>
+<li>A <strong>set of XML/SQL operators</strong> for the type.</li>
+<li>A <strong>set of XML/SQL functions.</strong></li>
+<li>A <strong>set of mappings from relational data to XML.</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="example-added-for-clarity_3"> Example (added for clarity)</h4>
+<p>Because SQL/XML is part of the SQL standard, a function such as <code>XMLELEMENT</code> is available (with small dialect differences) in PostgreSQL, Oracle and SQL Server-style systems — the same idea of "build XML from table rows" carries across vendors.</p>
+<hr />
+<h2 id="4-creating-a-table-using-the-xml-data-type">4. Creating a Table Using the XML Data Type</h2>
+<h3 id="41-coding-example-1-xmlstaff-from-the-slides">4.1 Coding Example 1 — <code>XMLStaff</code> (from the slides)</h3>
+<pre><code class="language-sql">CREATE TABLE XMLStaff (
+    docNo     CHAR(4) PRIMARY KEY,
+    docDate   DATE,
+    staffData XML );
+
+INSERT INTO XMLStaff VALUES ('D001',
+    DATE '2023-08-31',
+    XML ('&lt;STAFF branchNo  =    &quot;B002&quot;&gt;
+            &lt;STAFFNO&gt;   SL20        &lt;/STAFFNO&gt;
+            &lt;POSITION&gt;  Manager   &lt;/POSITION&gt;
+            &lt;DOB&gt;       1998-10-01   &lt;/DOB&gt;
+            &lt;SALARY&gt;    30000        &lt;/SALARY&gt;  &lt;/STAFF&gt;') );
+
+SELECT * FROM XMLStaff;
+</code></pre>
+<p><strong>Result (pgAdmin, partially displayed):</strong></p>
+<table>
+<thead>
+<tr>
+<th>docno [PK] character</th>
+<th>docdate date</th>
+<th>staffdata xml</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D001</td>
+<td>2023-08-31</td>
+<td><code>&lt;STAFF branchNo = "B002"&gt;</code> …</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong><code>staffData XML</code></strong> — the third column is declared with the <strong>native <code>XML</code> data type</strong>, so the DBMS stores an XML value (and checks it is well-formed), rather than plain text.</li>
+<li><strong><code>docNo CHAR(4) PRIMARY KEY</code></strong> and <strong><code>docDate DATE</code></strong> — ordinary relational columns sitting <em>next to</em> the XML column: this is Approach 1 (Section 2.1) in action.</li>
+<li><strong><code>INSERT ... XML('&lt;STAFF ...&gt;...&lt;/STAFF&gt;')</code></strong> — the XML fragment is passed in as a string and converted to the <code>XML</code> type. A single <code>&lt;STAFF&gt;</code> element (not a whole <code>&lt;STAFFLIST&gt;</code>) is stored.</li>
+<li><strong>Note the stray whitespace</strong> inside the tags (<code>&lt;STAFFNO&gt;   SL20        &lt;/STAFFNO&gt;</code>): the XML type <strong>preserves it</strong>. This matters later — when we query this row with <code>xpath()</code> the value comes back with those extra spaces (Section 8.3).</li>
+<li><strong><code>SELECT *</code></strong> — pgAdmin only shows the start of the XML value; double-click the cell to see all of it.</li>
+</ol>
+<h3 id="42-coding-example-2-a-second-row-from-the-slides">4.2 Coding Example 2 — A Second Row (from the slides)</h3>
+<pre><code class="language-sql">INSERT INTO XMLStaff VALUES ('D002', DATE '2023-08-31',
+    XML('&lt;STAFF branchNo = &quot;B003&quot;&gt;
+            &lt;STAFFNO&gt;SL21&lt;/STAFFNO&gt;
+            &lt;POSITION&gt;Accountant&lt;/POSITION&gt;
+            &lt;DOB&gt;2002-11-02&lt;/DOB&gt;
+            &lt;SALARY&gt;27000&lt;/SALARY&gt; &lt;/STAFF&gt;') );
+
+SELECT * FROM XMLStaff;
+</code></pre>
+<ul>
+<li>Adds <strong>D002</strong>: Marlize's record (SL21, branch B003, Accountant, salary 27000). The table now holds <strong>two documents</strong> (D001 and D002) — used by all the <code>xpath()</code> examples in Section 8.</li>
+<li>Note the second document has <strong>clean values</strong> (no extra spaces) while the first does not.</li>
+<li>Also note the date format is ISO (<code>2002-11-02</code>), unlike the <code>31-Nov-02</code> style in <code>staff_list.xml</code> from Lectures 9–10 (which is not even a real date).</li>
+</ul>
+<hr />
+<h2 id="5-sqlxml-functions-reading-for-the-student">5. SQL/XML Functions (Reading for the Student)</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>XMLFOREST</strong></td>
+<td>Generates a <strong>sequence (forest) of XML elements</strong> from the supplied values.</td>
+</tr>
+<tr>
+<td><strong>XMLCONCAT</strong></td>
+<td><strong>Concatenates</strong> a list of XML values.</td>
+</tr>
+<tr>
+<td><strong>XMLPARSE</strong></td>
+<td>Performs a <strong>non-validating parse</strong> of a character string to produce an XML value.</td>
+</tr>
+<tr>
+<td><strong>XMLROOT</strong></td>
+<td>Creates an XML value by <strong>modifying the properties of the root item</strong> of another XML value.</td>
+</tr>
+<tr>
+<td><strong>XMLCOMMENT</strong></td>
+<td>Generates an <strong>XML comment.</strong></td>
+</tr>
+<tr>
+<td><strong>XMLPI</strong></td>
+<td>Generates an <strong>XML processing instruction.</strong></td>
+</tr>
+<tr>
+<td><strong>XMLSERIALIZE</strong></td>
+<td>Generates a <strong>character or binary string from an XML value</strong> (the opposite of XMLPARSE).</td>
+</tr>
+<tr>
+<td><strong>XMLAGG</strong></td>
+<td><strong>Aggregates XML values across rows</strong> into a single XML value.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples-added-for-clarity-not-on-the-slides"> Examples (added for clarity — not on the slides)</h4>
+<pre><code class="language-sql">-- XMLFOREST: one element per supplied value, element name = alias
+SELECT XMLFOREST(staffNo AS id, lName AS surname) FROM staff;
+-- → &lt;id&gt;SL20&lt;/id&gt;&lt;surname&gt;Mandela&lt;/surname&gt;
+
+-- XMLPARSE: string → xml
+SELECT XMLPARSE(DOCUMENT '&lt;a&gt;1&lt;/a&gt;');
+
+-- XMLSERIALIZE: xml → text
+SELECT XMLSERIALIZE(CONTENT '&lt;a&gt;1&lt;/a&gt;'::xml AS text);
+
+-- XMLAGG: many rows → one XML value
+SELECT XMLAGG(XMLELEMENT(NAME staff, lName)) FROM staff;
+-- → &lt;staff&gt;Mandela&lt;/staff&gt;&lt;staff&gt;Kruger&lt;/staff&gt;
+</code></pre>
+<p><strong>Memory aid:</strong> <em>Parse</em> = text → XML; <em>Serialize</em> = XML → text; <em>Agg</em> = many rows → one value; <em>Forest/Concat</em> = build/join several elements.</p>
+<hr />
+<h2 id="6-sqlxml-operators-generating-xml-from-relational-data">6. SQL/XML Operators — Generating XML from Relational Data</h2>
+<h3 id="61-the-source-table-from-the-slides">6.1 The Source Table (from the slides)</h3>
+<pre><code class="language-sql">CREATE TABLE staff (
+    staffNo  CHAR(4), fName CHAR(10),
+    lName    CHAR(10), branchNo CHAR(4) );
+
+INSERT INTO staff VALUES ('SL20', 'Thando',  'Mandela', 'B002');
+INSERT INTO staff VALUES ('SL21', 'Marlize', 'Kruger',  'B003');
+SELECT * FROM staff;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>staffno</th>
+<th>fname</th>
+<th>lname</th>
+<th>branchno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SL20</td>
+<td>Thando</td>
+<td>Mandela</td>
+<td>B002</td>
+</tr>
+<tr>
+<td>SL21</td>
+<td>Marlize</td>
+<td>Kruger</td>
+<td>B003</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>This is the reverse direction to Sections 4 and 8: here the data starts <strong>relational</strong> and we <strong>generate XML</strong> from it.</p>
+</blockquote>
+<h3 id="62-xmlelement-generate-an-element">6.2 XMLELEMENT — Generate an Element</h3>
+<ul>
+<li><strong>Generates an XML value with a single element</strong> as a child of its root item.</li>
+</ul>
+<pre><code class="language-sql">SELECT xmlelement( NAME staffname, concat(fName, lName) )
+FROM Staff;
+</code></pre>
+<p><strong>Result:</strong></p>
+<table>
+<thead>
+<tr>
+<th>xmlelement (xml)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;staffname&gt;Thando   Mandela  &lt;/staffname&gt;</code></td>
+</tr>
+<tr>
+<td><code>&lt;staffname&gt;Marlize   Kruger  &lt;/staffname&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step-by-step walkthrough:</strong></p>
+<ol>
+<li><strong><code>xmlelement( NAME staffname, ... )</code></strong> — <code>NAME staffname</code> gives the <strong>tag name</strong> of the new element.</li>
+<li><strong><code>concat(fName, lName)</code></strong> — the second argument is the <strong>element content</strong>; here the first and last name joined together.</li>
+<li><strong>The query runs once per row of <code>Staff</code></strong>, so two rows give <strong>two <code>&lt;staffname&gt;</code> elements.</strong></li>
+<li><strong>Why the odd spacing?</strong> <code>fName</code> and <code>lName</code> are declared <strong><code>CHAR(10)</code></strong>, which is blank-padded to 10 characters. The padding is carried into the XML. (Use <code>VARCHAR</code>, or <code>trim()</code>, to avoid it.) Also, <code>concat</code> does not insert a space itself.</li>
+</ol>
+<h3 id="63-xmlattributes-give-the-element-attributes">6.3 XMLATTRIBUTES — Give the Element Attributes</h3>
+<ul>
+<li>An element can have <strong>zero or more attributes</strong>, specified in the <strong><code>XMLATTRIBUTES</code> sub-clause.</strong></li>
+</ul>
+<pre><code class="language-sql">SELECT xmlelement( NAME staff,
+                   xmlattributes( branchNo AS &quot;branchNo&quot; ) )
+FROM Staff;
+</code></pre>
+<p><strong>Result:</strong></p>
+<table>
+<thead>
+<tr>
+<th>xmlelement (xml)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;staff branchNo="B002"/&gt;</code></td>
+</tr>
+<tr>
+<td><code>&lt;staff branchNo="B003"/&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><code>NAME staff</code> → the element is called <code>staff</code>.</li>
+<li><code>xmlattributes( branchNo AS "branchNo" )</code> → takes the <strong>column value</strong> <code>branchNo</code> and makes it an <strong>attribute</strong>; the <strong>alias in double quotes</strong> is the <strong>attribute name</strong> (quotes preserve the capital N — otherwise PostgreSQL would fold it to lowercase).</li>
+<li><strong>No content was supplied</strong>, so each element is <strong>self-closing</strong> (<code>&lt;staff .../&gt;</code>).</li>
+</ol>
+<h3 id="64-combining-attributes-and-content-from-the-slides">6.4 Combining Attributes and Content (from the slides)</h3>
+<p><strong>Task:</strong> <em>List all staff as XML elements with name and branch number as an attribute.</em></p>
+<pre><code class="language-sql">SELECT staffNo,
+       xmlelement( NAME staff,
+                   xmlattributes( branchNo AS &quot;branchNo&quot; ),
+                   concat(fName, lName)
+       ) AS staffXMLCol
+FROM Staff;
+</code></pre>
+<p><strong>Result:</strong></p>
+<table>
+<thead>
+<tr>
+<th>staffno character(4)</th>
+<th>staffxmlcol xml</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SL20</td>
+<td><code>&lt;staff branchNo="B002"&gt;Thando   Mandela  &lt;/staff&gt;</code></td>
+</tr>
+<tr>
+<td>SL21</td>
+<td><code>&lt;staff branchNo="B003"&gt;Marlize   Kruger   &lt;/staff&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong>Argument order inside <code>xmlelement</code>:</strong> <code>NAME</code> first, then <strong><code>xmlattributes(...)</code></strong>, then the <strong>content</strong> expression(s).</li>
+<li><code>staffNo</code> is selected as a <strong>normal relational column</strong> beside the generated XML column, and the XML column is named with <code>AS staffXMLCol</code>.</li>
+<li>This is the <strong>table → XML</strong> direction: every row becomes one XML element.</li>
+</ol>
+<h4 id="additional-example-added-for-clarity-nesting-elements"> Additional Example (added for clarity) — Nesting Elements</h4>
+<p><code>XMLELEMENT</code> calls can be <strong>nested</strong> to build a hierarchy like the <code>staff_list.xml</code> structure:</p>
+<pre><code class="language-sql">SELECT xmlelement( NAME &quot;STAFF&quot;,
+           xmlattributes( branchNo AS &quot;branchNo&quot; ),
+           xmlelement( NAME &quot;STAFFNO&quot;, staffNo ),
+           xmlelement( NAME &quot;NAME&quot;,
+               xmlelement( NAME &quot;FNAME&quot;, trim(fName) ),
+               xmlelement( NAME &quot;LNAME&quot;, trim(lName) ) ) )
+FROM Staff;
+-- &lt;STAFF branchNo=&quot;B002&quot;&gt;&lt;STAFFNO&gt;SL20&lt;/STAFFNO&gt;&lt;NAME&gt;&lt;FNAME&gt;Thando&lt;/FNAME&gt;&lt;LNAME&gt;Mandela&lt;/LNAME&gt;&lt;/NAME&gt;&lt;/STAFF&gt;
+</code></pre>
+<p>Wrapping all of them in <code>XMLELEMENT(NAME "STAFFLIST", XMLAGG(...))</code> would produce a full <code>&lt;STAFFLIST&gt;</code> document.</p>
+<hr />
+<h2 id="7-sqlxml-mapping-functions">7. SQL/XML Mapping Functions</h2>
+<ul>
+<li>SQL/XML <strong>defines functions for mapping from tables to XML documents.</strong></li>
+<li>The mapping produces <strong>two types of XML document:</strong><ol>
+<li><strong>Mapped table data</strong> — e.g., PostgreSQL: <strong><code>table_to_xml</code>.</strong></li>
+<li><strong>An XML Schema describing the mapped table data</strong> — e.g., PostgreSQL: <strong><code>table_to_xmlschema</code>.</strong></li>
+</ol>
+</li>
+</ul>
+<h3 id="71-the-demonstration-table-from-the-slides">7.1 The Demonstration Table (from the slides)</h3>
+<pre><code class="language-sql">CREATE TABLE numbers( num1 int, num2 int );
+INSERT INTO NUMBERS VALUES (1,2);
+INSERT INTO NUMBERS VALUES (3,4);
+INSERT INTO NUMBERS VALUES (5,6);
+SELECT * FROM NUMBERS;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>num1</th>
+<th>num2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3</td>
+<td>4</td>
+</tr>
+<tr>
+<td>5</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Reference: PostgreSQL 18 documentation, "Functions for converting tables to XML".)</em></p>
+<h3 id="72-generating-xml-from-a-table-table_to_xml-query_to_xml">7.2 Generating XML from a Table — <code>table_to_xml</code> / <code>query_to_xml</code></h3>
+<pre><code class="language-sql">SELECT table_to_xml('Numbers', false, false, '');
+-- OR:
+SELECT query_to_xml('SELECT num1, num2 FROM Numbers', false, false, '');
+</code></pre>
+<p><strong>Output (when <code>table_to_xml</code> is used):</strong></p>
+<pre><code class="language-xml">&lt;numbers xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+  &lt;row&gt; &lt;num1&gt;1&lt;/num1&gt; &lt;num2&gt;2&lt;/num2&gt; &lt;/row&gt;
+  &lt;row&gt; &lt;num1&gt;3&lt;/num1&gt; &lt;num2&gt;4&lt;/num2&gt; &lt;/row&gt;
+  ...
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li>The <strong>root element is named after the table</strong> (<code>&lt;numbers&gt;</code>); <strong>each row becomes a <code>&lt;row&gt;</code> element</strong>; <strong>each column becomes a child element</strong> (<code>&lt;num1&gt;</code>, <code>&lt;num2&gt;</code>).</li>
+<li><strong><code>table_to_xml(tbl, nulls, tableforest, targetns)</code></strong> — the four arguments are:<ul>
+<li><strong><code>tbl</code></strong> — the table name (<code>'Numbers'</code>).</li>
+<li><strong><code>nulls</code></strong> — <code>false</code> = <strong>omit</strong> NULL columns; <code>true</code> = include them with <code>xsi:nil="true"</code>.</li>
+<li><strong><code>tableforest</code></strong> — <code>false</code> = <strong>one document with a single root</strong> wrapping all rows (as shown); <code>true</code> = <strong>a "forest"</strong>: one element per row, no wrapper.</li>
+<li><strong><code>targetns</code></strong> — the <strong>target namespace</strong> (<code>''</code> = none).</li>
+</ul>
+</li>
+<li><strong><code>query_to_xml</code></strong> does the same for <strong>the result of any query</strong> (first argument is the query string), so you can choose columns or filter rows.</li>
+<li>The <strong>output is a single <code>xml</code> value</strong> in <strong>one cell</strong> — the whole table as one document.</li>
+</ol>
+<h3 id="73-generating-the-xml-schema-table_to_xmlschema-query_to_xmlschema">7.3 Generating the XML Schema — <code>table_to_xmlschema</code> / <code>query_to_xmlschema</code></h3>
+<pre><code class="language-sql">SELECT table_to_xmlschema('Numbers', false, false, '');
+-- OR:
+SELECT query_to_xmlschema('SELECT num1, num2 FROM Numbers', false, false, '');
+</code></pre>
+<p><strong>Output (partial listing):</strong></p>
+<pre><code class="language-xml">&lt;xsd:schema xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+
+  &lt;xsd:simpleType name=&quot;INTEGER&quot;&gt;
+    &lt;xsd:restriction base=&quot;xsd:int&quot;&gt;
+      &lt;xsd:maxInclusive value=&quot;2147483647&quot;/&gt;
+      &lt;xsd:minInclusive value=&quot;-2147483648&quot;/&gt;
+    &lt;/xsd:restriction&gt;
+  &lt;/xsd:simpleType&gt;
+
+  &lt;xsd:complexType name=&quot;RowType.StaffList.public.numbers&quot;&gt;
+    &lt;xsd:sequence&gt;
+      &lt;xsd:element name=&quot;num1&quot; type=&quot;INTEGER&quot; minOccurs=&quot;0&quot;&gt;&lt;/xsd:element&gt;
+      &lt;xsd:element name=&quot;num2&quot; type=&quot;INTEGER&quot; minOccurs=&quot;0&quot;&gt;&lt;/xsd:element&gt;
+    &lt;/xsd:sequence&gt;
+  &lt;/xsd:complexType&gt;
+
+  &lt;xsd:complexType name=&quot;TableType.StaffList.public.numbers&quot;&gt;
+    &lt;xsd:sequence&gt;
+      &lt;xsd:element name=&quot;row&quot; type=&quot;RowType.StaffList.public.numbers&quot; minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;/&gt;
+    &lt;/xsd:sequence&gt;
+  &lt;/xsd:complexType&gt;
+
+  &lt;xsd:element name=&quot;numbers&quot; type=&quot;TableType.StaffList.public.numbers&quot;/&gt;
+&lt;/xsd:schema&gt;
+</code></pre>
+<p><strong>Step-by-step reading (links straight back to Lectures 9–10, XSD):</strong></p>
+<ol>
+<li><strong><code>xsd:simpleType name="INTEGER"</code></strong> — a <strong>simple type</strong> (Section 12.1 of L9–10) restricting <code>xsd:int</code> to PostgreSQL's integer range (−2147483648 to 2147483647).</li>
+<li><strong><code>RowType...numbers</code></strong> — a <strong>named (global) complex type</strong> with an <code>xsd:sequence</code> of <code>num1</code> and <code>num2</code>, both of type <code>INTEGER</code>. <strong><code>minOccurs="0"</code></strong> because a column value may be NULL.</li>
+<li><strong><code>TableType...numbers</code></strong> — a <strong>global complex type</strong> containing <code>row</code> elements: <strong><code>minOccurs="0"</code> and <code>maxOccurs="unbounded"</code></strong> (zero or more rows).</li>
+<li><strong><code>xsd:element name="numbers"</code></strong> — the <strong>root element</strong>, of type <code>TableType...</code>.</li>
+<li>Notice the schema is <strong>built entirely from global types</strong> — exactly the reuse pattern from the <em>Global Type</em> section of L9–10. The schema <strong>describes the table_to_xml output</strong> from Section 7.2, so the data can be validated against it.</li>
+<li>The type names contain <code>StaffList.public.numbers</code> = <strong>database name . schema name . table name</strong> (this database is called <code>StaffList</code>).</li>
+</ol>
+<hr />
+<h2 id="8-postgresql-and-xml-sql-xpath-queries">8. PostgreSQL and XML — SQL + XPath Queries</h2>
+<h3 id="81-the-xpath-function">8.1 The <code>xpath()</code> Function</h3>
+<ul>
+<li><strong>Syntax:</strong> <code>xpath('xpath_expression', colname)</code></li>
+<li>PostgreSQL's <code>xpath()</code> <strong>evaluates XPath 1.0 expressions</strong> and <strong>returns an <code>xml[]</code> array</strong> (an <em>array</em> of XML values, because an XPath expression can match many nodes).</li>
+<li>Use the <strong><code>text()</code></strong> function in the path to <strong>strip the tags</strong> and return only the content.</li>
+<li>It combines the two query languages: <strong>SQL</strong> decides <em>which rows</em> and <em>which columns</em>; <strong>XPath</strong> digs <em>inside the XML value</em>.</li>
+</ul>
+<blockquote>
+<p><strong>Reminder:</strong> the <code>XMLStaff</code> table has two rows: <strong>D001</strong> (SL20, B002, Manager, 1998-10-01, 30000 — with extra spaces) and <strong>D002</strong> (SL21, B003, Accountant, 2002-11-02, 27000).</p>
+</blockquote>
+<h3 id="82-query-4a-selecting-an-element">8.2 Query (4a) — Selecting an Element</h3>
+<pre><code class="language-sql">SELECT xpath('/STAFF/STAFFNO', staffData) AS StaffNumberXML
+FROM XMLStaff;
+</code></pre>
+<p><strong>Result:</strong></p>
+<table>
+<thead>
+<tr>
+<th>staffnumberxml xml[]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{&lt;STAFFNO&gt;   SL20        &lt;/STAFFNO&gt;}</code></td>
+</tr>
+<tr>
+<td><code>{&lt;STAFFNO&gt;SL21&lt;/STAFFNO&gt;}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong><code>/STAFF/STAFFNO</code></strong> — from the root <code>STAFF</code> element, select its <code>STAFFNO</code> child. (The root of each stored document is <code>&lt;STAFF&gt;</code>, not <code>&lt;STAFFLIST&gt;</code>, so the path starts <code>/STAFF</code>.)</li>
+<li>The query runs <strong>once per table row</strong>; each result is an <strong><code>xml[]</code> array</strong> (hence the <code>xml[]</code> column type) holding the matching element(s).</li>
+<li><strong>Without <code>text()</code>, the tags are kept</strong> (<code>&lt;STAFFNO&gt;...&lt;/STAFFNO&gt;</code>) and the <strong>spaces from D001's insert are visible.</strong></li>
+</ol>
+<h3 id="83-query-4b-using-text-and-for-several-columns">8.3 Query (4b) — Using <code>text()</code> and <code>@</code> for Several Columns</h3>
+<pre><code class="language-sql">SELECT docNo, docDate,
+    xpath('/STAFF/@branchNo',         staffData) AS BranchNumber,
+    xpath('/STAFF/STAFFNO/text()',    staffData) AS StaffNumber,
+    xpath('/STAFF/POSITION/text()',   staffData) AS Position,
+    xpath('/STAFF/DOB/text()',        staffData) AS DOB,
+    xpath('/STAFF/SALARY/text()',     staffData) AS Salary
+FROM XMLStaff;
+</code></pre>
+<p><strong>Result (each XML column has type <code>xml[]</code>):</strong></p>
+<table>
+<thead>
+<tr>
+<th>docno</th>
+<th>docdate</th>
+<th>branchnumber xml[]</th>
+<th>staffnumber xml[]</th>
+<th>position xml[]</th>
+<th>dob xml[]</th>
+<th>salary xml[]</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D001</td>
+<td>2023-08-31</td>
+<td>B002</td>
+<td>SL20</td>
+<td>Manager</td>
+<td>1998-10-01</td>
+<td>30000</td>
+</tr>
+<tr>
+<td>D002</td>
+<td>2023-08-31</td>
+<td>B003</td>
+<td>SL21</td>
+<td>Accountant</td>
+<td>2002-11-02</td>
+<td>27000</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong>Relational + XML in one query:</strong> <code>docNo</code> and <code>docDate</code> are ordinary columns; the other five columns are <strong>extracted from inside the XML column.</strong></li>
+<li><strong><code>/STAFF/@branchNo</code></strong> — <strong><code>@</code></strong> selects an <strong>attribute</strong> (recall <code>attribute::branchNo</code> = <code>@branchNo</code> from L9–10).</li>
+<li><strong><code>/text()</code></strong> — returns <strong>just the text content</strong>, no tags.</li>
+<li><strong>Each result is still an array</strong> (<code>xml[]</code>), shown as <code>{SL20}</code> in pgAdmin; it contains one element because each document has exactly one <code>STAFF</code>.</li>
+</ol>
+<h3 id="84-query-5-flattening-arrays-with-unnest">8.4 Query (5) — Flattening Arrays with <code>unnest</code></h3>
+<ul>
+<li><strong><code>unnest</code></strong> <strong>converts an array into a table-like structure</strong> (one row per array element) — so the <code>xml[]</code> arrays become plain <code>xml</code> values.</li>
+</ul>
+<pre><code class="language-sql">SELECT docNo, docDate,
+    unnest(xpath('/STAFF/@branchNo',       staffData)) AS BranchNumber,
+    unnest(xpath('/STAFF/STAFFNO/text()',  staffData)) AS StaffNumber,
+    unnest(xpath('/STAFF/POSITION/text()', staffData)) AS Position,
+    unnest(xpath('/STAFF/DOB/text()',      staffData)) AS DOB,
+    unnest(xpath('/STAFF/SALARY/text()',   staffData)) AS Salary
+FROM XMLStaff;
+</code></pre>
+<p><strong>Result:</strong> same values as 8.3, but the column types are now <strong><code>xml</code></strong> (not <code>xml[]</code>) — no more curly-brace array wrappers.</p>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><code>xpath(...)</code> returns an <strong>array</strong>; <strong><code>unnest(...)</code></strong> <strong>expands it to one row per element.</strong></li>
+<li>Here each array has <strong>one</strong> element, so the row count stays at 2. If a document had <strong>several matches</strong> (e.g., a <code>&lt;STAFFLIST&gt;</code> with 4 <code>&lt;STAFF&gt;</code> children), <code>unnest</code> would produce <strong>4 rows</strong> instead.</li>
+<li><strong>Caution:</strong> several <code>unnest</code> calls in the same <code>SELECT</code> list expand <strong>in parallel</strong> (PostgreSQL 10+), so they only line up correctly when every array has the <strong>same length</strong>.</li>
+</ol>
+<h4 id="additional-example-added-for-clarity"> Additional Example (added for clarity)</h4>
+<p>To get only the <strong>names of staff earning more than 28000</strong>, combine SQL's <code>WHERE</code> with a cast:</p>
+<pre><code class="language-sql">SELECT (xpath('/STAFF/STAFFNO/text()', staffData))[1]::text AS staffNo
+FROM XMLStaff
+WHERE ((xpath('/STAFF/SALARY/text()', staffData))[1]::text)::int &gt; 28000;
+-- → SL20
+</code></pre>
+<p><code>[1]</code> picks the first array element, <code>::text</code> turns <code>xml</code> into text, and <code>::int</code> makes the comparison numeric.</p>
+<hr />
+<h2 id="9-postgresql-server-side-file-access">9. PostgreSQL Server-Side File Access</h2>
+<ul>
+<li><strong><code>pg_read_file()</code></strong> and <strong><code>pg_ls_dir()</code></strong> <strong>access files on the machine hosting the PostgreSQL server</strong> (not the client/PC running pgAdmin).</li>
+<li><strong>Relative paths</strong> are resolved <strong>relative to the PostgreSQL cluster/data directory.</strong></li>
+<li>PostgreSQL <strong>restricts these functions by default</strong>, and they <strong>can expose files accessible to the database server.</strong></li>
+</ul>
+<blockquote>
+<p> <strong>Security note (from the slides):</strong> these are <strong>server-side file access functions restricted by PostgreSQL privileges. They should not be granted casually</strong> because they can expose files accessible to the database server.</p>
+</blockquote>
+<h4 id="example-added-for-clarity_4"> Example (added for clarity)</h4>
+<p>If a normal user could run <code>SELECT pg_read_file('postgresql.conf');</code>, they could read the server's configuration (and with absolute paths, other files the server process can read). That is why access is limited to superusers or roles explicitly granted it (e.g., the built-in <code>pg_read_server_files</code> role).</p>
+<hr />
+<h2 id="10-importing-xml-data-into-a-postgresql-database">10. Importing XML Data into a PostgreSQL Database</h2>
+<p><strong>Workflow:</strong> place the file where the server can see it → list files to confirm → read the file as text → cast to <code>xml</code> → store in a table → use <code>xpath</code> to break it up.</p>
+<h3 id="101-step-1-place-the-file-where-the-server-can-read-it">10.1 Step 1 — Place the File Where the Server Can Read It</h3>
+<ul>
+<li><strong>The current working directory (cwd) for pgAdmin4/the server is</strong> <code>C:\Program Files\PostgreSQL\18\data</code>.</li>
+<li><strong>Create a folder under <code>data</code></strong> and store your XML files there, e.g., <strong><code>MyXMLfiles</code></strong>.</li>
+<li><em>For this demonstration, the XML file is placed in a directory accessible to the PostgreSQL server.</em></li>
+</ul>
+<h3 id="102-step-2-list-files-with-pg_ls_dir">10.2 Step 2 — List Files with <code>pg_ls_dir</code></h3>
+<pre><code class="language-sql">SELECT pg_ls_dir('.');               -- files/folders under the cwd (data)
+SELECT pg_ls_dir('./MyXMLfiles');    -- files/folders in the sub-folder MyXMLfiles
+</code></pre>
+<ul>
+<li><code>'.'</code> = the cwd (the <code>data</code> folder); the second query lists the contents of <code>MyXMLfiles</code> (it should show <code>staff_list.xml</code>). One file/folder name is returned per row.</li>
+</ul>
+<h3 id="103-step-3-read-the-file-as-text-with-pg_read_file">10.3 Step 3 — Read the File as Text with <code>pg_read_file</code></h3>
+<pre><code class="language-sql">SELECT pg_read_file('./MyXMLfiles/staff_list.xml');
+</code></pre>
+<ul>
+<li><strong>Reads the contents of the file and returns it as <code>text</code></strong> type — the XML is just a string at this point; PostgreSQL has not parsed it.</li>
+</ul>
+<h3 id="104-step-4-present-the-contents-as-xml-type">10.4 Step 4 — Present the Contents as <code>xml</code> Type</h3>
+<pre><code class="language-sql">SELECT CAST( pg_read_file('./MyXMLfiles/staff_list.xml') AS xml );
+</code></pre>
+<ul>
+<li><strong><code>CAST(... AS xml)</code></strong> converts the text into the <strong><code>xml</code> data type</strong>. This <strong>parses</strong> the string and <strong>fails with an error if the XML is not well-formed.</strong></li>
+</ul>
+<h3 id="105-step-5-create-a-table-and-load-the-file-contents">10.5 Step 5 — Create a Table and Load the File Contents</h3>
+<pre><code class="language-sql">SELECT ( CAST( pg_read_file('./MyXMLfiles/staff_list.xml') AS xml ) )
+       AS xmldata
+INTO   NewXMLtable;
+
+SELECT * FROM NewXMLtable;
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong><code>SELECT ... AS xmldata INTO NewXMLtable</code></strong> — <code>SELECT ... INTO</code> <strong>creates a new table</strong> <code>NewXMLtable</code> with <strong>one column <code>xmldata</code> of type <code>xml</code></strong> and <strong>inserts the result</strong> into it. This is a quick way to create a (temporary-style) XML table without writing <code>CREATE TABLE</code>.</li>
+<li>The table has <strong>one row</strong> containing the <strong>entire <code>staff_list.xml</code></strong> — Approach 1 (whole document in a column) again.</li>
+<li><code>SELECT * FROM NewXMLtable</code> shows that single row.</li>
+</ol>
+<h3 id="106-step-6-use-xpath-to-split-into-staff-elements">10.6 Step 6 — Use <code>xpath</code> to Split into <code>&lt;STAFF&gt;</code> Elements</h3>
+<pre><code class="language-sql">SELECT xpath('//STAFF', xmldata) AS XMLcol
+FROM NewXMLtable;
+</code></pre>
+<p><strong>Query result</strong> (one cell, an <code>xml[]</code> array with <strong>one array element per <code>&lt;STAFF&gt;</code> element</strong>):</p>
+<pre><code>{ &quot;&lt;STAFF branchNo=\&quot;B002\&quot;&gt;
+     &lt;STAFFNO&gt;SL20&lt;/STAFFNO&gt;
+     &lt;NAME&gt;&lt;FNAME&gt;Thando&lt;/FNAME&gt;&lt;LNAME&gt;Mandela&lt;/LNAME&gt;&lt;/NAME&gt;
+     &lt;POSITION&gt;Manager&lt;/POSITION&gt;
+     &lt;DOB&gt;1998-10-01&lt;/DOB&gt;
+     &lt;SALARY&gt;30000&lt;/SALARY&gt;
+   &lt;/STAFF&gt;&quot;,
+  &quot;&lt;STAFF branchNo=\&quot;B003\&quot;&gt;
+     &lt;STAFFNO&gt;SL21&lt;/STAFFNO&gt;
+     &lt;NAM (...)  &quot; }
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong><code>//STAFF</code></strong> — the double slash selects <strong><code>STAFF</code> elements anywhere</strong> in the document.</li>
+<li>The result is <strong>one row</strong> whose single value is <strong>an array</strong> of all the <code>&lt;STAFF&gt;</code> elements (curly braces, comma-separated, each element quoted with escaped inner quotes <code>\"</code>).</li>
+<li>This is the stepping-stone to <strong>shredding</strong> (Approach 2): the array still sits in one cell and must be spread out into rows.</li>
+</ol>
+<blockquote>
+<p> <strong>HOMEWORK (from the slides):</strong> <em>Write a PL/pgSQL function to store the array elements into a table, with one element per row.</em></p>
+</blockquote>
+<h4 id="hint-sketch-for-the-homework-added-for-clarity-not-a-memo"> Hint / Sketch for the Homework (added for clarity — not a memo)</h4>
+<pre><code class="language-sql">CREATE TABLE StaffRows ( staffXML xml );
+
+CREATE OR REPLACE FUNCTION split_staff() RETURNS void AS $$
+DECLARE
+    arr xml[];
+    el  xml;
+BEGIN
+    SELECT xpath('//STAFF', xmldata) INTO arr FROM NewXMLtable;
+    FOREACH el IN ARRAY arr LOOP
+        INSERT INTO StaffRows VALUES (el);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+</code></pre>
+<p>This reuses <strong><code>FOREACH ... IN ARRAY</code></strong> from the PL/pgSQL lectures (5–8). <em>(Alternative without PL/pgSQL: <code>INSERT INTO StaffRows SELECT unnest(xpath('//STAFF', xmldata)) FROM NewXMLtable;</code>.)</em> Check it against your own understanding before relying on it.</p>
+<hr />
+<h2 id="11-further-reading">11. Further Reading</h2>
+<ul>
+<li>PostgreSQL also provides <strong><code>XMLTABLE</code></strong> for <strong>converting XML content into relational rows and columns.</strong></li>
+</ul>
+<h4 id="example-added-for-clarity_5"> Example (added for clarity)</h4>
+<p><code>XMLTABLE</code> does in one step what Section 8.3/8.4 did with several <code>xpath</code>/<code>unnest</code> calls:</p>
+<pre><code class="language-sql">SELECT x.*
+FROM NewXMLtable,
+     XMLTABLE('//STAFF' PASSING xmldata
+        COLUMNS branchNo text PATH '@branchNo',
+                staffNo  text PATH 'STAFFNO',
+                fname    text PATH 'NAME/FNAME',
+                lname    text PATH 'NAME/LNAME') AS x;
+</code></pre>
+<p>It turns each matching <code>&lt;STAFF&gt;</code> element into <strong>one relational row</strong> — effectively <strong>shredding</strong> (Approach 2) on the fly.</p>
+<hr />
+<h2 id="12-quick-reference-direction-of-conversion">12. Quick Reference — Direction of Conversion</h2>
+<table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Tool</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Table → XML (custom shape)</strong></td>
+<td><code>XMLELEMENT</code>, <code>XMLATTRIBUTES</code>, <code>XMLFOREST</code>, <code>XMLAGG</code></td>
+<td><code>xmlelement(NAME staff, ...)</code></td>
+</tr>
+<tr>
+<td><strong>Table → XML (automatic)</strong></td>
+<td><code>table_to_xml</code>, <code>query_to_xml</code></td>
+<td><code>table_to_xml('Numbers', false, false, '')</code></td>
+</tr>
+<tr>
+<td><strong>Table → XML Schema</strong></td>
+<td><code>table_to_xmlschema</code>, <code>query_to_xmlschema</code></td>
+<td><code>table_to_xmlschema('Numbers', false, false, '')</code></td>
+</tr>
+<tr>
+<td><strong>XML → values (SQL + XPath)</strong></td>
+<td><code>xpath()</code> (+ <code>unnest</code>)</td>
+<td><code>xpath('/STAFF/STAFFNO/text()', staffData)</code></td>
+</tr>
+<tr>
+<td><strong>XML → rows/columns</strong></td>
+<td><code>XMLTABLE</code></td>
+<td>(further reading)</td>
+</tr>
+<tr>
+<td><strong>File → XML in database</strong></td>
+<td><code>pg_ls_dir</code>, <code>pg_read_file</code>, <code>CAST(... AS xml)</code></td>
+<td><code>CAST(pg_read_file('./MyXMLfiles/staff_list.xml') AS xml)</code></td>
+</tr>
+<tr>
+<td><strong>Text ↔ XML</strong></td>
+<td><code>XMLPARSE</code>, <code>XMLSERIALIZE</code>, <code>CAST</code></td>
+<td><code>XMLPARSE(DOCUMENT '&lt;a/&gt;')</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="13-questions-memo">13. Questions &amp; Memo</h2>
+<h3 id="section-2-storing-xml-in-an-rdbordb">Section 2 — Storing XML in an RDB/ORDB</h3>
+<p><strong>Q1:</strong> List the four general approaches for storing XML data in a relational or object-relational database.</p>
+<p><strong>A1:</strong></p>
+<ol>
+<li>Store the XML document as the value of a column in one row or several rows.</li>
+<li>Store the XML document in a shredded form across a number of columns and tables.</li>
+<li>Store the XML document in a schema-independent form.</li>
+<li>Store the XML document in a parsed (internal) form.</li>
+</ol>
+<hr />
+<p><strong>Q2:</strong> State two advantages and two disadvantages of storing XML as a value in a table column (Approach 1).</p>
+<p><strong>A2:</strong> <strong>Advantages (any two):</strong> efficient to insert documents; efficient to retrieve documents; easy to apply full-text indexing. <strong>Disadvantages (any two):</strong> general query performance is poor because the XML must be <strong>parsed on the fly</strong>; <strong>updates replace the entire document</strong> (although XML documents can now be updated using SQL).</p>
+<hr />
+<p><strong>Q3:</strong> What is meant by "shredding" an XML document, and what extra information is needed?</p>
+<p><strong>A3:</strong> Shredding means <strong>decomposing the XML into its constituent elements</strong> and <strong>distributing the data over a number of attributes (columns)</strong> in one or more relations. Extra data is needed to <strong>capture the hierarchical nature</strong> of the XML (e.g., which elements are children of which) so the <strong>original document can be recomposed.</strong></p>
+<hr />
+<p><strong>Q4:</strong> Name the native XML data type in (a) PostgreSQL and (b) Oracle, and the type that was used in the past.</p>
+<p><strong>A4:</strong> (a) <strong><code>xml</code></strong>; (b) <strong><code>XMLType</code></strong>; in the past a <strong>CLOB</strong> (character large object) was used.</p>
+<hr />
+<p><strong>Q5 (Scenario):</strong> A company stores thousands of XML purchase orders. They are always inserted once and retrieved whole by order number, and are never searched internally. Which storage approach is most appropriate, and why? Which approach would you choose if analysts must frequently query individual elements such as the total amount?</p>
+<p><strong>A5:</strong> <strong>Approach 1 (whole document in an XML column)</strong> — inserting and retrieving whole documents is efficient, and the weak query performance does not matter if documents are never searched internally. If individual elements (e.g., total amount) are queried often, <strong>Approach 2 (shredding)</strong> is better: values are in ordinary columns that are <strong>easy to index</strong>, avoiding on-the-fly parsing.</p>
+<hr />
+<p><strong>Q6:</strong> Which SQL standards introduced the XML data type, and what four things did they add?</p>
+<p><strong>A6:</strong> <strong>SQL:2003</strong> (continuing in <strong>SQL:2008</strong> and <strong>SQL:2011</strong>) added: a <strong>native <code>XML</code> data type</strong>, a <strong>set of XML/SQL operators</strong>, a <strong>set of XML/SQL functions</strong>, and a <strong>set of mappings from relational data to XML.</strong></p>
+<hr />
+<h3 id="section-4-the-xml-data-type">Section 4 — The XML Data Type</h3>
+<p><strong>Q7 (Code Tracing):</strong> Given <code>CREATE TABLE XMLStaff (docNo CHAR(4) PRIMARY KEY, docDate DATE, staffData XML);</code> — what would happen if you tried to insert <code>'D003'</code> with the value <code>XML('&lt;STAFF&gt;&lt;STAFFNO&gt;SL22&lt;/STAFFNO&gt;')</code> (no closing <code>&lt;/STAFF&gt;</code>)? Why?</p>
+<p><strong>A7:</strong> The <code>INSERT</code> <strong>fails with an error</strong> because the value is <strong>not well-formed XML</strong> — the <code>XML</code> data type parses the string and rejects it. A plain <code>VARCHAR</code>/<code>TEXT</code> column would have accepted it, which is an advantage of the native XML type.</p>
+<hr />
+<p><strong>Q8:</strong> In Coding Example 1 the <code>&lt;STAFFNO&gt;</code> contained <code>SL20</code> with extra spaces. What effect does this have on an <code>xpath()</code> query?</p>
+<p><strong>A8:</strong> The XML type <strong>preserves the whitespace</strong>, so <code>xpath('/STAFF/STAFFNO', staffData)</code> returns <code>&lt;STAFFNO&gt;   SL20        &lt;/STAFFNO&gt;</code> with the spaces, and <code>.../text()</code> returns <code>SL20</code> — which would <strong>not equal</strong> <code>'SL20'</code> in a comparison unless trimmed.</p>
+<hr />
+<h3 id="section-6-sqlxml-operators">Section 6 — SQL/XML Operators</h3>
+<p><strong>Q9 (Code Tracing):</strong> What does the following return for the <code>Staff</code> table (rows: SL20 Thando Mandela B002; SL21 Marlize Kruger B003)?</p>
+<pre><code class="language-sql">SELECT xmlelement( NAME staff, xmlattributes( branchNo AS &quot;branchNo&quot; ) ) FROM Staff;
+</code></pre>
+<p><strong>A9:</strong> <strong>Two rows</strong>, each a self-closing element with a <code>branchNo</code> attribute: <code>&lt;staff branchNo="B002"/&gt;</code> and <code>&lt;staff branchNo="B003"/&gt;</code>. No content was supplied, so there is no closing tag.</p>
+<hr />
+<p><strong>Q10 (Code Writing):</strong> Write a query that lists all staff as XML elements named <code>member</code>, with <code>staffNo</code> as an attribute and the last name as content.</p>
+<p><strong>A10:</strong></p>
+<pre><code class="language-sql">SELECT xmlelement( NAME member,
+                   xmlattributes( staffNo AS &quot;staffNo&quot; ),
+                   lName )
+FROM Staff;
+-- &lt;member staffNo=&quot;SL20&quot;&gt;Mandela   &lt;/member&gt; ...
+</code></pre>
+<hr />
+<p><strong>Q11:</strong> Why does <code>concat(fName, lName)</code> in the <code>XMLELEMENT</code> example produce extra spaces between the names?</p>
+<p><strong>A11:</strong> <code>fName</code> and <code>lName</code> are declared <strong><code>CHAR(10)</code></strong>, which <strong>pads values with blanks</strong> to 10 characters. <code>concat</code> joins the padded strings (and adds no separator of its own), so the padding appears inside the generated element.</p>
+<hr />
+<p><strong>Q12:</strong> Match each function to its purpose: XMLPARSE, XMLSERIALIZE, XMLAGG, XMLFOREST.</p>
+<p><strong>A12:</strong> <strong>XMLPARSE</strong> — non-validating parse of a character string to produce an XML value. <strong>XMLSERIALIZE</strong> — generates a character/binary string from an XML value. <strong>XMLAGG</strong> — aggregates XML values across rows into a single XML value. <strong>XMLFOREST</strong> — generates a sequence (forest) of XML elements from the supplied values.</p>
+<hr />
+<h3 id="section-7-mapping-functions">Section 7 — Mapping Functions</h3>
+<p><strong>Q13:</strong> What two kinds of XML document do the SQL/XML mapping functions produce? Give the PostgreSQL function for each.</p>
+<p><strong>A13:</strong> (1) The <strong>mapped table data</strong> — <strong><code>table_to_xml</code></strong>; (2) an <strong>XML Schema describing the mapped table data</strong> — <strong><code>table_to_xmlschema</code></strong>. (Query-based versions: <code>query_to_xml</code>, <code>query_to_xmlschema</code>.)</p>
+<hr />
+<p><strong>Q14 (Code Tracing):</strong> For table <code>numbers(num1, num2)</code> holding (1,2), (3,4), (5,6), describe the structure of the output of <code>SELECT table_to_xml('Numbers', false, false, '');</code>.</p>
+<p><strong>A14:</strong> A <strong>single XML value</strong> whose <strong>root element is <code>&lt;numbers&gt;</code></strong>, containing <strong>one <code>&lt;row&gt;</code> element per table row</strong>, each with <strong><code>&lt;num1&gt;</code> and <code>&lt;num2&gt;</code> children</strong> holding that row's values (e.g., <code>&lt;row&gt;&lt;num1&gt;1&lt;/num1&gt;&lt;num2&gt;2&lt;/num2&gt;&lt;/row&gt;</code>).</p>
+<hr />
+<p><strong>Q15:</strong> In <code>table_to_xmlschema</code>, why do the generated <code>num1</code> and <code>num2</code> elements have <code>minOccurs="0"</code>, and why does <code>row</code> have <code>maxOccurs="unbounded"</code>?</p>
+<p><strong>A15:</strong> <code>minOccurs="0"</code> because <strong>column values may be NULL</strong> (an omitted element). <code>row</code> has <code>maxOccurs="unbounded"</code> because a table can have <strong>any number of rows</strong>; <code>minOccurs="0"</code> there allows an empty table.</p>
+<hr />
+<p><strong>Q16:</strong> What is the difference between <code>table_to_xml</code> and <code>query_to_xml</code>?</p>
+<p><strong>A16:</strong> <code>table_to_xml</code> maps <strong>an entire named table</strong>; <code>query_to_xml</code> maps <strong>the result of any SQL query</strong> passed as a string, so specific columns/rows can be selected.</p>
+<hr />
+<h3 id="section-8-sql-xpath-in-postgresql">Section 8 — SQL + XPath in PostgreSQL</h3>
+<p><strong>Q17:</strong> What does PostgreSQL's <code>xpath()</code> return, and which XPath version does it evaluate?</p>
+<p><strong>A17:</strong> It returns an <strong><code>xml[]</code> array</strong> (array of XML values) and evaluates <strong>XPath 1.0</strong> expressions.</p>
+<hr />
+<p><strong>Q18 (Code Tracing):</strong> Explain the difference in output between <code>xpath('/STAFF/POSITION', staffData)</code> and <code>xpath('/STAFF/POSITION/text()', staffData)</code>.</p>
+<p><strong>A18:</strong> The first returns the <strong>whole element including tags</strong>, e.g. <code>{&lt;POSITION&gt;Manager&lt;/POSITION&gt;}</code>. The second uses the <strong><code>text()</code></strong> node test to return <strong>only the text content</strong>, <code>{Manager}</code>.</p>
+<hr />
+<p><strong>Q19 (Code Writing):</strong> Write a query returning <code>docNo</code> and the branch number (as plain text, one row per document) from <code>XMLStaff</code>.</p>
+<p><strong>A19:</strong></p>
+<pre><code class="language-sql">SELECT docNo,
+       unnest( xpath('/STAFF/@branchNo', staffData) ) AS BranchNumber
+FROM XMLStaff;
+</code></pre>
+<p><code>@branchNo</code> selects the attribute; <code>unnest</code> converts the resulting array into ordinary values (type <code>xml</code>).</p>
+<hr />
+<p><strong>Q20:</strong> What does <code>unnest</code> do, and why was it needed in the lecture example?</p>
+<p><strong>A20:</strong> <code>unnest</code> <strong>converts an array into a table-like structure</strong> (one row per element). <code>xpath()</code> returns arrays (<code>xml[]</code>); applying <code>unnest</code> yields <strong>plain <code>xml</code> values/rows</strong> instead of arrays, giving a more table-like result (and producing multiple rows if the XPath matches multiple nodes).</p>
+<hr />
+<p><strong>Q21:</strong> In the query <code>xpath('/STAFF/@branchNo', staffData)</code>, what does <code>@</code> mean, and what would <code>/STAFF/branchNo</code> return instead?</p>
+<p><strong>A21:</strong> <code>@</code> selects an <strong>attribute</strong>. <code>/STAFF/branchNo</code> looks for a <strong>child element</strong> called <code>branchNo</code>, which does not exist (it is an attribute), so it returns an <strong>empty array</strong> <code>{}</code>.</p>
+<hr />
+<h3 id="sections-9-10-importing-xml-files">Sections 9 &amp; 10 — Importing XML Files</h3>
+<p><strong>Q22:</strong> What do <code>pg_ls_dir()</code> and <code>pg_read_file()</code> do, and why should access to them be restricted?</p>
+<p><strong>A22:</strong> <code>pg_ls_dir()</code> <strong>lists files/folders</strong> and <code>pg_read_file()</code> <strong>reads a file's contents</strong>, both on the <strong>machine hosting the PostgreSQL server</strong>, with relative paths resolved against the <strong>cluster/data directory</strong>. They are restricted by default because they <strong>can expose any file the database server can access</strong>, so privileges to use them must not be granted casually.</p>
+<hr />
+<p><strong>Q23 (Ordering):</strong> Put the following in the correct order for loading an XML file into a table: (a) <code>xpath('//STAFF', xmldata)</code>; (b) place the file in a folder under the data directory; (c) <code>CAST(... AS xml)</code>; (d) <code>pg_read_file(...)</code>; (e) <code>SELECT ... INTO NewXMLtable</code>.</p>
+<p><strong>A23:</strong> <strong>(b) → (d) → (c) → (e) → (a).</strong> Place the file; read it as text; cast it to <code>xml</code>; store it in a table (<code>INTO</code>); then split it with <code>xpath</code>.</p>
+<hr />
+<p><strong>Q24 (Code Tracing):</strong> What does <code>SELECT (CAST(pg_read_file('./MyXMLfiles/staff_list.xml') AS xml)) AS xmldata INTO NewXMLtable;</code> do?</p>
+<p><strong>A24:</strong> It <strong>reads the file as text</strong>, <strong>casts it to the <code>xml</code> type</strong> (error if not well-formed), and <strong>creates a new table <code>NewXMLtable</code></strong> with one <code>xml</code> column named <code>xmldata</code>, <strong>containing one row with the entire document.</strong></p>
+<hr />
+<p><strong>Q25:</strong> What does <code>SELECT xpath('//STAFF', xmldata) FROM NewXMLtable;</code> return when the file holds four <code>&lt;STAFF&gt;</code> elements — one row or four? Why?</p>
+<p><strong>A25:</strong> <strong>One row</strong>, containing <strong>one <code>xml[]</code> array with four elements</strong> (one per <code>&lt;STAFF&gt;</code>). <code>xpath</code> returns an array in a single cell. To get <strong>four rows</strong>, apply <code>unnest</code> (or loop over the array, as in the homework).</p>
+<hr />
+<p><strong>Q26 (Homework recap):</strong> What was the homework task set in this lecture?</p>
+<p><strong>A26:</strong> Write a <strong>PL/pgSQL function</strong> that <strong>stores the elements of the <code>&lt;STAFF&gt;</code> array (result of <code>xpath('//STAFF', xmldata)</code>) into a table, with one element per row.</strong></p>
+<hr />
+<p><strong>Q27:</strong> Which PostgreSQL feature is mentioned for further reading to convert XML content directly into relational rows and columns?</p>
+<p><strong>A27:</strong> <strong><code>XMLTABLE</code>.</strong></p>
+<hr />
+<h3 id="comparison-questions">Comparison Questions</h3>
+<p><strong>Q28:</strong> Compare using <strong>BaseX</strong> (native XML database) with storing XML in <strong>PostgreSQL's XML type</strong>, in terms of how queries are written.</p>
+<p><strong>A28:</strong> In <strong>BaseX</strong> the entire database is XML and queries are pure <strong>XPath/XQuery</strong> (e.g., <code>//STAFFLIST/STAFF[1]/STAFFNO</code>). In <strong>PostgreSQL</strong> the XML sits in a <strong>column of a relational table</strong>; <strong>SQL</strong> selects rows/columns and <strong><code>xpath()</code></strong> (XPath 1.0 only, returning arrays) queries inside the XML value (e.g., <code>SELECT xpath('/STAFF/STAFFNO', staffData) FROM XMLStaff;</code>). PostgreSQL therefore lets you mix XML with relational data in one query, while BaseX offers full XQuery (FLWOR) over XML collections.</p>
+<hr />
+<p><em>End of Lecture 12 Notes.</em></p>
+<hr />
+<blockquote>
+<p><strong>Revision Tip:</strong> The exam is likely to test (a) naming/describing the <strong>four storage approaches</strong> and choosing one for a scenario with justification, (b) <strong>tracing</strong> <code>XMLELEMENT</code> / <code>XMLATTRIBUTES</code> queries to the XML they output (watch argument order and the <code>AS "branchNo"</code> alias), (c) <strong>tracing <code>xpath()</code> queries</strong>, especially <code>text()</code> vs. no <code>text()</code>, <code>@attribute</code>, <code>xml[]</code> vs. <code>xml</code> after <code>unnest</code>, (d) knowing what <strong><code>table_to_xml</code> / <code>table_to_xmlschema</code></strong> return and being able to read the generated XSD (links back to simple/complex/global types), and (e) the <strong>import sequence</strong> <code>pg_ls_dir → pg_read_file → CAST AS xml → INTO table → xpath</code>. Also be ready for the <strong>homework</strong> PL/pgSQL function (array → one row per element), which combines this lecture with the <code>FOREACH</code> loops from Lectures 5–8. Since this is the end of the semi-structured data module, revisit Lectures 9–10 and be able to compare <strong>native XML databases (BaseX/XQuery)</strong> with <strong>XML inside an RDBMS (PostgreSQL/SQL+XPath)</strong>.</p>
+</blockquote>
+<h2 id="sqlxml-functions-cheat-sheet-cos-326-lecture-12">SQL/XML Functions Cheat Sheet — COS 326 Lecture 12</h2>
+<h3 id="1-querying-xml-stored-in-postgresql">1. Querying XML stored in PostgreSQL</h3>
+<table>
+<thead>
+<tr>
+<th>Function / Syntax</th>
+<th>Parameters</th>
+<th>When to use</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>xpath()</code></td>
+<td><code>(path, xml_column)</code></td>
+<td>Retrieve elements or values from XML</td>
+<td><code>xpath('/STAFF/NAME', staffData)</code></td>
+</tr>
+<tr>
+<td><code>text()</code></td>
+<td>No parameters</td>
+<td>Select text inside an XML element</td>
+<td><code>xpath('/STAFF/NAME/text()', staffData)</code></td>
+</tr>
+<tr>
+<td><code>@</code></td>
+<td>Attribute name</td>
+<td>Retrieve an XML attribute</td>
+<td><code>xpath('/STAFF/@branchNo', staffData)</code></td>
+</tr>
+<tr>
+<td><code>unnest()</code></td>
+<td><code>(array)</code></td>
+<td>Expand an XML array into individual rows</td>
+<td><code>unnest(xpath('//NAME', staffData))</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-converting-sql-tables-and-queries-into-xml">2. Converting SQL tables and queries into XML</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>When to use</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table_to_xml()</code></td>
+<td><code>(table, nulls, tableforest, namespace)</code></td>
+<td>Convert an entire SQL table into XML</td>
+<td><code>table_to_xml('Numbers', false, false, '')</code></td>
+</tr>
+<tr>
+<td><code>query_to_xml()</code></td>
+<td><code>(query, nulls, tableforest, namespace)</code></td>
+<td>Convert SQL query results into XML</td>
+<td><code>query_to_xml('SELECT num1 FROM Numbers', false, false, '')</code></td>
+</tr>
+<tr>
+<td><code>table_to_xmlschema()</code></td>
+<td><code>(table, nulls, tableforest, namespace)</code></td>
+<td>Generate an XSD schema describing a table's XML output</td>
+<td><code>table_to_xmlschema('Numbers', false, false, '')</code></td>
+</tr>
+<tr>
+<td><code>query_to_xmlschema()</code></td>
+<td><code>(query, nulls, tableforest, namespace)</code></td>
+<td>Generate an XSD schema describing query results</td>
+<td><code>query_to_xmlschema('SELECT num1 FROM Numbers', false, false, '')</code></td>
+</tr>
+</tbody>
+</table>
+<p>Shared parameters for the four functions:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code> / <code>query</code></td>
+<td>Table name or SQL query string</td>
+</tr>
+<tr>
+<td><code>nulls</code></td>
+<td><code>true</code> = include NULLs, <code>false</code> = omit</td>
+</tr>
+<tr>
+<td><code>tableforest</code></td>
+<td><code>true</code> = separate row elements, <code>false</code> = single enclosing root</td>
+</tr>
+<tr>
+<td><code>namespace</code></td>
+<td>XML namespace (<code>''</code> = none)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-creating-xml-using-sql">3. Creating XML using SQL</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>When to use</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>XMLELEMENT()</code></td>
+<td><code>(NAME tag, content)</code></td>
+<td>Create an XML element</td>
+<td><code>XMLELEMENT(NAME age, 20)</code></td>
+</tr>
+<tr>
+<td><code>XMLATTRIBUTES()</code></td>
+<td><code>(value AS attribute)</code></td>
+<td>Add attributes to an element</td>
+<td><code>XMLATTRIBUTES(5 AS id)</code></td>
+</tr>
+<tr>
+<td><code>XMLFOREST()</code></td>
+<td><code>(value AS tag, ...)</code></td>
+<td>Create multiple XML elements</td>
+<td><code>XMLFOREST(1 AS a, 2 AS b)</code></td>
+</tr>
+<tr>
+<td><code>XMLCONCAT()</code></td>
+<td><code>(xml1, xml2, ...)</code></td>
+<td>Join XML fragments together</td>
+<td><code>XMLCONCAT('&lt;a/&gt;'::xml, '&lt;b/&gt;'::xml)</code></td>
+</tr>
+<tr>
+<td><code>XMLAGG()</code></td>
+<td><code>(xml_expression)</code></td>
+<td>Combine XML values from multiple rows</td>
+<td><code>XMLAGG(XMLELEMENT(NAME n, num1))</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>XMLATTRIBUTES()</code> is used inside <code>XMLELEMENT()</code>, for example:</p>
+<pre><code>SELECT XMLELEMENT(
+    NAME staff,
+    XMLATTRIBUTES('B002' AS &quot;branchNo&quot;),
+    'Thando'
+);
+</code></pre>
+<h3 id="4-other-xml-functions">4. Other XML functions</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>When to use</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>XMLPARSE()</code></td>
+<td><code>(DOCUMENT/CONTENT text)</code></td>
+<td>Convert a string into XML</td>
+<td><code>XMLPARSE(DOCUMENT '&lt;a&gt;1&lt;/a&gt;')</code></td>
+</tr>
+<tr>
+<td><code>XMLSERIALIZE()</code></td>
+<td><code>(CONTENT/DOCUMENT xml AS type)</code></td>
+<td>Convert XML into text</td>
+<td><code>XMLSERIALIZE(CONTENT '&lt;a/&gt;'::xml AS text)</code></td>
+</tr>
+<tr>
+<td><code>XMLROOT()</code></td>
+<td><code>(xml, VERSION value [, STANDALONE option])</code></td>
+<td>Modify XML document root properties</td>
+<td><code>XMLROOT('&lt;a/&gt;'::xml, VERSION '1.0')</code></td>
+</tr>
+<tr>
+<td><code>XMLCOMMENT()</code></td>
+<td><code>(text)</code></td>
+<td>Create an XML comment</td>
+<td><code>XMLCOMMENT('Hello')</code></td>
+</tr>
+<tr>
+<td><code>XMLPI()</code></td>
+<td><code>(NAME target, content)</code></td>
+<td>Create an XML processing instruction</td>
+<td><code>XMLPI(NAME test, 'value')</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="5-importing-xml-files-into-postgresql">5. Importing XML files into PostgreSQL</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>When to use</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pg_ls_dir()</code></td>
+<td><code>(directory_path)</code></td>
+<td>List files in a server directory</td>
+<td><code>pg_ls_dir('./MyXMLfiles')</code></td>
+</tr>
+<tr>
+<td><code>pg_read_file()</code></td>
+<td><code>(file_path)</code></td>
+<td>Read a server file as text</td>
+<td><code>pg_read_file('./MyXMLfiles/staff.xml')</code></td>
+</tr>
+<tr>
+<td><code>CAST()</code></td>
+<td><code>(expression AS type)</code></td>
+<td>Convert the file's text into XML</td>
+<td><code>CAST(pg_read_file('./MyXMLfiles/staff.xml') AS xml)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Key distinctions for the test:</p>
+<ul>
+<li>
+<p><code>xpath()</code> = XML → retrieve information.</p>
+</li>
+<li>
+<p><code>unnest()</code> = array → individual rows.</p>
+</li>
+<li>
+<p><code>XMLELEMENT()</code> = values → XML elements.</p>
+</li>
+<li>
+<p><code>XMLATTRIBUTES()</code> = values → XML attributes.</p>
+</li>
+<li>
+<p><code>table_to_xml()</code> = entire table → XML.</p>
+</li>
+<li>
+<p><code>query_to_xml()</code> = query results → XML.</p>
+</li>
+<li>
+<p><code>XMLPARSE()</code> = text → XML.</p>
+</li>
+<li>
+<p><code>XMLSERIALIZE()</code> = XML → text.</p>
+</li>
+</ul>
+<p>All functions above are covered in or directly illustrated by your Lecture 12 notes; the less common functions in Section 4 are part of its additional SQL/XML reading.</p></article><div class="article-tools"><a href="lecture-04.html">← Previous</a><a href="lecture-06.html">Next lecture →</a></div></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

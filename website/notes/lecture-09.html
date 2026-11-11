@@ -1,0 +1,992 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>NoSQL Databases — MongoDB (4): Text Search, Shell Functions and Java Applications — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html" aria-current="page">Notes</a><a href="../papers/index.html">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>MongoDB: search and shell functions</h1><p>Lecture 16 &middot; Course notes</p></div><button class="study" data-id="lecture-09.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All notes</a><button class="bookmark" data-id="lecture-09.html"> Bookmark</button></div><div class="related"><span class="related-label">Use this topic</span><a href="../reference/coding-patterns.html#pattern-mongodb">MongoDB pattern</a><a href="../reference/mongodb-indexing.html">Operators & indexing</a><a href="../papers/question-index.html#3-mongodb-lectures-1416">Exam questions</a><a href="../papers/answer-memo.html#2-mongodb-l1416">Memo</a><a href="../papers/st2-2026.html#mongo">Test 2 · Q34</a><a href="../practice/essays.html#practice-mongo">Practise</a></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-the-dataset-the-blogs-collection-from-the-slides">2. The Dataset — the blogs Collection (from the slides)</a></li><li><a href="#3-searching-for-text">3. Searching for Text</a></li><li><a href="#4-mongo-shell-client-functions">4. Mongo Shell (Client) Functions</a></li><li><a href="#5-java-mongodb-applications">5. Java &amp; MongoDB Applications</a></li><li><a href="#6-quick-reference">6. Quick Reference</a></li><li><a href="#7-questions-memo">7. Questions &amp; Memo</a></li><li><a href="#1-connecting-to-a-database-and-collection">1. Connecting to a database and collection</a></li><li><a href="#2-crud-operations">2. CRUD operations</a></li><li><a href="#3-comparison-operators">3. Comparison operators</a></li><li><a href="#4-logical-operators">4. Logical operators</a></li><li><a href="#5-projections-sorting-and-limits">5. Projections, sorting and limits</a></li><li><a href="#6-update-operators">6. Update operators</a></li><li><a href="#7-aggregation-pipeline">7. Aggregation pipeline</a></li><li><a href="#8-cursors-and-iteration">8. Cursors and iteration</a></li><li><a href="#9-indexing-and-text-search">9. Indexing and text search</a></li><li><a href="#10-java-imports">10. Java imports</a></li><li><a href="#11-can-you-use-mongodb-syntax-directly-in-java">11. Can you use MongoDB syntax directly in Java?</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<ul>
+<li><strong>In this lecture:</strong><ul>
+<li>MongoDB <strong>text search</strong> (text indexes and <code>$text</code>).</li>
+<li><strong>Mongo shell (client) functions.</strong></li>
+<li><strong>Java &amp; MongoDB applications.</strong></li>
+</ul>
+</li>
+<li><strong>Reference:</strong> the <strong>MongoDB manual (documentation).</strong></li>
+<li><strong>Builds on:</strong> Lecture 14 (CRUD, <code>find</code>, indexes) and Lecture 15 (aggregation pipeline — <code>$match</code> / <code>$group</code>, recalled in Section 5).</li>
+</ul>
+<hr />
+<h2 id="2-the-dataset-the-blogs-collection-from-the-slides">2. The Dataset — the <code>blogs</code> Collection (from the slides)</h2>
+<p>All text-search examples use this collection of <strong>seven documents</strong> (fields <code>title</code>, <code>comments</code>, <code>likes</code>):</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>title</th>
+<th>comments</th>
+<th>likes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>NoSQL</td>
+<td>NoSQL databases were invented for Big Data</td>
+<td>400</td>
+</tr>
+<tr>
+<td>2</td>
+<td>MongoDB</td>
+<td>MongoDB is a NoSQL database</td>
+<td>100</td>
+</tr>
+<tr>
+<td>3</td>
+<td>MongoDB</td>
+<td>MongoDB is a very easy database to use</td>
+<td>150</td>
+</tr>
+<tr>
+<td>4</td>
+<td>MongoDB</td>
+<td>mongosh provides a JavaScript-based shell interface</td>
+<td>50</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Neo4j</td>
+<td>Neo4j is a NoSQL database</td>
+<td>50</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Neo4j</td>
+<td>Neo4j can store social networks data</td>
+<td>150</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Neo4j</td>
+<td>Neo4j is a client-server database</td>
+<td>250</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Keep this table handy: every query result below can be <strong>traced by hand</strong> against it.</p>
+</blockquote>
+<hr />
+<h2 id="3-searching-for-text">3. Searching for Text</h2>
+<h3 id="31-text-indexes">3.1 Text Indexes</h3>
+<ul>
+<li><strong>Text indexes are required</strong> when using the <strong><code>$text</code> query operator</strong> to search string content.</li>
+<li>A text index can include <strong>any field whose value is a string</strong> (e.g., <code>comments</code>) <strong>or an array of string elements.</strong></li>
+<li><strong>Create</strong> a text index with <code>createIndex()</code>:</li>
+</ul>
+<pre><code class="language-js">db.blogs.createIndex( { comments: &quot;text&quot; } )
+</code></pre>
+<ul>
+<li><strong>A collection can have at most one text index.</strong> <em>Note:</em> <strong>a single text index can include multiple fields.</strong></li>
+<li><strong>Remove</strong> an index with the <strong><code>dropIndex()</code></strong> method.</li>
+</ul>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li>The index specification <code>{ comments: "text" }</code> uses the <strong>string <code>"text"</code></strong> instead of <code>1</code>/<code>-1</code> (compare ascending/descending indexes in Lecture 14).</li>
+<li>MongoDB responds with the <strong>auto-generated index name</strong> <code>comments_text</code> (seen in the slide screenshot).</li>
+<li>Only the <strong><code>comments</code></strong> field is searchable with <code>$text</code> now; <code>title</code> is not covered.</li>
+</ol>
+<blockquote>
+<p><strong>Modern MongoDB (slide note):</strong> <strong>MongoDB Search</strong> provides more advanced full-text search and is <strong>recommended for new full-text search applications.</strong> The <strong><code>$text</code> operator remains supported</strong> and is useful for <strong>learning basic MongoDB text indexes.</strong></p>
+</blockquote>
+<h4 id="example-added-for-clarity-a-multi-field-text-index"> Example (added for clarity) — A Multi-Field Text Index</h4>
+<pre><code class="language-js">db.blogs.createIndex( { title: &quot;text&quot;, comments: &quot;text&quot; } )
+</code></pre>
+<p>This is still <strong>one</strong> text index (allowed) but covers <strong>two</strong> fields. Trying to create a <em>second, separate</em> text index on the same collection would fail — to change the indexed fields you must <strong>drop</strong> the old text index first (<code>db.blogs.dropIndex("comments_text")</code>).</p>
+<h3 id="32-searching-for-a-word-text-and-search">3.2 Searching for a Word — <code>$text</code> and <code>$search</code></h3>
+<p><strong>Task:</strong> find documents with the word <strong>"big"</strong> in the <code>comments</code> field.</p>
+<pre><code class="language-js">var c = db.blogs.find( { $text: { $search: &quot;big&quot; } } )
+while ( c.hasNext() )  printjson( c.next() )
+</code></pre>
+<p><strong>Result (from the slide screenshot):</strong></p>
+<pre><code>{ _id: ObjectId(&quot;6511c4e158d33a1abbda5ebb&quot;),
+  title: 'NoSQL',
+  likes: 400,
+  comments: 'NoSQL databases were invented for Big Data' }
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong><code>{ $text: { $search: "big" } }</code></strong> — the filter document uses the <strong><code>$text</code> operator</strong> with a <strong><code>$search</code> string.</strong></li>
+<li>Only <strong>document 1</strong> contains the word <em>big</em> — it appears as <strong>"Big"</strong> (capital B), and it still matches because <strong><code>$text</code> searches are case-insensitive by default.</strong></li>
+<li><strong>Cursor loop:</strong> <code>find()</code> returns a <strong>cursor</strong> held in the variable <code>c</code>. <strong><code>c.hasNext()</code></strong> is true while documents remain; <strong><code>c.next()</code></strong> fetches the next one; <strong><code>printjson()</code></strong> prints it. (The same pattern is used for shell functions in Section 4.)</li>
+</ol>
+<h3 id="33-searching-for-several-words-or-semantics">3.3 Searching for Several Words — OR Semantics</h3>
+<p><strong>Task:</strong> documents containing <strong>"big" or "data"</strong> in <code>comments</code>.</p>
+<pre><code class="language-js">var c = db.blogs.find( { $text: { $search: &quot;big data&quot; } } )
+while ( c.hasNext() )  printjson( c.next() )
+</code></pre>
+<p><strong>Result (from the slide screenshot):</strong> <strong>two</strong> documents</p>
+<pre><code>{ title: 'NoSQL', likes: 400, comments: 'NoSQL databases were invented for Big Data' }
+{ title: 'Neo4j', likes: 150, comments: 'Neo4j can store social networks data' }
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li>A <strong>space-separated list of terms</strong> in <code>$search</code> is treated as <strong>logical OR</strong> — a document matches if it contains <strong>any</strong> of the words.</li>
+<li><strong>Document 1</strong> contains both "Big" and "Data"; <strong>document 6</strong> contains "data" only. Both match.</li>
+<li><strong>Why don't the "database" documents match "data"?</strong> <code>$text</code> matches <strong>whole (stemmed) words</strong>, not substrings: "database" is a <strong>different word</strong> from "data".</li>
+</ol>
+<h4 id="additional-examples-added-for-clarity-standard-text-features-not-on-the-slides"> Additional Examples (added for clarity — standard <code>$text</code> features, not on the slides)</h4>
+<pre><code class="language-js">db.blogs.find( { $text: { $search: &quot;\&quot;big data\&quot;&quot; } } )   // exact PHRASE: both words together
+db.blogs.find( { $text: { $search: &quot;database -Neo4j&quot; } } ) // minus sign EXCLUDES a term
+</code></pre>
+<p>Use <strong>escaped double quotes</strong> for a phrase, and a <strong>leading <code>-</code></strong> to exclude a word.</p>
+<h3 id="34-wildcard-text-indexes">3.4 Wildcard Text Indexes</h3>
+<ul>
+<li>To allow text search on <strong>all fields with string content</strong>, use the <strong>wildcard specifier <code>$**</code></strong>:</li>
+</ul>
+<pre><code class="language-js">db.collection.createIndex( { &quot;$**&quot;: &quot;text&quot; } )
+</code></pre>
+<ul>
+<li>MongoDB then <strong>indexes every field containing string data</strong> in every document.</li>
+<li><strong>Useful for highly unstructured data</strong> where it is <strong>unclear which fields to include</strong>, or for <strong>ad-hoc querying.</strong></li>
+</ul>
+<blockquote>
+<p> <strong>Caution (slide note):</strong> use wildcard text indexes <strong>cautiously</strong> — they can <strong>increase index size</strong> and <strong>hurt insert/update performance.</strong> <strong>Targeted text indexes are preferable</strong> when the searchable fields are known.</p>
+</blockquote>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
+<p>On <code>blogs</code>, <code>db.blogs.createIndex({ "$**": "text" })</code> would index <strong>both <code>title</code> and <code>comments</code></strong>, so <code>$search: "Neo4j"</code> would now match on titles too. That is convenient while exploring unknown data, but for a production blog search you would index just <code>comments</code> (and perhaps <code>title</code>).</p>
+<h3 id="35-text-search-in-the-aggregation-pipeline">3.5 Text Search in the Aggregation Pipeline</h3>
+<ul>
+<li>Text search in a pipeline uses the <strong><code>$text</code> operator in the <code>$match</code> stage.</strong></li>
+<li><strong>Restrictions:</strong><ol>
+<li>The <strong><code>$match</code> stage containing <code>$text</code> must be the FIRST stage</strong> in the pipeline.</li>
+<li>A <strong>text operator can only occur once</strong> in the stage.</li>
+<li>The text operator expression <strong>cannot appear in <code>$or</code> or <code>$not</code></strong> expressions.</li>
+</ol>
+</li>
+</ul>
+<p><strong>Example (from the slides):</strong> search for "NoSQL" and <strong>total the likes</strong> of the matching documents.</p>
+<pre><code class="language-js">db.blogs.aggregate( [
+    { $match: { $text: { $search: &quot;NoSQL&quot; } } },
+    { $group: { _id: null, totalLikes: { $sum: &quot;$likes&quot; } } }
+] )
+</code></pre>
+<p><strong>Result:</strong></p>
+<pre><code>{ &quot;_id&quot;: null, &quot;totalLikes&quot;: 550 }
+</code></pre>
+<p><strong>Step-by-step trace (against the Section 2 table):</strong></p>
+<ol>
+<li><strong><code>$match</code> with <code>$text</code></strong> — keeps documents whose indexed field (<code>comments</code>) contains <strong>"NoSQL"</strong>:<ul>
+<li>Doc 1 <em>"NoSQL databases were invented…"</em> → <strong>400</strong> likes</li>
+<li>Doc 2 <em>"MongoDB is a NoSQL database"</em> → <strong>100</strong> likes</li>
+<li>Doc 5 <em>"Neo4j is a NoSQL database"</em> → <strong>50</strong> likes</li>
+<li><em>(The <code>title: "NoSQL"</code> is irrelevant here — only the <code>comments</code> field is text-indexed.)</em></li>
+</ul>
+</li>
+<li><strong><code>$group</code> with <code>_id: null</code></strong> — <strong>one single group</strong> for <em>all</em> surviving documents (no grouping key).</li>
+<li><strong><code>totalLikes: { $sum: "$likes" }</code></strong> — adds the <code>likes</code> values: 400 + 100 + 50 = <strong>550</strong> . Note <strong><code>"$likes"</code></strong> — the <strong><code>$</code> prefix</strong> refers to the <strong>value of the field</strong> in each document.</li>
+</ol>
+<hr />
+<h2 id="4-mongo-shell-client-functions">4. Mongo Shell (Client) Functions</h2>
+<blockquote>
+<p>The shell is a <strong>JavaScript environment</strong>, so you can define <strong>your own functions</strong> to avoid retyping long commands.</p>
+</blockquote>
+<h3 id="41-example-1-a-function-that-creates-data">4.1 Example 1 — A Function That Creates Data</h3>
+<pre><code class="language-js">function insertData( dbName, colName, num )
+{
+    const col = db.getSiblingDB(dbName).getCollection(colName);
+    for ( i = 0; i &lt; num; i++ )
+    {   col.insertOne( { x: i } );   }
+    print( col.countDocuments() );
+}
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li><strong>Parameters:</strong> database name, collection name, and the <strong>number of documents</strong> to insert.</li>
+<li><strong><code>db.getSiblingDB(dbName)</code></strong> — the JavaScript equivalent of <code>use dbName</code> (Lecture 14, "helpers vs JavaScript"); <strong><code>.getCollection(colName)</code></strong> gets the collection by name (works for any name held in a variable).</li>
+<li><strong><code>for</code> loop</strong> — inserts <code>num</code> documents <code>{ x: 0 }, { x: 1 }, …, { x: num-1 }</code>.</li>
+<li><strong><code>col.countDocuments()</code></strong> — returns the number of documents in the collection; <strong><code>print()</code></strong> displays it.</li>
+<li><strong>Call:</strong> <code>insertData("mydb", "testCollection", 20)</code> → inserts 20 documents and prints <strong>20</strong> (if the collection started empty).</li>
+</ol>
+<h3 id="42-storing-functions-in-mongoshrcjs">4.2 Storing Functions in <code>.mongoshrc.js</code></h3>
+<ul>
+<li>A function can be <strong>stored in the file <code>.mongoshrc.js</code></strong> for future use.</li>
+<li><strong>Location:</strong> the user's home folder (slide example: <code>C:\Users\UserName</code>).</li>
+<li><strong>The file's contents are loaded when the shell starts</strong>, so your functions are <strong>available in every new session.</strong></li>
+</ul>
+<h3 id="43-example-2-wrapping-an-aggregation-in-a-function">4.3 Example 2 — Wrapping an Aggregation in a Function</h3>
+<p><strong>Recall (Lecture 15):</strong> compute the <strong>total likes for the title 'Neo4j'</strong>:</p>
+<pre><code class="language-js">db.blogs.aggregate( [
+    { $match: { title: &quot;Neo4j&quot; } },
+    { $group: { _id: &quot;$title&quot;, num_likes: { $sum: &quot;$likes&quot; } } }
+] )
+</code></pre>
+<ul>
+<li><strong>Problem (slide):</strong> <em>"Not nice to have to type this query whenever the aggregate is needed."</em> → <strong>put it in a function.</strong></li>
+</ul>
+<p><strong>Function definition in <code>.mongoshrc.js</code>:</strong></p>
+<pre><code class="language-js">function computeTotalLikes( dbName, colName, blogTitle )
+{
+    var col = db.getSiblingDB(dbName).getCollection(colName);
+    var res = col.aggregate( [
+        { $match: { title: blogTitle } },
+        { $group: { _id: blogTitle, num_likes: { $sum: &quot;$likes&quot; } } }
+    ] );
+    while ( res.hasNext() )  printjson( res.next() );
+}
+</code></pre>
+<p><strong>Function call and result (slide screenshot):</strong></p>
+<pre><code>db&gt; computeTotalLikes(&quot;db&quot;, &quot;blogs&quot;, &quot;Neo4j&quot;)
+{ _id: 'Neo4j', num_likes: 450 }
+</code></pre>
+<p><strong>Walkthrough:</strong></p>
+<ol>
+<li>The <strong>hard-coded</strong> database, collection and title become <strong>parameters</strong> (<code>dbName</code>, <code>colName</code>, <code>blogTitle</code>) — one function now works for <strong>any</strong> title.</li>
+<li><code>$match: { title: blogTitle }</code> — the <strong>JavaScript variable</strong> is dropped straight into the pipeline.</li>
+<li><code>_id: blogTitle</code> — the group key is the <strong>title value</strong> (the earlier version used <code>"$title"</code>, a field reference; here the variable's value is used, so the output <code>_id</code> is <code>'Neo4j'</code>).</li>
+<li><code>col.aggregate(...)</code> returns a <strong>cursor</strong>, so the <strong><code>while (res.hasNext()) printjson(res.next())</code></strong> loop prints each result.</li>
+<li><strong>Trace:</strong> Neo4j documents have likes <strong>50 + 150 + 250 = 450</strong>  (docs 5, 6, 7).</li>
+</ol>
+<blockquote>
+<p><strong>Note (slide detail):</strong> in the call, the first argument is the <strong>database name</strong> (<code>"db"</code> in the demo — a database that happens to be named <code>db</code>), not the shell's <code>db</code> object.</p>
+</blockquote>
+<h4 id="example-added-for-clarity_1"> Example (added for clarity)</h4>
+<p><code>computeTotalLikes("db", "blogs", "MongoDB")</code> → <code>{ _id: 'MongoDB', num_likes: 300 }</code> (100 + 150 + 50).</p>
+<h3 id="44-why-use-shell-functions-summary-added-for-clarity">4.4 Why Use Shell Functions? (summary, added for clarity)</h3>
+<table>
+<thead>
+<tr>
+<th>Benefit</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Reuse</strong></td>
+<td>Write the query once; call it with different arguments.</td>
+</tr>
+<tr>
+<td><strong>Fewer typing errors</strong></td>
+<td>Long pipelines are error-prone to retype.</td>
+</tr>
+<tr>
+<td><strong>Persistence</strong></td>
+<td>Saved in <code>.mongoshrc.js</code>, loaded at every shell start.</td>
+</tr>
+<tr>
+<td><strong>Familiar analogy</strong></td>
+<td>Similar to <strong>stored procedures</strong> in relational DBMSs — but these run <strong>client-side</strong> in the shell, not on the database server (hence "client functions").</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-java-mongodb-applications">5. Java &amp; MongoDB Applications</h2>
+<h3 id="51-the-mongodb-java-driver">5.1 The MongoDB Java Driver</h3>
+<ul>
+<li>The <strong>MongoDB Java Driver</strong> provides an <strong>API for Java applications</strong> to access MongoDB.</li>
+<li>It provides <strong>synchronous and other Java APIs</strong> for interacting with MongoDB.</li>
+<li><strong>Add the driver to the project using Maven or Gradle.</strong></li>
+<li><strong>Core classes:</strong><ul>
+<li><strong><code>MongoClient</code></strong> — the connection to the MongoDB server/cluster.</li>
+<li><strong><code>MongoDatabase</code></strong> — a database obtained from the client.</li>
+<li><strong><code>MongoCollection</code></strong> — a collection obtained from the database.</li>
+</ul>
+</li>
+<li><em>(The slides refer to a </em><em>demo video</em><em> showing how to set up and test a Java application.)</em></li>
+</ul>
+<h3 id="52-dependency-management-maven-gradle">5.2 Dependency Management (Maven / Gradle)</h3>
+<ul>
+<li><strong>Current MongoDB documentation recommends Maven/Gradle dependency management</strong> rather than <strong>manually adding an old JAR</strong> file (which the earlier demo video does).</li>
+<li><strong>Current Maven setup:</strong></li>
+</ul>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.mongodb&lt;/groupId&gt;
+    &lt;artifactId&gt;mongodb-driver-sync&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>The <strong>MongoDB driver BOM (Bill of Materials)</strong> <strong>manages the version</strong>, so the version number does not need to be written in the dependency.</li>
+</ul>
+<h3 id="53-demo-and-further-reading">5.3 Demo and Further Reading</h3>
+<ul>
+<li><strong>Demo:</strong> follow the demo to learn how to <strong>create and test a Java application that uses a MongoDB database.</strong></li>
+<li><strong>Further reading:</strong> the <strong>MongoDB Java Driver documentation</strong> — mongodb.com/docs/drivers/java/sync/current/get-started/</li>
+</ul>
+<h4 id="illustrative-example-added-for-clarity-not-from-the-slides"> Illustrative Example (added for clarity — NOT from the slides)</h4>
+<p>A minimal sketch tying the three core classes together (using the <code>blogs</code> collection):</p>
+<pre><code class="language-java">import com.mongodb.client.*;
+import org.bson.Document;
+import static com.mongodb.client.model.Filters.eq;
+
+public class BlogDemo {
+    public static void main(String[] args) {
+        try (MongoClient client = MongoClients.create(&quot;mongodb://localhost:27017&quot;)) {
+            MongoDatabase     db    = client.getDatabase(&quot;db&quot;);
+            MongoCollection&lt;Document&gt; blogs = db.getCollection(&quot;blogs&quot;);
+
+            blogs.insertOne( new Document(&quot;title&quot;, &quot;Neo4j&quot;)
+                                 .append(&quot;comments&quot;, &quot;Neo4j is great&quot;)
+                                 .append(&quot;likes&quot;, 10) );
+
+            for ( Document d : blogs.find( eq(&quot;title&quot;, &quot;Neo4j&quot;) ) )
+                System.out.println( d.toJson() );
+        }
+    }
+}
+</code></pre>
+<p><strong>Reading it:</strong> <code>MongoClient</code> connects → <code>getDatabase</code> gives a <code>MongoDatabase</code> → <code>getCollection</code> gives a <code>MongoCollection&lt;Document&gt;</code> → <code>insertOne</code> / <code>find</code> mirror the shell commands. A <strong><code>Document</code></strong> is the Java representation of a BSON document. Compare with the <strong>JDBC</strong> code from the OODBMS lectures: here <strong>no SQL strings and no manual row-to-object translation</strong> are needed, which reduces the impedance mismatch. Treat this sketch as an aid only and check it against the driver documentation.</p>
+<hr />
+<h2 id="6-quick-reference">6. Quick Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create text index</td>
+<td><code>db.blogs.createIndex({ comments: "text" })</code></td>
+</tr>
+<tr>
+<td>Multi-field text index</td>
+<td><code>db.blogs.createIndex({ title: "text", comments: "text" })</code></td>
+</tr>
+<tr>
+<td>Wildcard text index</td>
+<td><code>db.coll.createIndex({ "$**": "text" })</code></td>
+</tr>
+<tr>
+<td>Drop an index</td>
+<td><code>db.blogs.dropIndex("comments_text")</code></td>
+</tr>
+<tr>
+<td>Search a word</td>
+<td><code>db.blogs.find({ $text: { $search: "big" } })</code></td>
+</tr>
+<tr>
+<td>Search any of several words (OR)</td>
+<td><code>{ $search: "big data" }</code></td>
+</tr>
+<tr>
+<td>Text search + aggregation</td>
+<td><code>$match: { $text: {...} }</code> <strong>as first stage</strong>, then <code>$group</code></td>
+</tr>
+<tr>
+<td>Iterate a cursor</td>
+<td><code>while (c.hasNext()) printjson(c.next())</code></td>
+</tr>
+<tr>
+<td>Get DB/collection in a function</td>
+<td><code>db.getSiblingDB(name).getCollection(name)</code></td>
+</tr>
+<tr>
+<td>Count documents</td>
+<td><code>col.countDocuments()</code></td>
+</tr>
+<tr>
+<td>Persist shell functions</td>
+<td>put them in <code>.mongoshrc.js</code> (loaded at shell start)</td>
+</tr>
+<tr>
+<td>Java driver (Maven)</td>
+<td><code>org.mongodb : mongodb-driver-sync</code> (+ BOM)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-questions-memo">7. Questions &amp; Memo</h2>
+<p><em>(Use the <code>blogs</code> table in Section 2 for all tracing questions; assume a text index exists on <code>comments</code> only.)</em></p>
+<h3 id="section-3-text-search">Section 3 — Text Search</h3>
+<p><strong>Q1:</strong> What is required before you can use the <code>$text</code> operator, and how do you create it for the <code>comments</code> field?</p>
+<p><strong>A1:</strong> A <strong>text index</strong> on the field(s) being searched: <code>db.blogs.createIndex({ comments: "text" })</code>. Without one, <code>$text</code> queries fail.</p>
+<hr />
+<p><strong>Q2:</strong> How many text indexes can a collection have? Can a text index cover more than one field?</p>
+<p><strong>A2:</strong> <strong>At most one</strong> text index per collection, but <strong>that single index may include multiple fields.</strong> (An index is removed with <code>dropIndex()</code>.)</p>
+<hr />
+<p><strong>Q3 (Code Tracing):</strong> What does <code>db.blogs.find({ $text: { $search: "big" } })</code> return, and why does it match although the text contains "Big" with a capital letter?</p>
+<p><strong>A3:</strong> Only <strong>document 1</strong> (<em>"NoSQL databases were invented for Big Data"</em>, 400 likes). <code>$text</code> searches are <strong>case-insensitive by default</strong>, so "Big" matches "big".</p>
+<hr />
+<p><strong>Q4 (Code Tracing):</strong> What does <code>{ $search: "big data" }</code> return, and what logical operator is used between the words?</p>
+<p><strong>A4:</strong> <strong>Two documents:</strong> doc 1 (<em>…Big Data</em>) and doc 6 (<em>Neo4j can store social networks data</em>). Multiple space-separated words are combined with <strong>OR</strong> — a document matching <strong>either</strong> word is returned.</p>
+<hr />
+<p><strong>Q5:</strong> Why does the search for "data" not return documents such as <em>"MongoDB is a NoSQL database"</em>?</p>
+<p><strong>A5:</strong> <code>$text</code> matches <strong>whole words (after stemming)</strong>, not substrings. <strong>"database" is a different word from "data"</strong>, so those documents don't match.</p>
+<hr />
+<p><strong>Q6:</strong> What is a wildcard text index, when is it useful, and what is the drawback?</p>
+<p><strong>A6:</strong> Created with <code>db.collection.createIndex({ "$**": "text" })</code>; it <strong>indexes every field containing string data.</strong> Useful for <strong>highly unstructured data or ad-hoc querying</strong> when the searchable fields are unknown. Drawback: <strong>larger index size and slower inserts/updates</strong>, so <strong>targeted text indexes are preferable</strong> when the fields are known.</p>
+<hr />
+<p><strong>Q7:</strong> List the three restrictions on using <code>$text</code> in the aggregation pipeline.</p>
+<p><strong>A7:</strong> (1) The <code>$match</code> stage containing <code>$text</code> <strong>must be the first stage</strong> of the pipeline. (2) A <strong>text operator can appear only once</strong> in the stage. (3) The text expression <strong>cannot appear in <code>$or</code> or <code>$not</code></strong> expressions.</p>
+<hr />
+<p><strong>Q8 (Code Tracing):</strong> Trace the result of:</p>
+<pre><code class="language-js">db.blogs.aggregate([
+  { $match: { $text: { $search: &quot;NoSQL&quot; } } },
+  { $group: { _id: null, totalLikes: { $sum: &quot;$likes&quot; } } } ])
+</code></pre>
+<p><strong>A8:</strong> <code>$match</code> keeps documents whose <code>comments</code> contain "NoSQL": doc 1 (400), doc 2 (100), doc 5 (50). <code>$group</code> with <code>_id: null</code> makes <strong>one group</strong>; <code>$sum</code> of likes = 400 + 100 + 50 = <strong>550.</strong> Result: <code>{ "_id": null, "totalLikes": 550 }</code>.</p>
+<hr />
+<p><strong>Q9 (Code Writing):</strong> Write an aggregation giving the <strong>average likes</strong> of the blogs whose comments contain the word "database".</p>
+<p><strong>A9:</strong></p>
+<pre><code class="language-js">db.blogs.aggregate([
+  { $match: { $text: { $search: &quot;database&quot; } } },
+  { $group: { _id: null, avgLikes: { $avg: &quot;$likes&quot; } } } ])
+</code></pre>
+<p><strong>Trace:</strong> with English stemming, "database" also matches "databases", so the matched documents are <strong>1, 2, 3, 5 and 7</strong> (likes 400, 100, 150, 50, 250) → average = 950 / 5 = <strong>190</strong>. <em>(This relies on stemming behaviour — confirm on your own instance.)</em></p>
+<hr />
+<p><strong>Q10:</strong> Why does the <code>$text</code> aggregation stage have to come first?</p>
+<p><strong>A10:</strong> Because text search <strong>relies on the text index</strong>, which MongoDB can only use at the <strong>start</strong> of the pipeline, where the stage reads directly from the collection. Later stages work on transformed in-memory documents with no index.</p>
+<hr />
+<h3 id="section-4-shell-functions">Section 4 — Shell Functions</h3>
+<p><strong>Q11:</strong> Where can you store your own shell functions so they're available every time the shell starts, and why do this?</p>
+<p><strong>A11:</strong> In the <strong><code>.mongoshrc.js</code></strong> file (e.g., in <code>C:\Users\UserName</code>), whose contents are <strong>loaded when the shell starts.</strong> It avoids retyping long commands and lets you reuse them.</p>
+<hr />
+<p><strong>Q12 (Code Tracing):</strong> Explain what <code>insertData("mydb", "testCollection", 20)</code> does and prints.</p>
+<p><strong>A12:</strong> It gets <code>testCollection</code> in <code>mydb</code> (via <code>getSiblingDB(...).getCollection(...)</code>), <strong>inserts 20 documents</strong> <code>{ x: 0 } … { x: 19 }</code> in a loop, then <strong>prints the document count</strong> (<code>countDocuments()</code>), which is <strong>20</strong> if the collection started empty.</p>
+<hr />
+<p><strong>Q13 (Code Tracing):</strong> What does <code>computeTotalLikes("db", "blogs", "Neo4j")</code> output? Show the working.</p>
+<p><strong>A13:</strong> <code>{ _id: 'Neo4j', num_likes: 450 }</code>. <code>$match</code> selects the Neo4j documents (likes 50, 150, 250); <code>$group</code> sums them: 50 + 150 + 250 = <strong>450.</strong></p>
+<hr />
+<p><strong>Q14 (Code Writing):</strong> Write a shell function <code>countByTitle(dbName, colName, blogTitle)</code> that <strong>prints the number of blog documents</strong> with a given title.</p>
+<p><strong>A14:</strong></p>
+<pre><code class="language-js">function countByTitle( dbName, colName, blogTitle )
+{
+    var col = db.getSiblingDB(dbName).getCollection(colName);
+    print( col.countDocuments( { title: blogTitle } ) );
+}
+</code></pre>
+<p><code>countByTitle("db", "blogs", "Neo4j")</code> → <strong>3</strong>.</p>
+<hr />
+<p><strong>Q15:</strong> Why use <code>while (res.hasNext()) printjson(res.next())</code> after <code>aggregate()</code> inside a function?</p>
+<p><strong>A15:</strong> <code>aggregate()</code> returns a <strong>cursor</strong>, not an array. The loop <strong>iterates through the cursor</strong> (<code>hasNext()</code> / <code>next()</code>) and prints each result document with <code>printjson</code>.</p>
+<hr />
+<p><strong>Q16:</strong> In <code>computeTotalLikes</code>, why is <code>_id: blogTitle</code> used rather than <code>_id: "$title"</code>?</p>
+<p><strong>A16:</strong> Both give the same group key here: <code>"$title"</code> is a <strong>field reference</strong> read from each document, while <code>blogTitle</code> is the <strong>function parameter's value.</strong> Since <code>$match</code> already restricts to one title, the parameter value can be used directly.</p>
+<hr />
+<h3 id="section-5-java-and-mongodb">Section 5 — Java and MongoDB</h3>
+<p><strong>Q17:</strong> Name the three main Java classes used to interact with MongoDB and what each represents.</p>
+<p><strong>A17:</strong> <strong><code>MongoClient</code></strong> — the connection to MongoDB; <strong><code>MongoDatabase</code></strong> — a database; <strong><code>MongoCollection</code></strong> — a collection of documents.</p>
+<hr />
+<p><strong>Q18:</strong> How should the MongoDB Java driver be added to a project according to current documentation, and why?</p>
+<p><strong>A18:</strong> Via <strong>Maven or Gradle dependency management</strong> (e.g., <code>org.mongodb:mongodb-driver-sync</code>), with the <strong>driver BOM managing the version</strong>, <strong>rather than manually adding an old JAR</strong> — it handles dependencies and versions automatically.</p>
+<hr />
+<p><strong>Q19:</strong> Compare accessing MongoDB from Java with the JDBC approach from the OODBMS lectures (impedance mismatch).</p>
+<p><strong>A19:</strong> With <strong>JDBC</strong>, Java embeds <strong>SQL strings</strong> and receives <strong>generic <code>ResultSet</code> rows</strong> that must be manually mapped to objects (the <strong>impedance mismatch</strong>). With the <strong>MongoDB Java driver</strong>, data is exchanged as <strong>documents</strong> (JSON/BSON-like objects) via <code>Document</code> and <code>MongoCollection</code> methods (<code>insertOne</code>, <code>find</code>), which maps far more naturally onto Java objects — <strong>no SQL strings and less translation.</strong></p>
+<hr />
+<p><em>End of Lecture 16 Notes.</em></p>
+<hr />
+<blockquote>
+<p><strong>Revision Tip:</strong> The exam is likely to test (a) <strong>creating a text index and tracing <code>$text</code> / <code>$search</code> queries</strong> against the <code>blogs</code> collection (case-insensitivity, OR semantics for several words, whole-word matching), (b) <strong>the aggregation pipeline with <code>$text</code></strong> — the <strong>must-be-first-stage</strong> rule and the restrictions, with a hand-calculated <code>$sum</code> (e.g., 550 and 450), (c) <strong>writing and tracing shell functions</strong> with <code>getSiblingDB().getCollection()</code>, cursor loops and <code>.mongoshrc.js</code>, and (d) <strong>Java driver basics</strong> — <code>MongoClient</code> / <code>MongoDatabase</code> / <code>MongoCollection</code> and Maven/Gradle dependencies. Revisit <strong>Lecture 15</strong> (aggregation pipeline) together with this lecture, since the <code>$match</code>/<code>$group</code> examples build directly on it.</p>
+</blockquote>
+<h1 id="mongodb-vs-java-driver-cos-326-cheat-sheet">MongoDB vs Java Driver — COS 326 Cheat Sheet</h1>
+<p>In a Java application, you use the MongoDB Java Driver to execute the same database operations you learned in Lectures 14–16.</p>
+<p>The examples below compare mongosh (JavaScript) with Java (MongoDB Sync Driver).</p>
+<h2 id="1-connecting-to-a-database-and-collection">1. Connecting to a database and collection</h2>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>MongoDB Shell</th>
+<th>Java Driver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connect to MongoDB</td>
+<td>Automatically connected in mongosh</td>
+<td><code>MongoClients.create(uri)</code></td>
+</tr>
+<tr>
+<td>Select database</td>
+<td><code>use university</code></td>
+<td><code>client.getDatabase("university")</code></td>
+</tr>
+<tr>
+<td>Access another database</td>
+<td><code>db.getSiblingDB("university")</code></td>
+<td><code>client.getDatabase("university")</code></td>
+</tr>
+<tr>
+<td>Select collection</td>
+<td><code>db.getCollection("students")</code></td>
+<td><code>database.getCollection("students")</code></td>
+</tr>
+<tr>
+<td>List databases</td>
+<td><code>show dbs</code></td>
+<td><code>client.listDatabaseNames()</code></td>
+</tr>
+<tr>
+<td>List collections</td>
+<td><code>show collections</code></td>
+<td><code>database.listCollectionNames()</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="java-example">Java example</h3>
+<pre><code>MongoClient client =
+    MongoClients.create(&quot;mongodb://localhost:27017&quot;);
+
+MongoDatabase db = client.getDatabase(&quot;university&quot;);
+
+MongoCollection&lt;Document&gt; students =
+    db.getCollection(&quot;students&quot;);
+</code></pre>
+<p>Here, <code>students</code> is equivalent to <code>db.students</code> in mongosh.</p>
+<h2 id="2-crud-operations">2. CRUD operations</h2>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>MongoDB Shell</th>
+<th>Java Driver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insert one</td>
+<td><code>db.students.insertOne(doc)</code></td>
+<td><code>students.insertOne(doc)</code></td>
+</tr>
+<tr>
+<td>Insert many</td>
+<td><code>db.students.insertMany(docs)</code></td>
+<td><code>students.insertMany(docs)</code></td>
+</tr>
+<tr>
+<td>Find all</td>
+<td><code>db.students.find()</code></td>
+<td><code>students.find()</code></td>
+</tr>
+<tr>
+<td>Find one</td>
+<td><code>db.students.findOne(filter)</code></td>
+<td><code>students.find(filter).first()</code></td>
+</tr>
+<tr>
+<td>Find matching</td>
+<td><code>db.students.find({age:20})</code></td>
+<td><code>students.find(eq("age",20))</code></td>
+</tr>
+<tr>
+<td>Update one</td>
+<td><code>db.students.updateOne(filter,update)</code></td>
+<td><code>students.updateOne(filter,update)</code></td>
+</tr>
+<tr>
+<td>Update many</td>
+<td><code>db.students.updateMany(filter,update)</code></td>
+<td><code>students.updateMany(filter,update)</code></td>
+</tr>
+<tr>
+<td>Delete one</td>
+<td><code>db.students.deleteOne(filter)</code></td>
+<td><code>students.deleteOne(filter)</code></td>
+</tr>
+<tr>
+<td>Delete many</td>
+<td><code>db.students.deleteMany(filter)</code></td>
+<td><code>students.deleteMany(filter)</code></td>
+</tr>
+<tr>
+<td>Count matching</td>
+<td><code>db.students.countDocuments(filter)</code></td>
+<td><code>students.countDocuments(filter)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-find-students-older-than-20">Example — Find students older than 20</h3>
+<p>MongoDB Shell</p>
+<pre><code>db.students.find({
+    age: { $gt: 20 }
+})
+</code></pre>
+<p>Java</p>
+<pre><code>students.find(gt(&quot;age&quot;, 20));
+</code></pre>
+<h2 id="3-comparison-operators">3. Comparison operators</h2>
+<p>In Java, these are methods provided by the <code>Filters</code> class.</p>
+<table>
+<thead>
+<tr>
+<th>MongoDB Operator</th>
+<th>Meaning</th>
+<th>Java Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$eq</code></td>
+<td>Equal</td>
+<td><code>eq("age",20)</code></td>
+</tr>
+<tr>
+<td><code>$ne</code></td>
+<td>Not equal</td>
+<td><code>ne("age",20)</code></td>
+</tr>
+<tr>
+<td><code>$gt</code></td>
+<td>Greater than</td>
+<td><code>gt("age",20)</code></td>
+</tr>
+<tr>
+<td><code>$gte</code></td>
+<td>Greater or equal</td>
+<td><code>gte("age",20)</code></td>
+</tr>
+<tr>
+<td><code>$lt</code></td>
+<td>Less than</td>
+<td><code>lt("age",20)</code></td>
+</tr>
+<tr>
+<td><code>$lte</code></td>
+<td>Less or equal</td>
+<td><code>lte("age",20)</code></td>
+</tr>
+<tr>
+<td><code>$in</code></td>
+<td>In a list</td>
+<td><code>in("age",20,21,22)</code></td>
+</tr>
+<tr>
+<td><code>$nin</code></td>
+<td>Not in list</td>
+<td><code>nin("age",20,21)</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-logical-operators">4. Logical operators</h2>
+<table>
+<thead>
+<tr>
+<th>MongoDB Shell</th>
+<th>Java Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$and</code></td>
+<td><code>and(condition1,condition2)</code></td>
+</tr>
+<tr>
+<td><code>$or</code></td>
+<td><code>or(condition1,condition2)</code></td>
+</tr>
+<tr>
+<td><code>$nor</code></td>
+<td><code>nor(condition1,condition2)</code></td>
+</tr>
+<tr>
+<td><code>$not</code></td>
+<td><code>not(condition)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-age-above-20-and-grade-above-80">Example — Age above 20 AND grade above 80</h3>
+<p>MongoDB Shell</p>
+<pre><code>db.students.find({
+    age: { $gt: 20 },
+    grade: { $gt: 80 }
+})
+</code></pre>
+<p>Java</p>
+<pre><code>students.find(
+    and(
+        gt(&quot;age&quot;, 20),
+        gt(&quot;grade&quot;, 80)
+    )
+);
+</code></pre>
+<h2 id="5-projections-sorting-and-limits">5. Projections, sorting and limits</h2>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>MongoDB Shell</th>
+<th>Java Driver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Include fields</td>
+<td><code>{name:1,age:1}</code></td>
+<td><code>include("name","age")</code></td>
+</tr>
+<tr>
+<td>Exclude fields</td>
+<td><code>{age:0}</code></td>
+<td><code>exclude("age")</code></td>
+</tr>
+<tr>
+<td>Exclude <code>_id</code></td>
+<td><code>{_id:0}</code></td>
+<td><code>excludeId()</code></td>
+</tr>
+<tr>
+<td>Sort ascending</td>
+<td><code>.sort({age:1})</code></td>
+<td><code>.sort(ascending("age"))</code></td>
+</tr>
+<tr>
+<td>Sort descending</td>
+<td><code>.sort({age:-1})</code></td>
+<td><code>.sort(descending("age"))</code></td>
+</tr>
+<tr>
+<td>Limit results</td>
+<td><code>.limit(5)</code></td>
+<td><code>.limit(5)</code></td>
+</tr>
+<tr>
+<td>Skip results</td>
+<td><code>.skip(5)</code></td>
+<td><code>.skip(5)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-names-of-the-top-5-students">Example — Names of the top 5 students</h3>
+<p>MongoDB Shell</p>
+<pre><code>db.students.find(
+    {},
+    { name: 1, _id: 0 }
+).sort({ grade: -1 }).limit(5)
+</code></pre>
+<p>Java</p>
+<pre><code>students.find()
+    .projection(fields(include(&quot;name&quot;), excludeId()))
+    .sort(descending(&quot;grade&quot;))
+    .limit(5);
+</code></pre>
+<h2 id="6-update-operators">6. Update operators</h2>
+<p>These Java methods come from the <code>Updates</code> class.</p>
+<table>
+<thead>
+<tr>
+<th>MongoDB Operator</th>
+<th>Purpose</th>
+<th>Java Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$set</code></td>
+<td>Set a field</td>
+<td><code>set("age",21)</code></td>
+</tr>
+<tr>
+<td><code>$inc</code></td>
+<td>Increase/decrease a number</td>
+<td><code>inc("age",1)</code></td>
+</tr>
+<tr>
+<td><code>$unset</code></td>
+<td>Remove a field</td>
+<td><code>unset("age")</code></td>
+</tr>
+<tr>
+<td><code>$push</code></td>
+<td>Append to an array</td>
+<td><code>push("subjects","Math")</code></td>
+</tr>
+<tr>
+<td><code>$pull</code></td>
+<td>Remove matching array elements</td>
+<td><code>pull("subjects","Math")</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-increase-johns-age-by-1">Example — Increase John's age by 1</h3>
+<p>MongoDB Shell</p>
+<pre><code>db.students.updateOne(
+    { name: &quot;John&quot; },
+    { $inc: { age: 1 } }
+)
+</code></pre>
+<p>Java</p>
+<pre><code>students.updateOne(
+    eq(&quot;name&quot;, &quot;John&quot;),
+    inc(&quot;age&quot;, 1)
+);
+</code></pre>
+<h2 id="7-aggregation-pipeline">7. Aggregation pipeline</h2>
+<p>These methods come from the Java <code>Aggregates</code> and <code>Accumulators</code> classes.</p>
+<table>
+<thead>
+<tr>
+<th>MongoDB Operator</th>
+<th>Purpose</th>
+<th>Java Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$match</code></td>
+<td>Filter documents</td>
+<td><code>match(eq("year",2))</code></td>
+</tr>
+<tr>
+<td><code>$group</code></td>
+<td>Group documents</td>
+<td><code>group("$course", ...)</code></td>
+</tr>
+<tr>
+<td><code>$sort</code></td>
+<td>Sort results</td>
+<td><code>sort(descending("total"))</code></td>
+</tr>
+<tr>
+<td><code>$sum</code></td>
+<td>Sum values</td>
+<td><code>sum("total","$mark")</code></td>
+</tr>
+<tr>
+<td><code>$sum: 1</code></td>
+<td>Count grouped documents</td>
+<td><code>sum("count",1)</code></td>
+</tr>
+<tr>
+<td><code>$avg</code></td>
+<td>Calculate average</td>
+<td><code>avg("average","$mark")</code></td>
+</tr>
+<tr>
+<td><code>$min</code></td>
+<td>Find minimum</td>
+<td><code>min("lowest","$mark")</code></td>
+</tr>
+<tr>
+<td><code>$max</code></td>
+<td>Find maximum</td>
+<td><code>max("highest","$mark")</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-average-grade-of-second-year-students-by-course">Example — Average grade of second-year students by course</h3>
+<p>MongoDB Shell</p>
+<pre><code>db.students.aggregate([
+    { $match: { year: 2 } },
+    { $group: {
+        _id: &quot;$course&quot;,
+        average: { $avg: &quot;$grade&quot; }
+    }},
+    { $sort: { average: -1 } }
+])
+</code></pre>
+<p>Java</p>
+<pre><code>students.aggregate(Arrays.asList(
+    match(eq(&quot;year&quot;, 2)),
+    group(&quot;$course&quot;, avg(&quot;average&quot;, &quot;$grade&quot;)),
+    sort(descending(&quot;average&quot;))
+));
+</code></pre>
+<p>The logic and pipeline order are identical. Only the syntax changes.</p>
+<p><img alt="" src="https://www.google.com/s2/favicons?domain=https://www.mongodb.com&amp;sz=32" /></p>
+<p>MongoDB Docs</p>
+<p>+1</p>
+<h2 id="8-cursors-and-iteration">8. Cursors and iteration</h2>
+<table>
+<thead>
+<tr>
+<th>MongoDB Shell</th>
+<th>Java Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cursor.hasNext()</code></td>
+<td><code>cursor.hasNext()</code></td>
+</tr>
+<tr>
+<td><code>cursor.next()</code></td>
+<td><code>cursor.next()</code></td>
+</tr>
+<tr>
+<td><code>cursor.toArray()</code></td>
+<td><code>students.find().into(new ArrayList&lt;&gt;())</code></td>
+</tr>
+<tr>
+<td><code>printjson(doc)</code></td>
+<td><code>System.out.println(doc.toJson())</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="java-example_1">Java example</h3>
+<pre><code>try (MongoCursor&lt;Document&gt; cursor =
+         students.find().iterator()) {
+
+    while (cursor.hasNext()) {
+        System.out.println(cursor.next().toJson());
+    }
+}
+</code></pre>
+<h2 id="9-indexing-and-text-search">9. Indexing and text search</h2>
+<table>
+<thead>
+<tr>
+<th>MongoDB Shell</th>
+<th>Java Driver</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createIndex({age:1})</code></td>
+<td><code>createIndex(Indexes.ascending("age"))</code></td>
+</tr>
+<tr>
+<td><code>createIndex({age:-1})</code></td>
+<td><code>createIndex(Indexes.descending("age"))</code></td>
+</tr>
+<tr>
+<td><code>createIndex({bio:"text"})</code></td>
+<td><code>createIndex(Indexes.text("bio"))</code></td>
+</tr>
+<tr>
+<td><code>dropIndex("age_1")</code></td>
+<td><code>dropIndex("age_1")</code></td>
+</tr>
+<tr>
+<td><code>{$text:{$search:"database"}}</code></td>
+<td><code>Filters.text("database")</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-search-blogs-containing-mongodb">Example — Search blogs containing "MongoDB"</h3>
+<p>MongoDB Shell</p>
+<pre><code>db.blogs.find({
+    $text: { $search: &quot;MongoDB&quot; }
+})
+</code></pre>
+<p>Java</p>
+<pre><code>blogs.find(Filters.text(&quot;MongoDB&quot;));
+</code></pre>
+<p>Both require an appropriate text index.</p>
+<p><img alt="" src="https://www.google.com/s2/favicons?domain=https://www.mongodb.com&amp;sz=32" /></p>
+<p>MongoDB Docs</p>
+<h2 id="10-java-imports">10. Java imports</h2>
+<p>The shortened Java examples above assume these imports:</p>
+<pre><code>import com.mongodb.client.*;
+import org.bson.Document;
+
+import java.util.Arrays;
+import java.util.ArrayList;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Sorts.*;
+import static com.mongodb.client.model.Updates.*;
+import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Accumulators.*;
+</code></pre>
+<p>When Java methods have the same name (such as <code>sort()</code>), the surrounding context or an explicit class name such as <code>Aggregates.sort(...)</code> can help distinguish them.</p>
+<h2 id="11-can-you-use-mongodb-syntax-directly-in-java">11. Can you use MongoDB syntax directly in Java?</h2>
+<p>Yes. The Java driver also supports BSON documents, so you don't always need to use the helper methods.</p>
+<p>For example, these are equivalent:</p>
+<p>Java using predefined methods</p>
+<pre><code>students.find(gt(&quot;age&quot;, 20));
+</code></pre>
+<p>Java using MongoDB-style BSON</p>
+<pre><code>students.find(
+    Document.parse(&quot;{ age: { $gt: 20 } }&quot;)
+);
+</code></pre>
+<p>The second option looks almost identical to mongosh. It is still executed through the Java driver, not through the MongoDB shell.</p>
+<p><img alt="" src="https://www.google.com/s2/favicons?domain=https://www.mongodb.com&amp;sz=32" /></p>
+<p>MongoDB Docs</p>
+<p>Important for COS 326: Your Lecture 16 Java section demonstrates how an application interacts with MongoDB. The tables here expand that into practical Java Driver equivalents for the MongoDB operations from Lectures 14–16; they are not all separate Java examples prescribed in the notes.</p>
+<p>For more Java-specific methods, see the <a href="https://www.mongodb.com/docs/drivers/java/sync/current/builders/?utm_source=chatgpt.com">official MongoDB Java Driver builders documentation</a>.</p></article><div class="article-tools"><a href="lecture-08.html">← Previous</a><a href="lecture-10.html">Next lecture →</a></div></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

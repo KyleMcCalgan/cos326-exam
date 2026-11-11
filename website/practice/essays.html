@@ -1,0 +1,86 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>20-mark essays · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html">Notes</a><a href="../papers/index.html">Papers</a><a href="../practice/index.html" aria-current="page">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><nav class="subnav" aria-label="Practice pages"><a href="../practice/index.html">Overview</a><a href="../practice/essays.html" aria-current="page">20-mark essays</a><a href="../practice/question-bank.html">Question bank</a><a href="../practice/quiz.html">Quick quiz</a></nav><div class="eyebrow">PRACTICE / 20-MARK ESSAYS</div><h1>Seven essays to write from memory</h1><p class="lead">Original exercises in the style of the tests. Attempt each one without opening the model answer, then self-mark against the marking points.</p><div class="notice"><strong>How to use these</strong><p>Write your answer on paper or in an editor first. Open the model answer only when you have finished, tick off each marking point, then repeat later with renamed fields. All seven are original, not past-paper questions, and the mark allocations are suggested self-marking splits. The essays are ordered by lecture, from the first-semester topics to the newest.</p></div><section class="prose wide"><table><thead><tr><th>#</th><th>Essay</th><th>Topic</th><th>Lectures</th><th>Marks</th></tr></thead><tbody><tr><td>1</td><td><a href="#practice-mixed">Mixed practical</a></td><td>JPA, PL/pgSQL, XPath, XSD</td><td>1–12</td><td>20</td></tr><tr><td>2</td><td><a href="#practice-mongo">Library loans</a></td><td>MongoDB find, update, aggregate</td><td>14–16</td><td>20</td></tr><tr><td>3</td><td><a href="#practice-neo4j">Field surveys</a></td><td>Cypher match, count, distinct</td><td>17–19</td><td>20</td></tr><tr><td>4</td><td><a href="#practice-spark">Store revenue</a></td><td>PySpark group and join</td><td>21</td><td>10</td></tr><tr><td>5</td><td><a href="#practice-apriori">Association rules</a></td><td>Support, confidence</td><td>22</td><td>20</td></tr><tr><td>6</td><td><a href="#practice-warehouse">Warehouse design</a></td><td>Star schema, ROLLUP, SCD</td><td>23–24</td><td>20</td></tr><tr><td>7</td><td><a href="#practice-ranking">Ranking and totals</a></td><td>Window functions</td><td>24</td><td>20</td></tr></tbody></table><section class="essay" id="practice-mixed"><div class="eyebrow">ESSAY 1 · JPA · POSTGRESQL · XML · LECTURES 1–12 · 20 marks</div><h2>Mixed practical: entity, trigger, XPath and XSD</h2><div class="question"><p><em>An original question inspired by Semester Test 1 Q44, not a question from the test.</em></p><p>A research institute tracks <code>Drone</code> entities. Each drone has <code>droneId</code>, <code>model</code>, <code>mission</code>, <code>maxAltitude</code> and <code>active</code>, and has many <code>SensorReading</code> entities. A PostgreSQL table <code>DroneEnergy(drone_id integer, stage_energy numeric[], average_energy numeric)</code> holds a non-empty array of non-null values. XML has <code>flight/flightCode</code>, <code>flight/status</code> and <code>flight/readings/reading/altitude</code>.</p><ol><li>Write a JPA Drone entity with its ID, attributes and many readings. Write JPQL returning IDs of active drones with maxAltitude over 5000. Constructors and getters may be omitted. (7)</li><li>Write a PL/pgSQL trigger function that loops through <code>NEW.stage_energy</code>, computes its average, assigns it to <code>NEW.average_energy</code> and returns NEW. Create the row-level BEFORE INSERT OR UPDATE trigger. (7)</li><li>Write XPath returning altitude elements for readings above 3000, then an XSD fragment declaring flightCode as required text and status as text. (6)</li></ol></div><details><summary>Reveal model answer and marking points</summary><pre><code>// (a) Assume required imports and a valid SensorReading entity.
+@Entity
+public class Drone {
+    @Id private int droneId;
+    private String model;
+    private String mission;
+    private int maxAltitude;
+    private boolean active;
+    @OneToMany private List&lt;SensorReading&gt; readings;
+}
+SELECT d.droneId FROM Drone d
+WHERE d.active = true AND d.maxAltitude &gt; 5000
+
+-- (b)
+CREATE FUNCTION set_drone_average() RETURNS TRIGGER AS $$
+DECLARE
+    energy NUMERIC;
+    total NUMERIC := 0;
+    n INTEGER := 0;
+BEGIN
+    FOREACH energy IN ARRAY NEW.stage_energy LOOP
+        total := total + energy;
+        n := n + 1;
+    END LOOP;
+    NEW.average_energy := total / n;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER drone_average_trigger
+BEFORE INSERT OR UPDATE ON DroneEnergy
+FOR EACH ROW EXECUTE FUNCTION set_drone_average();
+
+&lt;!-- (c) XPath, followed by an XSD fragment --&gt;
+/flight/readings/reading[altitude &gt; 3000]/altitude
+&lt;xs:element name="flightCode" type="xs:string" minOccurs="1"/&gt;
+&lt;xs:element name="status" type="xs:string"/&gt;</code></pre><p><strong>Self-mark:</strong> JPA: entity 1, ID 1, attributes 2, collection 1, JPQL 2. Trigger: function 1, iteration 2, average 2, assign and return 1, trigger 1. XPath: path and predicate 1, select altitude 1. XSD: flightCode declaration 1, text type 1, required 1, status text declaration 1. As in the original rubric, these are marking points; evaluate the whole answer for valid syntax.</p></details><p class="learn-first"><strong>Learn first:</strong> <a href="../notes/lecture-01.html">Lectures 1–4</a> &middot; <a href="../notes/lecture-02.html">Lectures 5–8</a> &middot; <a href="../notes/lecture-03.html">Lectures 9–10</a> &middot; <a href="../papers/st1-2026.html">your marked answer</a> &middot; <a href="../reference/coding-patterns.html#pattern-jpa">JPA pattern</a></p></section><section class="essay" id="practice-mongo"><div class="eyebrow">ESSAY 2 · MONGODB · LECTURES 14–16 · 20 marks</div><h2>MongoDB: library loans</h2><div class="question"><p>A <code>loans</code> document has <code>loanId</code>, <code>branch</code>, <code>status</code>, <code>daysLate</code>, <code>priority</code>, an array <code>staff</code> of objects with <code>role</code>, and a string array <code>tags</code>.</p><ol><li>Find "Returned" loans over 7 days late, with a staff member whose role is "Librarian" and tag "overdue". Return loanId, branch and daysLate only. (5)</li><li>Add "audit" to tags of all "High" priority loans without duplicates. (4)</li><li>For returned loans, group by branch, calculate average daysLate and loan count, then sort by average descending. (7)</li><li>For 3, 7, 10 and 12 days, calculate the average and decide whether it meets a maximum of 8 days. Show why. (4)</li></ol></div><details><summary>Reveal model answer and marking points</summary><pre><code>db.loans.find(
+  { status: "Returned", daysLate: { $gt: 7 },
+    "staff.role": "Librarian", tags: "overdue" },
+  { _id: 0, loanId: 1, branch: 1, daysLate: 1 }
+)
+db.loans.updateMany({ priority: "High" }, { $addToSet: { tags: "audit" } })
+db.loans.aggregate([
+  { $match: { status: "Returned" } },
+  { $group: { _id: "$branch", averageDays: { $avg: "$daysLate" },
+              loanCount: { $sum: 1 } } },
+  { $sort: { averageDays: -1 } }
+])</code></pre><p>Average = 32 / 4 = 8 days. Yes, 8 is at most 8. Mark as in Q34: 5 for the individual query requirements, 4 for the update, 7 for match/group/average/count/sort and 4 for calculation and justification.</p></details><p class="learn-first"><strong>Learn first:</strong> <a href="../notes/index.html#topic-mongodb">Lectures 14–16</a> &middot; <a href="../reference/coding-patterns.html#pattern-mongodb">MongoDB pattern</a> &middot; <a href="../reference/mongodb-indexing.html">operators</a> &middot; <a href="../papers/st2-2026.html#mongo">your Q34</a></p></section><section class="essay" id="practice-neo4j"><div class="eyebrow">ESSAY 3 · NEO4J · LECTURES 17–19 · 20 marks</div><h2>Neo4j: field surveys</h2><div class="question"><p>The graph contains <code>(o:Observer)-[:RECORDED]-&gt;(s:Survey)-[:IDENTIFIES]-&gt;(b:Bird)</code> and <code>(s)-[:OCCURRED_IN]-&gt;(p:Park)</code>. Properties: observerId, survey confidence, birdId, bird species and park name.</p><ol><li>Return observer ID, bird ID and park name for surveys with confidence at least 0.8, species "Eagle" and park "North Park". (5)</li><li>Return each matched observer's ID and survey count, highest count first. (6)</li><li>Return each park name and the number of distinct birds identified there. (4)</li><li>Return distinct bird IDs in North Park with confidence at least 0.8. Explain why a count of all qualifying surveys across all parks may differ. (5)</li></ol></div><details><summary>Reveal model answer and marking points</summary><pre><code>// (a)
+MATCH (o:Observer)-[:RECORDED]-&gt;(s:Survey)-[:IDENTIFIES]-&gt;(b:Bird),
+      (s)-[:OCCURRED_IN]-&gt;(p:Park)
+WHERE s.confidence &gt;= 0.8 AND b.species = "Eagle" AND p.name = "North Park"
+RETURN o.observerId, b.birdId, p.name
+// (b)
+MATCH (o:Observer)-[:RECORDED]-&gt;(s:Survey)
+RETURN o.observerId, count(s) AS surveyCount ORDER BY surveyCount DESC
+// (c)
+MATCH (s:Survey)-[:IDENTIFIES]-&gt;(b:Bird), (s)-[:OCCURRED_IN]-&gt;(p:Park)
+RETURN p.name, count(DISTINCT b.birdId) AS birdCount
+// (d)
+MATCH (s:Survey)-[:IDENTIFIES]-&gt;(b:Bird), (s)-[:OCCURRED_IN]-&gt;(p:Park)
+WHERE s.confidence &gt;= 0.8 AND p.name = "North Park"
+RETURN DISTINCT b.birdId</code></pre><p>A survey count can count repeated surveys of the same bird and includes other parks if no park filter is applied. Mark the graph paths, filters and requested output as in Q35.</p></details><p class="learn-first"><strong>Learn first:</strong> <a href="../notes/index.html#topic-neo4j">Lectures 17–19</a> &middot; <a href="../reference/coding-patterns.html#pattern-cypher">Cypher pattern</a> &middot; <a href="../papers/st2-2026.html#cypher">your Q35</a></p></section><section class="essay" id="practice-spark"><div class="eyebrow">ESSAY 4 · PYSPARK · LECTURE 21 · 10 marks</div><h2>PySpark: store revenue</h2><div class="question"><p><strong>Original practice, not a past-paper question:</strong> A file <code>sales.csv</code> has <code>Store</code>, <code>Product</code> and numeric <code>Revenue</code>. Read the file, calculate total revenue per store, and display the result. Explain how to find each store's highest individual revenue and the corresponding product. (10 marks)</p></div><details><summary>Reveal model answer and marking points</summary><pre><code>from pyspark.sql import SparkSession
+from pyspark.sql.functions import sum, max, col
+spark = SparkSession.builder.appName("Sales Analysis").getOrCreate()
+df = spark.read.csv("sales.csv", header=True, inferSchema=True)
+
+totals = df.groupBy("Store").agg(sum("Revenue").alias("TotalRevenue"))
+totals.show()
+
+maxima = df.groupBy("Store").agg(max("Revenue").alias("MaxRevenue"))
+d = df.alias("d")
+m = maxima.alias("m")
+top = d.join(m, (col("d.Store") == col("m.Store")) &amp;
+                (col("d.Revenue") == col("m.MaxRevenue")))
+result = top.select(col("d.Store"), col("d.Product"), col("d.Revenue"))
+result.show()</code></pre><p>Group and sum for the total; group and take the maximum, then join on both store and maximum revenue to recover the product. Ties return multiple rows.</p></details><p class="learn-first"><strong>Learn first:</strong> <a href="../notes/lecture-14.html">Lecture 21</a> &middot; <a href="../notes/pyspark-activity.html">PySpark class activity</a></p></section><section class="essay" id="practice-apriori"><div class="eyebrow">ESSAY 5 · DATA MINING · LECTURE 22 · 20 marks</div><h2>Association rules: support and confidence</h2><div class="question"><p>Five baskets: 1 Bread/Milk; 2 Bread/Milk/Juice; 3 Bread/Milk; 4 Bread/Juice; 5 Juice. Calculate support of {Bread, Milk} (4), confidence Bread &rArr; Milk (4), assess minimum support 60% and confidence 75% (4), calculate confidence Milk &rArr; Bread (4), and explain the result and a limitation (4).</p></div><details><summary>Reveal model answer and marking points</summary><p><strong>Model answer:</strong> Both appear in 3 of 5 baskets, so support is 60%. Bread appears in 4 baskets: confidence Bread &rArr; Milk = 3/4 = 75%. Both thresholds are met. Milk appears in 3 baskets: confidence Milk &rArr; Bread = 3/3 = 100%. The rule describes association, not causation; five baskets are too few to confidently generalise.</p></details><p class="learn-first"><strong>Learn first:</strong> <a href="../notes/lecture-15.html">Lecture 22</a> &middot; <a href="../notes/lectures-20-24-guide.html#apriori">Apriori worked example</a></p></section><section class="essay" id="practice-warehouse"><div class="eyebrow">ESSAY 6 · DATA WAREHOUSING · LECTURES 23–24 · 20 marks</div><h2>Warehouse design and SQL</h2><div class="question"><p>A retailer records each product sold, store, date, quantity and sales amount. (a) Design a star schema with a fact, three dimensions, keys and measures (6). (b) State the grain (2). (c) Write SQL for sales totals by province and category (4). (d) Add ROLLUP for province subtotals and the grand total (4). (e) A store moves province; preserve historical location (4).</p></div><details><summary>Reveal model answer and marking points</summary><p><strong>Model answer:</strong> A sales fact at one sale-line grain has date, store and product foreign keys plus quantity and sales_amount. Date, Store and Product are dimensions. Join the fact to Store and Product, then use:</p><pre><code>SELECT s.province, p.category, SUM(f.sales_amount) AS total_sales
+FROM FactSales f
+JOIN DimStore s ON f.store_key = s.store_key
+JOIN DimProduct p ON f.product_key = p.product_key
+GROUP BY ROLLUP(s.province, p.category);</code></pre><p>Without ROLLUP, group by province and category for part (c). For part (e), use SCD Type 2: retain the old row and create a new row with a new surrogate key; old facts retain the old key.</p></details><p class="learn-first"><strong>Learn first:</strong> <a href="../notes/lecture-16.html">Lecture 23</a> &middot; <a href="../notes/lecture-17.html">Lecture 24</a> &middot; <a href="../notes/lectures-20-24-guide.html#olap">OLAP patterns</a></p></section><section class="essay" id="practice-ranking"><div class="eyebrow">ESSAY 7 · OLAP SQL · LECTURE 24 · 20 marks</div><h2>Ranking and running totals</h2><div class="question"><p>Monthly sales for Pretoria are 100, 150, 120 and Durban 80, 110, 130. Write a per-branch running total query (7), calculate Pretoria totals (3), rank branches by total sales (6), and explain RANK versus DENSE_RANK ties (4).</p></div><details><summary>Reveal model answer and marking points</summary><pre><code>SELECT branch, month_no, sales_amount,
+  SUM(sales_amount) OVER (PARTITION BY branch ORDER BY month_no
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total
+FROM MonthlySales;
+
+SELECT branch, SUM(sales_amount) AS total_sales,
+  RANK() OVER (ORDER BY SUM(sales_amount) DESC) AS sales_rank
+FROM MonthlySales GROUP BY branch;</code></pre><p>Pretoria running totals are 100, 250 and 370; total 370 ranks ahead of Durban's 320. For 100, 90, 90, 80: RANK = 1,2,2,4; DENSE_RANK = 1,2,2,3.</p></details><p class="learn-first"><strong>Learn first:</strong> <a href="../notes/lecture-17.html">Lecture 24</a> &middot; <a href="../notes/lectures-20-24-guide.html#olap">OLAP patterns</a></p></section></section></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>

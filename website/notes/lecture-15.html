@@ -1,0 +1,969 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b2c"><title>Big Data Technologies (2): Data Mining Concepts — Comprehensive Notes · COS326 Study</title><link rel="stylesheet" href="../css/main.css"><script defer src="../js/app.js"></script></head><body><header class="top"><a class="brand" href="../index.html"><span class="logo">C<span>·</span></span><span>COS326 <small>STUDY STUDIO</small></span></a><button class="menu" aria-expanded="false" aria-controls="nav">Menu</button><nav id="nav" aria-label="Main navigation"><a href="../index.html">Home</a><a href="../notes/index.html" aria-current="page">Notes</a><a href="../papers/index.html">Papers</a><a href="../practice/index.html">Practice</a><a href="../reference/index.html">Reference</a></nav><button id="theme" aria-label="Toggle color theme">Theme</button></header><main><div class="eyebrow">LECTURE NOTES <span> / </span> SOURCE MATERIAL</div><div class="article-head"><div><h1>Data mining</h1><p>Lecture 22 &middot; Course notes</p></div><button class="study" data-id="lecture-15.html">Mark as studied</button></div><div class="article-tools"><a href="index.html">← All notes</a><button class="bookmark" data-id="lecture-15.html"> Bookmark</button></div><div class="related"><span class="related-label">Use this topic</span><a href="lectures-20-24-guide.html#apriori">Apriori worked example</a><a href="../practice/essays.html#practice-apriori">Practise: association rules</a><a href="lectures-20-24-guide.html#evidence">Past exam questions</a></div><details class="contents"><summary>On this page</summary><ol><li><a href="#1-lecture-overview">1. Lecture Overview</a></li><li><a href="#2-data-mining-definition">2. Data Mining — Definition</a></li><li><a href="#3-association-rules">3. Association Rules</a></li><li><a href="#4-algorithms-for-finding-frequent-itemsets">4. Algorithms for Finding Frequent Itemsets</a></li><li><a href="#5-association-rules-among-hierarchies-multi-dimensional-and-negative-rules">5. Association Rules Among Hierarchies, Multi-dimensional and Negative Rules</a></li><li><a href="#6-classification">6. Classification</a></li><li><a href="#7-clustering">7. Clustering</a></li><li><a href="#8-additional-data-mining-approaches">8. Additional Data Mining Approaches</a></li><li><a href="#9-data-mining-business-analytics-bi-applications">9. Data Mining / Business Analytics (B.I.) Applications</a></li><li><a href="#10-data-mining-tools-and-the-future">10. Data Mining Tools and the Future</a></li><li><a href="#11-questions-memo">11. Questions &amp; Memo</a></li></ol></details><article class="prose"><h2 id="1-lecture-overview">1. Lecture Overview</h2>
+<ul>
+<li><strong>This lecture covers:</strong><ol>
+<li><strong>Data mining:</strong> vs data warehousing; <strong>Knowledge Discovery in Databases (KDD)</strong>; goals; types of knowledge discovered.</li>
+<li><strong>Association rules.</strong></li>
+<li><strong>Classification.</strong></li>
+<li><strong>Clustering.</strong></li>
+<li><strong>Other data mining algorithms:</strong> sequential patterns, time series, regression, neural networks, genetic algorithms.</li>
+<li><strong>Data mining applications.</strong></li>
+<li><strong>Commercial data mining tools</strong> (and the future of data mining).</li>
+</ol>
+</li>
+</ul>
+<h4 id="example-added-for-clarity"> Example (added for clarity)</h4>
+<p>Lectures 13–21 were about <strong>storing and processing</strong> big data. This lecture asks: <strong>what do we do with it?</strong> Data mining is the step that turns stored data into <strong>knowledge</strong> — e.g., "customers who buy bread and cookies also buy coffee", "this transaction looks fraudulent", "these customers behave alike."</p>
+<hr />
+<h2 id="2-data-mining-definition">2. Data Mining — Definition</h2>
+<ul>
+<li><strong>Data mining</strong> is the process of <strong>analysing large datasets to discover useful patterns, relationships, trends and predictive models.</strong></li>
+<li>It uses techniques from <strong>statistics, machine learning, database systems and pattern recognition</strong> to extract <strong>knowledge that supports decision-making.</strong></li>
+<li><strong>Examples (from the slides):</strong><ul>
+<li>Identifying <strong>products frequently purchased together.</strong></li>
+<li><strong>Predicting whether a transaction is fraudulent.</strong></li>
+<li><strong>Grouping customers</strong> by similar purchasing behaviour.</li>
+<li><strong>Forecasting future demand</strong> from historical data.</li>
+</ul>
+</li>
+</ul>
+<h3 id="21-data-mining-vs-data-warehousing">2.1 Data Mining vs Data Warehousing</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th><strong>Data warehousing</strong></th>
+<th><strong>Data mining</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Primary purpose</strong></td>
+<td><strong>Integrate and organise</strong> data for reporting and analysis</td>
+<td><strong>Discover patterns</strong> and build predictive or descriptive models</td>
+</tr>
+<tr>
+<td><strong>Typical activities</strong></td>
+<td>Data integration, storage, querying, reporting</td>
+<td><strong>Association rule mining, classification, clustering, regression</strong></td>
+</tr>
+<tr>
+<td><strong>Main output</strong></td>
+<td>Curated datasets, reports, analytical views</td>
+<td><strong>Patterns, rules, clusters, predictive models</strong></td>
+</tr>
+<tr>
+<td><strong>Relationship</strong></td>
+<td>Provides a source of <strong>historical, integrated</strong> data</td>
+<td>Can analyse data <strong>in a warehouse or other sources</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Important (slide):</strong> a <strong>data warehouse is NOT a prerequisite</strong> for data mining — it can be done on <strong>operational databases, data lakes and other datasets</strong>, provided the data can be <strong>accessed and prepared</strong> appropriately.</p>
+</blockquote>
+<h3 id="22-knowledge-discovery-in-databases-kdd">2.2 Knowledge Discovery in Databases (KDD)</h3>
+<ul>
+<li><strong>KDD</strong> is the <strong>broader, iterative process</strong> of extracting <strong>useful and understandable knowledge</strong> from data. <strong>Data mining is one stage</strong> of KDD.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Data selection</strong></td>
+<td>Identify <strong>relevant data sources and attributes</strong></td>
+</tr>
+<tr>
+<td><strong>2. Data cleansing</strong></td>
+<td>Handle <strong>missing, inconsistent, duplicated or incorrect</strong> data</td>
+</tr>
+<tr>
+<td><strong>3. Data enrichment</strong></td>
+<td><strong>Integrate additional data</strong> or relevant background knowledge</td>
+</tr>
+<tr>
+<td><strong>4. Data transformation</strong></td>
+<td>Convert data into a <strong>suitable representation</strong> for analysis</td>
+</tr>
+<tr>
+<td><strong>5. Data mining</strong></td>
+<td><strong>Apply algorithms</strong> to identify patterns or construct models</td>
+</tr>
+<tr>
+<td><strong>6. Evaluation &amp; presentation</strong></td>
+<td><strong>Assess validity and usefulness</strong> of results and communicate findings</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The workflow <strong>may return to earlier stages</strong> when data-quality problems, unsuitable models or unexpected results appear (it is <strong>iterative</strong>).</li>
+</ul>
+<h4 id="worked-example-added-kdd-for-a-supermarket"> Worked Example (added) — KDD for a supermarket</h4>
+<ol>
+<li><strong>Select:</strong> till transactions and loyalty-card data for 2025.</li>
+<li><strong>Cleanse:</strong> remove duplicate scans, fix missing product codes.</li>
+<li><strong>Enrich:</strong> add product category and store region.</li>
+<li><strong>Transform:</strong> turn each receipt into a <strong>basket (set of items).</strong></li>
+<li><strong>Mine:</strong> run association-rule mining on the baskets.</li>
+<li><strong>Evaluate/present:</strong> show managers the <strong>strong, useful rules</strong>; discard trivial ones; go back to step 2 if results look odd (e.g., a "product" that is actually a bag charge).</li>
+</ol>
+<h3 id="23-goals-of-data-mining-pico">2.3 Goals of Data Mining — <strong>PICO</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Goal</th>
+<th>Meaning</th>
+<th>Example (from the slides)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P — Prediction</strong></td>
+<td>Estimate an <strong>unknown or future outcome</strong> from observed data</td>
+<td>Predicting <strong>next month's electricity demand</strong></td>
+</tr>
+<tr>
+<td><strong>I — Identification</strong></td>
+<td><strong>Detect the presence</strong> of a particular item, event or activity</td>
+<td>Identifying <strong>potentially fraudulent transactions</strong></td>
+</tr>
+<tr>
+<td><strong>C — Classification</strong></td>
+<td>Assign records to <strong>predefined categories</strong></td>
+<td>Classifying an <strong>email as spam or legitimate</strong></td>
+</tr>
+<tr>
+<td><strong>O — Optimisation</strong></td>
+<td>Find a solution that makes the <strong>best use of limited resources under constraints</strong></td>
+<td><strong>Allocating delivery vehicles</strong> to minimise travel time</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Important distinction (slide):</strong> PICO are <strong>goals/objectives.</strong> <strong>Classification, regression and clustering</strong> are <strong>analytical techniques</strong> used to achieve them. (Note that "classification" appears in both lists — as a <strong>goal</strong> (assign to categories) and as a <strong>technique</strong> (Section 5).)</p>
+</blockquote>
+<h3 id="24-types-of-discovered-knowledge">2.4 Types of Discovered Knowledge</h3>
+<ol>
+<li><strong>Association rules</strong></li>
+<li><strong>Classification hierarchies</strong></li>
+<li><strong>Sequential patterns</strong></li>
+<li><strong>Patterns within time series</strong></li>
+<li><strong>Clustering</strong></li>
+</ol>
+<hr />
+<h2 id="3-association-rules">3. Association Rules</h2>
+<ul>
+<li>Frequently used to generate rules from <strong>market-basket data.</strong><ul>
+<li>A <strong>market basket</strong> = the set of items a consumer purchases <strong>during one visit</strong> to a supermarket.</li>
+</ul>
+</li>
+<li>The set of items purchased is an <strong>itemset.</strong></li>
+<li><strong>An association rule has the form X ⇒ Y</strong>, where X = {x₁,…,xₙ} and Y = {y₁,…,yₘ} are <strong>sets of items</strong> (all items distinct).</li>
+<li>To be <strong>of interest</strong>, a rule must satisfy a <strong>minimum support</strong> and <strong>minimum confidence.</strong></li>
+</ul>
+<h3 id="31-support-and-confidence">3.1 Support and Confidence</h3>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Definition</th>
+<th>Formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Support</strong></td>
+<td>The <strong>percentage of transactions that contain all the items</strong> in the rule (<strong>LHS ∪ RHS</strong>)</td>
+<td>support(X ⇒ Y) = support(<strong>X ∪ Y</strong>)</td>
+</tr>
+<tr>
+<td><strong>Confidence</strong></td>
+<td>For a rule <strong>A ⇒ B</strong>, the <strong>conditional probability</strong> that B is true when A is known to be true</td>
+<td>confidence = <strong>support(LHS ∪ RHS) / support(LHS)</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-worked-example-slide-milk-juice-and-bread-juice">3.2 Worked Example — Slide: <code>milk ⇒ juice</code> and <code>bread ⇒ juice</code></h3>
+<p><strong>Transaction table (slide figure):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Transaction_id</th>
+<th>Time</th>
+<th>Items_bought</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>101</td>
+<td>6:35</td>
+<td>milk, bread, cookies, juice</td>
+</tr>
+<tr>
+<td>792</td>
+<td>7:38</td>
+<td>milk, juice</td>
+</tr>
+<tr>
+<td>1130</td>
+<td>8:05</td>
+<td>milk, eggs</td>
+</tr>
+<tr>
+<td>1735</td>
+<td>8:40</td>
+<td>bread, cookies, coffee</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Step-by-step calculation:</strong></p>
+<ol>
+<li><strong>Rule <code>milk ⇒ juice</code>:</strong><ul>
+<li>Transactions with <strong>milk:</strong> 101, 792, 1130 → <strong>3</strong>.</li>
+<li>Transactions with <strong>milk AND juice:</strong> 101, 792 → <strong>2</strong>.</li>
+<li><strong>Support</strong> = 2/4 = <strong>50%.</strong> <strong>Confidence</strong> = 2/3 = <strong>66.7%.</strong></li>
+</ul>
+</li>
+<li><strong>Rule <code>bread ⇒ juice</code>:</strong><ul>
+<li>Transactions with <strong>bread:</strong> 101, 1735 → <strong>2.</strong></li>
+<li>Transactions with <strong>bread AND juice:</strong> 101 → <strong>1.</strong></li>
+<li><strong>Support</strong> = 1/4 = <strong>25%.</strong> <strong>Confidence</strong> = 1/2 = <strong>50%.</strong></li>
+</ul>
+</li>
+<li><strong>Goal of mining association rules (slide):</strong> generate rules that <strong>exceed user-specified support and confidence thresholds.</strong></li>
+<li><strong>Interpretation:</strong> "milk ⇒ juice" holds in half of all transactions, and <strong>two-thirds of milk buyers also bought juice.</strong></li>
+</ol>
+<blockquote>
+<p><strong>Remember:</strong> support uses the <strong>whole database</strong> as denominator (4 transactions); confidence uses only the transactions containing the <strong>left-hand side.</strong> Confidence is <strong>not symmetric:</strong> juice ⇒ milk has confidence 2/2 = 100%, while milk ⇒ juice is 66.7%.</p>
+</blockquote>
+<h3 id="33-generating-association-rules-the-two-step-process">3.3 Generating Association Rules — the Two-Step Process</h3>
+<ol>
+<li><strong>Generate all itemsets whose support exceeds the threshold</strong> — called <strong>large (frequent) itemsets.</strong></li>
+<li><strong>Generate rules from each frequent itemset:</strong> for itemset <strong>X</strong> and a subset <strong>Y</strong> of X, let <strong>Z = X − Y.</strong> If <strong>support(X) / support(Z) &gt; minimum confidence</strong>, then the rule <strong>Z ⇒ Y</strong> is valid.</li>
+</ol>
+<p><strong>Example (added):</strong> X = {milk, juice}, Y = {juice}, Z = {milk} → confidence of milk ⇒ juice = support({milk, juice}) / support({milk}) = 50% / 75% = <strong>66.7%.</strong></p>
+<h3 id="34-reducing-search-complexity-two-properties">3.4 Reducing Search Complexity — Two Properties</h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Statement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Downward closure</strong></td>
+<td><strong>A subset of a large (frequent) itemset must also be large.</strong></td>
+</tr>
+<tr>
+<td><strong>Anti-monotonicity</strong></td>
+<td><strong>A superset of a small (infrequent) itemset is also small</strong> — it lacks sufficient support, so it need not be considered.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example (added):</strong> if {bread, juice} is <strong>infrequent</strong>, then {bread, juice, milk} <strong>cannot</strong> be frequent — it is <strong>pruned</strong> without counting.</p>
+<hr />
+<h2 id="4-algorithms-for-finding-frequent-itemsets">4. Algorithms for Finding Frequent Itemsets</h2>
+<h3 id="41-the-apriori-algorithm-agrawal-srikant-1994">4.1 The Apriori Algorithm (Agrawal &amp; Srikant, 1994)</h3>
+<ul>
+<li>Uses <strong>downward closure of support</strong> to find frequent itemsets efficiently:<ul>
+<li>If an itemset is frequent, <strong>all its non-empty subsets</strong> are frequent.</li>
+<li>If an itemset is infrequent, <strong>none of its supersets</strong> can be frequent.</li>
+</ul>
+</li>
+<li><strong>Generates candidate itemsets iteratively</strong>, starting with <strong>single items</strong> and extending to larger itemsets, <strong>pruning</strong> candidates that cannot satisfy minimum support.</li>
+</ul>
+<p><strong>Algorithm 28.1 (summary):</strong></p>
+<ul>
+<li><strong>Input:</strong> database D of m transactions; minimum support <code>mins</code> (a fraction of m). <strong>Output:</strong> frequent itemsets L₁, L₂, …, L_k.</li>
+</ul>
+<ol>
+<li><strong>Scan once</strong> and compute <strong>support(i_j) = count(i_j) / m</strong> for each single item.</li>
+<li><strong>C₁</strong> (candidate 1-itemsets) = all items.</li>
+<li><strong>L₁</strong> = items in C₁ with <strong>support ≥ mins.</strong></li>
+<li><strong>Repeat</strong> (k = 1, 2, …):<ol>
+<li>L_{k+1} = ∅.</li>
+<li><strong>Create C_{k+1}</strong> by <strong>combining members of L_k that have k−1 items in common</strong> (extending frequent k-itemsets by one item).</li>
+<li><strong>Keep only</strong> candidates whose <strong>every size-k subset is in L_k</strong> (downward-closure pruning).</li>
+<li><strong>Scan the database once</strong> to compute the support of each candidate; those with <strong>support ≥ mins</strong> go into L_{k+1}.</li>
+<li>If <strong>L_{k+1} is empty → stop</strong>; else k = k + 1.</li>
+</ol>
+</li>
+</ol>
+<h4 id="worked-example-added-for-step-by-step-clarity-apriori-on-the-slides-four-transactions-mins-50-2-transactions"> Worked Example (added for step-by-step clarity) — Apriori on the slide's four transactions, <code>mins</code> = 50% (≥ 2 transactions)</h4>
+<p><strong>Pass 1 — single items (m = 4):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Count</th>
+<th>Support</th>
+<th>Frequent?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>milk</td>
+<td>3</td>
+<td>75%</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>bread</td>
+<td>2</td>
+<td>50%</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>cookies</td>
+<td>2</td>
+<td>50%</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>juice</td>
+<td>2</td>
+<td>50%</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>eggs</td>
+<td>1</td>
+<td>25%</td>
+<td>No</td>
+</tr>
+<tr>
+<td>coffee</td>
+<td>1</td>
+<td>25%</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>L₁ = {milk}, {bread}, {cookies}, {juice}.</strong> (eggs and coffee are dropped — and <strong>no itemset containing them</strong> will ever be considered.)</p>
+<p><strong>Pass 2 — candidate pairs (C₂ = all pairs from L₁):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Pair</th>
+<th>Transactions</th>
+<th>Count</th>
+<th>Support</th>
+<th>Frequent?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>{milk, bread}</td>
+<td>101</td>
+<td>1</td>
+<td>25%</td>
+<td>No</td>
+</tr>
+<tr>
+<td>{milk, cookies}</td>
+<td>101</td>
+<td>1</td>
+<td>25%</td>
+<td>No</td>
+</tr>
+<tr>
+<td>{milk, juice}</td>
+<td>101, 792</td>
+<td>2</td>
+<td>50%</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>{bread, cookies}</td>
+<td>101, 1735</td>
+<td>2</td>
+<td>50%</td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td>{bread, juice}</td>
+<td>101</td>
+<td>1</td>
+<td>25%</td>
+<td>No</td>
+</tr>
+<tr>
+<td>{cookies, juice}</td>
+<td>101</td>
+<td>1</td>
+<td>25%</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>→ <strong>L₂ = {milk, juice}, {bread, cookies}.</strong></p>
+<p><strong>Pass 3 — candidate triples:</strong> members of L₂ must share <strong>k−1 = 1</strong> item to be combined; {milk, juice} and {bread, cookies} share <strong>none</strong> → <strong>C₃ = ∅ → L₃ is empty → terminate.</strong></p>
+<p><strong>Result:</strong> frequent itemsets are L₁ ∪ L₂.</p>
+<p><strong>Generating rules (minimum confidence 70%):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Confidence</th>
+<th>Valid?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>milk ⇒ juice</td>
+<td>support{milk,juice}/support{milk} = 50/75 = 66.7%</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>juice ⇒ milk</strong></td>
+<td>50/50 = <strong>100%</strong></td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><strong>bread ⇒ cookies</strong></td>
+<td>50/50 = <strong>100%</strong></td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><strong>cookies ⇒ bread</strong></td>
+<td>50/50 = <strong>100%</strong></td>
+<td><strong>Yes</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-the-sampling-algorithm">4.2 The Sampling Algorithm</h3>
+<ul>
+<li>Selects <strong>samples</strong> of the transaction database that <strong>individually fit into memory</strong>; frequent itemsets are found <strong>for each sample.</strong></li>
+<li>If those frequent itemsets form a <strong>superset</strong> of the frequent itemsets for the <strong>entire</strong> database, the <strong>real</strong> frequent itemsets can be obtained by <strong>scanning the remainder</strong> of the database.</li>
+<li><strong>Negative border</strong> (w.r.t. a set of frequent itemsets S and item set I): the <strong>minimal itemsets in PowerSet(I) that are not in S</strong> — i.e., the <strong>closest itemsets that could also be frequent.</strong><ul>
+<li>If a set X is <strong>not</strong> in the frequent itemsets <strong>but all its subsets are</strong>, then X is in the negative border.</li>
+<li>If an itemset <strong>in the negative border turns out to be frequent</strong>, a <strong>superset</strong> of it might also be frequent → a <strong>second pass</strong> over the database is needed to be sure all frequent itemsets are found.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Example (added):</strong> if frequent itemsets from a sample are {a}, {b}, {c}, {a,b}: then <strong>{a,c}</strong> and <strong>{b,c}</strong> are <strong>in the negative border</strong> (not frequent, but their subsets {a},{b},{c} all are) — they are the "next candidates" to double-check against the full database.</p>
+<h3 id="43-the-frequent-pattern-fp-tree-algorithm">4.3 The Frequent-Pattern (FP) Tree Algorithm</h3>
+<ul>
+<li><strong>Reduces the number of candidate itemsets</strong> by producing a <strong>compressed version of the database</strong> as an <strong>FP-tree</strong>, which <strong>stores relevant information</strong> and allows <strong>efficient discovery</strong> of frequent itemsets.</li>
+<li><strong>Two steps:</strong> <strong>(1) build the FP-tree; (2) use the tree to find frequent itemsets (FP-growth).</strong></li>
+</ul>
+<p><strong>Step 1 — Building the FP-tree:</strong></p>
+<ol>
+<li>Compute <strong>frequent 1-itemsets with counts</strong>; <strong>sort them in non-increasing order</strong> of count.</li>
+<li>Create the <strong>root labelled "null."</strong></li>
+<li>For <strong>each transaction T</strong>, list its frequent items <strong>in that sorted order</strong>; call the first item the <strong>head</strong> and the rest the <strong>tail.</strong></li>
+<li><strong>Insert recursively:</strong> if the current node has a <strong>child with the head's item name</strong>, <strong>increment its count</strong>; else <strong>create a new node</strong> with count 1 (linked to its parent and to the <strong>item header table</strong>). If the tail is non-empty, <strong>repeat using the tail</strong> (new head = first item of tail).</li>
+</ol>
+<p><strong>Step 2 — FP-growth (Algorithm 28.2, summary):</strong></p>
+<ul>
+<li><strong>If the tree is a single path:</strong> for each <strong>combination β of the path's nodes</strong>, generate pattern (β ∪ α) with <strong>support = minimum support of nodes in β.</strong></li>
+<li><strong>Otherwise:</strong> for each item i in the tree's <strong>header:</strong> generate pattern β = (i ∪ α) with support = i.support; build <strong>β's conditional pattern base</strong> and <strong>conditional FP-tree</strong>; if non-empty, <strong>recursively call</strong> FP-growth(β_tree, β).</li>
+</ul>
+<h4 id="worked-example-added-building-the-fp-tree-for-the-slides-data-min-support-2"> Worked Example (added) — Building the FP-tree for the slide's data, min support = 2</h4>
+<ol>
+<li><strong>Frequent items (sorted by count):</strong> milk (3), then bread (2), cookies (2), juice (2) <em>(ties may be ordered arbitrarily but consistently).</em></li>
+<li><strong>Each transaction with frequent items in that order:</strong><ul>
+<li>101 → milk, bread, cookies, juice</li>
+<li>792 → milk, juice</li>
+<li>1130 → milk <em>(eggs dropped)</em></li>
+<li>1735 → bread, cookies <em>(coffee dropped)</em></li>
+</ul>
+</li>
+<li><strong>Insert into the tree:</strong></li>
+</ol>
+<pre><code>null
+├── milk (3)
+│   ├── bread (1) ── cookies (1) ── juice (1)     ← from 101
+│   └── juice (1)                                  ← from 792
+└── bread (1) ── cookies (1)                       ← from 1735
+</code></pre>
+<ol start="4">
+<li><strong>Why it's compact:</strong> the shared prefix <strong>milk</strong> is stored <strong>once</strong> with count 3 — transactions with common starts are <strong>merged.</strong> FP-growth then mines this tree <strong>without generating and counting many candidate itemsets.</strong></li>
+</ol>
+<h3 id="44-the-partition-algorithm">4.4 The Partition Algorithm</h3>
+<ol>
+<li><strong>Divide</strong> the transaction database into <strong>non-overlapping partitions.</strong></li>
+<li>Find the <strong>locally frequent itemsets</strong> in each partition (using the minimum-support threshold applied <strong>consistently</strong> to the global requirement).</li>
+<li><strong>Union</strong> of the locally frequent itemsets = the <strong>global candidate set.</strong></li>
+<li><strong>Scan the full database</strong> to compute the <strong>global support</strong> of these candidates.</li>
+<li><strong>Keep only</strong> candidates meeting the <strong>global minimum support.</strong></li>
+</ol>
+<ul>
+<li><strong>Key property:</strong> an itemset that is <strong>globally frequent must be frequent in at least one partition</strong> (with an appropriate local threshold). <strong>The second scan</strong> decides which candidates are globally frequent.</li>
+</ul>
+<h3 id="45-comparison-of-the-four-algorithms-added">4.5 Comparison of the Four Algorithms (added)</h3>
+<table>
+<thead>
+<tr>
+<th>Algorithm</th>
+<th>Main idea</th>
+<th>Database scans</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Apriori</strong></td>
+<td>Level-wise candidate generation with <strong>downward-closure pruning</strong></td>
+<td><strong>One per level</strong> (k passes)</td>
+<td>Simple; many candidates for large data</td>
+</tr>
+<tr>
+<td><strong>Sampling</strong></td>
+<td>Mine <strong>in-memory samples</strong>, then verify using the <strong>negative border</strong></td>
+<td><strong>1–2</strong> (second pass if a negative-border itemset is frequent)</td>
+<td>Fast but needs a verification pass</td>
+</tr>
+<tr>
+<td><strong>FP-tree / FP-growth</strong></td>
+<td><strong>Compress</strong> DB into a tree; <strong>no candidate generation</strong></td>
+<td><strong>2</strong> (count items, then build tree)</td>
+<td>Efficient with many frequent patterns</td>
+</tr>
+<tr>
+<td><strong>Partition</strong></td>
+<td><strong>Mine each partition locally</strong>, union, then verify globally</td>
+<td><strong>2</strong></td>
+<td>Suits large/distributed data</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-association-rules-among-hierarchies-multi-dimensional-and-negative-rules">5. Association Rules Among Hierarchies, Multi-dimensional and Negative Rules</h2>
+<h3 id="51-hierarchies-taxonomies">5.1 Hierarchies (Taxonomies)</h3>
+<ul>
+<li>Associations can occur <strong>among hierarchies of items</strong> — items in a supermarket/department store/sports shop are <strong>categorised into classes and subclasses.</strong></li>
+<li><strong>Slide figure 28.3 — supermarket taxonomy:</strong><ul>
+<li><strong>Beverages:</strong> <strong>Carbonated</strong> (colas, clear drinks, mixed drinks) and <strong>Noncarbonated</strong> (bottled juices [orange, apple, others], bottled water [plain, clear], wine coolers).</li>
+<li><strong>Desserts:</strong> <strong>Ice cream</strong> (e.g., rich cream), <strong>Baked</strong>, <strong>Frozen yogurt</strong> (reduce, healthy).</li>
+</ul>
+</li>
+<li><strong>Key point:</strong> the <strong>whole groups</strong> may <strong>not</strong> yield a rule like <strong>beverages ⇒ desserts</strong>, but <strong>specific, lower-level</strong> associations may have enough support and confidence — e.g., <strong>healthy-brand frozen yogurt ⇒ bottled water</strong>, or <strong>rich cream-brand ice cream ⇒ wine cooler.</strong></li>
+</ul>
+<h3 id="52-multi-dimensional-association-rules">5.2 Multi-dimensional Association Rules</h3>
+<ul>
+<li>Single-dimension example: <strong>Items_bought(milk) ⇒ Items_bought(juice).</strong></li>
+<li><strong>Multidimensional</strong> rules involve <strong>several attributes (dimensions)</strong>, e.g., <strong>Time(6:30…8:00) ⇒ Items_bought(milk).</strong></li>
+<li>Dimensions are <strong>attributes of records</strong> (columns of a relation) and can be <strong>categorical or quantitative.</strong></li>
+<li><strong>Handling quantitative attributes:</strong> <strong>partition values into non-overlapping intervals</strong>, e.g., salary:<ul>
+<li>0 &lt; salary &lt; 29,999 ⇒ {Kia, Hyundai}</li>
+<li>30,000 &lt; salary &lt; 99,999 ⇒ {Honda, Toyota}</li>
+<li>100,000 &lt; salary &lt; 149,000 ⇒ {Lexus, Mercedes}</li>
+<li>150,000 &lt; salary &lt; 300,000 ⇒ {Porsche, BMW}</li>
+</ul>
+</li>
+</ul>
+<p><strong>Using the slide's transactions (added):</strong> the rule <strong>Time(6:30–8:00) ⇒ Items_bought(milk)</strong> — transactions at 6:35 (101) and 7:38 (792) are in the time range and <strong>both contain milk</strong> → confidence <strong>100%</strong>, support 2/4 = <strong>50%.</strong></p>
+<h3 id="53-negative-association-rules">5.3 Negative Association Rules</h3>
+<ul>
+<li>Rules such as: <strong>those who buy soft drink "Wakeup" are <em>not</em> likely to buy chips "Nightos".</strong></li>
+<li><strong>Very difficult to discover</strong> because the <strong>support is very low by definition.</strong> (Reference on the slide: Savasere, Omiecinski &amp; Navathe, 1998.)</li>
+</ul>
+<h3 id="54-complications-with-association-rules">5.4 Complications with Association Rules</h3>
+<ol>
+<li>The <strong>cardinality of itemsets</strong> is usually <strong>extremely large.</strong></li>
+<li>Mining is harder when transactions <strong>vary by location and season.</strong></li>
+<li>Item classifications exist along <strong>multiple dimensions</strong> that must be taken into account.</li>
+<li><strong>Data quality is variable</strong> — missing, erroneous, conflicting and redundant data.</li>
+</ol>
+<hr />
+<h2 id="6-classification">6. Classification</h2>
+<ul>
+<li><strong>Classification</strong> = learning a <strong>model that describes different classes of data.</strong></li>
+<li><strong>Supervised learning:</strong> the <strong>classes are predetermined.</strong></li>
+<li>Learning uses a <strong>training set of pre-classified data.</strong></li>
+<li>The model is usually a <strong>decision tree</strong> or a <strong>set of rules.</strong></li>
+</ul>
+<h3 id="61-decision-tree-induction-algorithm-283">6.1 Decision Tree Induction (Algorithm 28.3)</h3>
+<ul>
+<li><strong>Input:</strong> training records R₁…R_m and attributes A₁…A_n. <strong>Output:</strong> a decision tree.</li>
+</ul>
+<p><strong><code>Build_tree(records, attributes)</code>:</strong></p>
+<ol>
+<li><strong>Create a node N.</strong></li>
+<li>If <strong>all records belong to the same class C</strong> → return N as a <strong>leaf labelled C.</strong></li>
+<li>If <strong>attributes is empty</strong> → return N as a <strong>leaf labelled with the majority class.</strong></li>
+<li><strong>Select the attribute A_i with the highest information gain</strong>; <strong>label N with A_i.</strong></li>
+<li><strong>For each known value v_j of A_i:</strong><ul>
+<li><strong>Add a branch</strong> for the condition A_i = v_j; <strong>S_j</strong> = records where A_i = v_j.</li>
+<li>If <strong>S_j is empty</strong> → add a <strong>leaf</strong> with the <strong>majority class</strong> (of the parent's records).</li>
+<li>Else → add the node returned by <strong>Build_tree(S_j, attributes − A_i).</strong></li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><strong>Information gain</strong> (concept): how much choosing an attribute <strong>reduces uncertainty</strong> about the class — the attribute that <strong>best separates</strong> the classes is chosen first (so it appears nearest the root).</li>
+</ul>
+<h3 id="62-worked-example-slide-figure-287-decision-tree">6.2 Worked Example — Slide Figure 28.7 (decision tree)</h3>
+<p><strong>Tree structure:</strong></p>
+<pre><code>Salary
+├── &lt; 20K        → class &quot;no&quot;   {records 4, 5}
+├── 20K … 50K    → Age
+│                    ├── &lt; 25   → class &quot;no&quot;   {record 3}
+│                    └── &gt;= 25  → class &quot;yes&quot;  {record 6}
+└── &gt;= 50K       → class &quot;yes&quot;  {records 1, 2}
+</code></pre>
+<ul>
+<li><strong>Leaf nodes</strong> are represented by the <strong>sets of record IDs (RIDs)</strong> of the partitioned records.</li>
+</ul>
+<p><strong>Extracting rules (slide):</strong></p>
+<ul>
+<li><strong>Rule 1:</strong> <strong>IF 50K &gt; salary ≥ 20K AND age ≥ 25 THEN class is "yes".</strong></li>
+<li><strong>Rule 2:</strong> <strong>IF 50K &gt; salary ≥ 20K AND age &lt; 25 THEN class is "no".</strong></li>
+</ul>
+<p><strong>Step-by-step:</strong></p>
+<ol>
+<li><strong>Each path from root to a leaf = one rule</strong> (conditions along the path are joined with AND).</li>
+<li>The root tests <strong>Salary</strong> (chosen as best attribute); only the <strong>middle</strong> salary band needs a <strong>second test on Age.</strong></li>
+<li><strong>Using the tree (added):</strong> a new customer with <strong>salary 35K and age 30</strong> → Salary branch 20K–50K → Age ≥ 25 → class <strong>"yes".</strong> A customer with <strong>salary 15K</strong> → <strong>"no"</strong> (age not even needed).</li>
+<li><strong>All five rules in full:</strong> salary &lt; 20K → no; 20K ≤ salary &lt; 50K &amp; age &lt; 25 → no; 20K ≤ salary &lt; 50K &amp; age ≥ 25 → yes; salary ≥ 50K → yes.</li>
+</ol>
+<hr />
+<h2 id="7-clustering">7. Clustering</h2>
+<ul>
+<li><strong>Clustering</strong> is an <strong>unsupervised learning</strong> technique that <strong>groups records by similarity of attributes</strong>, <strong>without predefined class labels.</strong></li>
+<li>Objective: groups whose records are <strong>relatively similar</strong> under a chosen <strong>distance or similarity measure.</strong></li>
+<li><strong>Examples:</strong> grouping <strong>customers by purchasing behaviour</strong>; grouping <strong>network devices by traffic patterns</strong>; <strong>identifying unusual groups/anomalies in security logs.</strong></li>
+<li><strong>Unlike classification,</strong> clustering <strong>does not require a predefined target class</strong> for every training record.</li>
+</ul>
+<h3 id="71-classification-vs-clustering-added">7.1 Classification vs Clustering (added)</h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th><strong>Classification</strong></th>
+<th><strong>Clustering</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Learning type</td>
+<td><strong>Supervised</strong></td>
+<td><strong>Unsupervised</strong></td>
+</tr>
+<tr>
+<td>Class labels</td>
+<td><strong>Predefined</strong> (training set pre-classified)</td>
+<td><strong>None</strong> — groups are discovered</td>
+</tr>
+<tr>
+<td>Output</td>
+<td>Decision tree / rules</td>
+<td>Groups (clusters) + centroids</td>
+</tr>
+<tr>
+<td>Example</td>
+<td>Spam vs legitimate</td>
+<td>Customer segments</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72-k-means-clustering">7.2 K-Means Clustering</h3>
+<ul>
+<li><strong>Input:</strong> dataset D with <strong>m records</strong> and a specified <strong>number of clusters k.</strong> <strong>Output:</strong> <strong>k clusters and their centroids.</strong></li>
+</ul>
+<ol>
+<li><strong>Initialise k centroids</strong> (using a method such as <strong>k-means++</strong>).</li>
+<li><strong>Assign</strong> each record to the cluster with the <strong>nearest centroid</strong> (chosen distance measure).</li>
+<li><strong>Recalculate each centroid</strong> as the <strong>mean</strong> of the records assigned to it.</li>
+<li><strong>Repeat</strong> steps 2–3 until <strong>convergence</strong> or another stopping condition.</li>
+</ol>
+<ul>
+<li><strong>Objective:</strong> minimise the <strong>within-cluster sum of squared distances</strong> to the centroids.</li>
+<li><strong>Results depend on:</strong> the <strong>initialisation</strong>, the <strong>choice of k</strong>, <strong>feature scaling</strong> and <strong>outliers.</strong></li>
+<li><strong>Limitation:</strong> standard k-means suits <strong>numerical data</strong> and can perform <strong>poorly when clusters have very different sizes, densities or non-spherical shapes.</strong></li>
+</ul>
+<h4 id="worked-example-added-k-2-on-the-values-1-2-10-11"> Worked Example (added) — k = 2 on the values 1, 2, 10, 11</h4>
+<ol>
+<li><strong>Initialise</strong> centroids: c₁ = 1, c₂ = 10.</li>
+<li><strong>Assign:</strong> 1 → c₁ (distance 0); 2 → c₁ (1 vs 8); 10 → c₂; 11 → c₂. Clusters: <strong>{1, 2}</strong> and <strong>{10, 11}.</strong></li>
+<li><strong>Update centroids:</strong> c₁ = (1+2)/2 = <strong>1.5</strong>; c₂ = (10+11)/2 = <strong>10.5.</strong></li>
+<li><strong>Reassign:</strong> nothing changes → <strong>converged.</strong> Final clusters <strong>{1, 2}</strong> and <strong>{10, 11}.</strong></li>
+</ol>
+<hr />
+<h2 id="8-additional-data-mining-approaches">8. Additional Data Mining Approaches</h2>
+<h3 id="81-sequential-pattern-analysis">8.1 Sequential Pattern Analysis</h3>
+<ul>
+<li>Looks for <strong>sequences of itemsets.</strong> <strong>Transactions ordered by time</strong> form a <strong>sequence of itemsets.</strong></li>
+<li><strong>Support for a sequence S</strong> = the <strong>percentage of the given sequences U of which S is a subsequence.</strong></li>
+<li>A sequence <strong>S₁, S₂, S₃, …</strong> predicts that a customer who buys itemset S₁ is likely to buy <strong>S₂ and then S₃</strong>, and so on.</li>
+</ul>
+<p><strong>Example (added):</strong> customers who buy a <strong>phone</strong>, then a <strong>phone case</strong>, then a <strong>screen protector</strong> within a month — the ordered sequence is the pattern.</p>
+<h3 id="82-time-series-analysis">8.2 Time Series Analysis</h3>
+<ul>
+<li>A <strong>time series</strong> = a <strong>sequence of observations recorded over time</strong>, often at regular intervals.</li>
+<li><strong>Examples:</strong> <strong>daily stock prices, hourly electricity consumption, network traffic per minute, monthly sales revenue.</strong></li>
+<li>Used to identify <strong>trends, seasonality, unusual observations, temporal relationships</strong>, and to <strong>forecast</strong> future values.</li>
+<li><strong>Difference from sequential pattern mining (slide):</strong> time-series analysis often examines <strong>numerical observations</strong> and their temporal structure; sequential pattern mining commonly finds <strong>recurring ordered sequences of events/itemsets.</strong> They can <strong>overlap.</strong></li>
+</ul>
+<h3 id="83-regression">8.3 Regression</h3>
+<ul>
+<li>Regression is a <strong>special application of the classification rule:</strong> a classification rule viewed as a <strong>function</strong> over variables that maps them to a <strong>target class variable</strong> is called a <strong>regression rule.</strong></li>
+<li>A <strong>regression equation</strong> <strong>estimates a dependent variable</strong> using a set of <strong>independent variables and constants.</strong></li>
+<li><strong>Slide example:</strong> relation <strong>LAB_TESTS(patient ID, test 1, test 2, …, test n)</strong>; the target is <strong>P = probability of survival.</strong> Rule form: <strong>(test 1 in range₁) AND (test 2 in range₂) AND … AND (test n in range_n) ⇒ P = x, or x &lt; P ≤ y</strong>, i.e., <strong>P = f(test 1, …, test n).</strong></li>
+<li>If <strong>Y = f(x₁, …, x_n)</strong> and <strong>f is linear</strong> in the variables xᵢ, deriving f from given tuples ⟨x₁,…,x_n, y⟩ is <strong>linear regression</strong> — a common statistical technique for <strong>fitting observations</strong> in n dimensions to the target y.</li>
+</ul>
+<p><strong>Example (added):</strong> predicting house price <strong>y = 50,000 + 12,000 × bedrooms + 800 × floorArea</strong> — a <strong>linear</strong> function of the inputs; regression finds the constants from past sales.</p>
+<h3 id="84-neural-networks">8.4 Neural Networks</h3>
+<ul>
+<li><strong>Machine learning models</strong> made of <strong>interconnected computational units arranged in layers</strong>; connections have <strong>learned weights</strong> adjusted during training.</li>
+<li><strong>Supervised learning:</strong> learn from examples with <strong>known target outputs.</strong> <strong>Unsupervised / self-supervised:</strong> learn <strong>representations/patterns</strong> with other training objectives.</li>
+<li><strong>Applications:</strong> <strong>image recognition, text processing, anomaly detection, forecasting, classification.</strong></li>
+<li><strong>Strengths/weaknesses:</strong> can model <strong>complex relationships</strong>, but may need <strong>substantial training data and computing resources</strong>, and decisions can be <strong>difficult to interpret.</strong></li>
+<li><strong>Time series:</strong> can be processed using suitable architectures — <strong>recurrent networks, temporal convolutional networks, Transformers.</strong></li>
+</ul>
+<h3 id="85-genetic-algorithms-gas">8.5 Genetic Algorithms (GAs)</h3>
+<ul>
+<li>A class of <strong>randomised search procedures</strong> capable of <strong>adaptive and robust search</strong> over a wide range of search-space topologies; <strong>modelled on biological evolution.</strong></li>
+<li><strong>How they work:</strong><ol>
+<li><strong>Initialise a population</strong> of candidate solutions.</li>
+<li><strong>Evaluate</strong> each with a <strong>fitness function</strong> (defines which solutions survive).</li>
+<li><strong>Select</strong> candidates for reproduction.</li>
+<li>Apply <strong>crossover</strong> to combine candidate solutions.</li>
+<li>Apply <strong>mutation</strong> to introduce variation.</li>
+<li><strong>Form a new population</strong> and <strong>repeat</strong> until a stopping condition is met.</li>
+</ol>
+</li>
+<li><strong>Example (slide):</strong> a <strong>delivery company</strong> searches for <strong>vehicle routes</strong> that reduce <strong>total travel distance</strong> while respecting <strong>delivery time windows and vehicle-capacity constraints</strong> (this links to the <strong>Optimisation</strong> goal in PICO).</li>
+<li><strong>Caveat:</strong> GAs are <strong>heuristic</strong> — they can find <strong>good</strong> solutions to complex optimisation problems but <strong>do not guarantee the global optimum.</strong></li>
+</ul>
+<h3 id="86-techniques-goals-added-summary">8.6 Techniques ↔ Goals (added summary)</h3>
+<table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>Type of learning</th>
+<th>Typical goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Association rules</td>
+<td>Unsupervised (pattern discovery)</td>
+<td>Discover co-occurrence (market-basket)</td>
+</tr>
+<tr>
+<td>Classification (decision trees)</td>
+<td>Supervised</td>
+<td><strong>Classification / identification</strong></td>
+</tr>
+<tr>
+<td>Clustering (k-means)</td>
+<td>Unsupervised</td>
+<td>Segmentation, anomaly spotting</td>
+</tr>
+<tr>
+<td>Regression</td>
+<td>Supervised</td>
+<td><strong>Prediction</strong> (numeric)</td>
+</tr>
+<tr>
+<td>Sequential pattern / time series</td>
+<td>Pattern / forecasting</td>
+<td>Prediction, trends</td>
+</tr>
+<tr>
+<td>Neural networks</td>
+<td>Supervised / unsupervised</td>
+<td>Prediction, classification, identification</td>
+</tr>
+<tr>
+<td>Genetic algorithms</td>
+<td>Heuristic search</td>
+<td><strong>Optimisation</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-data-mining-business-analytics-bi-applications">9. Data Mining / Business Analytics (B.I.) Applications</h2>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Applications</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Marketing</strong></td>
+<td>Marketing strategies and <strong>consumer behaviour</strong>; advertising; <strong>service location</strong>; <strong>customer segmentation</strong>; <strong>targeted mailing</strong></td>
+</tr>
+<tr>
+<td><strong>Finance</strong></td>
+<td><strong>Fraud detection</strong>, <strong>creditworthiness</strong>, <strong>investment performance</strong> analysis</td>
+</tr>
+<tr>
+<td><strong>Manufacturing</strong></td>
+<td><strong>Resource optimisation</strong> of men, machines and materials</td>
+</tr>
+<tr>
+<td><strong>Health</strong></td>
+<td><strong>Image analysis, genetic analysis</strong>, side effects of drugs, <strong>treatment effectiveness</strong>, process and <strong>cost optimisation</strong> in healthcare services</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-data-mining-tools-and-the-future">10. Data Mining Tools and the Future</h2>
+<h3 id="101-techniques-used-in-commercial-tools">10.1 Techniques Used in Commercial Tools</h3>
+<ul>
+<li>Common: <strong>association rules, clustering, neural networks, sequencing, statistical analysis</strong>; also <strong>decision trees</strong> (a representation of classification/clustering rules) and <strong>statistical analyses</strong> (various regressions, etc.).</li>
+<li>Some products add <strong>advanced techniques:</strong> <strong>genetic algorithms, case-based reasoning, Bayesian networks, nonlinear regression, combinatorial optimisation, pattern matching, fuzzy logic.</strong></li>
+</ul>
+<h3 id="102-representative-tools-from-the-slides">10.2 Representative Tools (from the slides)</h3>
+<table>
+<thead>
+<tr>
+<th>Tool/environment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Python:</strong> pandas, scikit-learn</td>
+<td>Data preparation and machine learning</td>
+</tr>
+<tr>
+<td><strong>R</strong></td>
+<td>Statistical analysis and data visualisation</td>
+</tr>
+<tr>
+<td><strong>Apache Spark MLlib</strong></td>
+<td><strong>Distributed</strong> machine learning for large datasets</td>
+</tr>
+<tr>
+<td><strong>Database/cloud platforms:</strong> BigQuery ML, other managed services</td>
+<td>Model development <strong>close to stored data</strong></td>
+</tr>
+<tr>
+<td><strong>Visual analytics:</strong> KNIME and commercial environments</td>
+<td><strong>Workflow-based</strong> data preparation and modelling</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Tool selection</strong> depends on <strong>dataset size, computing resources, analytical requirements, cost, explainability and integration with existing systems.</strong></li>
+</ul>
+<h3 id="103-future-of-data-mining">10.3 Future of Data Mining</h3>
+<ul>
+<li>Tools keep evolving, incorporating algorithms from <strong>AI, machine learning, statistics and optimisation.</strong></li>
+<li><strong>Primary direction:</strong> analysing <strong>terabytes and petabytes</strong> in <strong>Big Data systems</strong> (Chapter 25 / Lectures 21).</li>
+<li>Big-data systems get their own mining libraries — e.g., <strong>Mahout on top of Hadoop</strong>, and <strong>Spark MLlib.</strong></li>
+<li>Data mining will be tied to data <strong>housed in the cloud</strong> in data warehouses and brought in as needed using <strong>OLAP (Online Analytical Processing) servers.</strong></li>
+<li><strong>Business Analytics</strong> is the primary goal of the currently advancing <strong>Spark</strong> technology.</li>
+</ul>
+<hr />
+<h2 id="11-questions-memo">11. Questions &amp; Memo</h2>
+<h3 id="section-2-data-mining-kdd-pico">Section 2 — Data Mining, KDD, PICO</h3>
+<p><strong>Q1:</strong> Define data mining and give two examples.</p>
+<p><strong>A1:</strong> Analysing <strong>large datasets to discover useful patterns, relationships, trends and predictive models</strong> (using statistics, ML, database systems, pattern recognition) to support decisions. Examples: finding products <strong>frequently bought together</strong>; <strong>predicting fraudulent transactions</strong>; <strong>grouping customers</strong>; <strong>forecasting demand.</strong></p>
+<hr />
+<p><strong>Q2:</strong> Is a data warehouse required for data mining? Contrast the two.</p>
+<p><strong>A2:</strong> <strong>No</strong> — mining can use operational databases, data lakes and other datasets (given access/preparation). A <strong>warehouse</strong> <strong>integrates and organises</strong> data for reporting (output: curated datasets/reports); <strong>mining discovers patterns and builds models</strong> (output: patterns, rules, clusters, predictive models).</p>
+<hr />
+<p><strong>Q3:</strong> List the stages of KDD and state how KDD relates to data mining.</p>
+<p><strong>A3:</strong> <strong>Data selection → cleansing → enrichment → transformation → data mining → evaluation &amp; presentation.</strong> KDD is the <strong>broader, iterative</strong> process; <strong>data mining is one stage</strong> of it.</p>
+<hr />
+<p><strong>Q4:</strong> What does PICO stand for? Match each with an example.</p>
+<p><strong>A4:</strong> <strong>Prediction</strong> (next month's electricity demand), <strong>Identification</strong> (potentially fraudulent transactions), <strong>Classification</strong> (spam vs legitimate email), <strong>Optimisation</strong> (allocating delivery vehicles to minimise travel time).</p>
+<hr />
+<p><strong>Q5:</strong> Why are classification, regression and clustering not "goals" in the PICO sense?</p>
+<p><strong>A5:</strong> They are <strong>analytical techniques</strong> used to achieve goals; PICO lists the <strong>objectives.</strong></p>
+<hr />
+<h3 id="section-3-4-association-rules">Section 3 &amp; 4 — Association Rules</h3>
+<p><strong>Q6:</strong> Define support and confidence and give the confidence formula.</p>
+<p><strong>A6:</strong> <strong>Support</strong> = percentage of transactions containing <strong>all items</strong> of the rule (LHS ∪ RHS). <strong>Confidence</strong> = conditional probability of RHS given LHS = <strong>support(LHS ∪ RHS) / support(LHS).</strong></p>
+<hr />
+<p><strong>Q7 (Calculation):</strong> Using the four slide transactions (101: milk, bread, cookies, juice; 792: milk, juice; 1130: milk, eggs; 1735: bread, cookies, coffee), calculate support and confidence of <code>milk ⇒ juice</code> and <code>bread ⇒ juice</code>.</p>
+<p><strong>A7:</strong> <code>milk ⇒ juice</code>: support 2/4 = <strong>50%</strong>, confidence 2/3 = <strong>66.7%.</strong> <code>bread ⇒ juice</code>: support 1/4 = <strong>25%</strong>, confidence 1/2 = <strong>50%.</strong></p>
+<hr />
+<p><strong>Q8 (Calculation):</strong> For the same data, what is the confidence of <code>cookies ⇒ bread</code>, and of <code>juice ⇒ milk</code>?</p>
+<p><strong>A8:</strong> <code>cookies ⇒ bread</code>: cookies in 101 and 1735 (2); both also have bread → 2/2 = <strong>100%.</strong> <code>juice ⇒ milk</code>: juice in 101, 792 (2); both have milk → <strong>100%.</strong></p>
+<hr />
+<p><strong>Q9:</strong> Describe the two-step process for generating association rules.</p>
+<p><strong>A9:</strong> (1) Find all <strong>frequent (large) itemsets</strong> with support above the threshold. (2) For each frequent itemset X and subset Y, with Z = X − Y, <strong>Z ⇒ Y is valid if support(X)/support(Z) exceeds the minimum confidence.</strong></p>
+<hr />
+<p><strong>Q10:</strong> Explain downward closure and anti-monotonicity and how they help.</p>
+<p><strong>A10:</strong> <strong>Downward closure:</strong> every subset of a frequent itemset is frequent. <strong>Anti-monotonicity:</strong> every superset of an infrequent itemset is infrequent. Together they allow <strong>pruning</strong> of candidates without counting them, <strong>reducing the search space.</strong></p>
+<hr />
+<p><strong>Q11 (Code/Algorithm Tracing):</strong> Run Apriori with minimum support 50% on the four transactions above. What are L₁ and L₂, and why does the algorithm stop?</p>
+<p><strong>A11:</strong> <strong>L₁ = {milk, bread, cookies, juice}</strong> (eggs, coffee have 25%). <strong>L₂ = {milk, juice}, {bread, cookies}</strong> (each 50%). No two members of L₂ share one item, so <strong>C₃ is empty</strong> → L₃ empty → <strong>stop.</strong></p>
+<hr />
+<p><strong>Q12:</strong> Describe how Apriori generates C_{k+1} from L_k.</p>
+<p><strong>A12:</strong> <strong>Combine members of L_k that have k−1 items in common</strong>, then <strong>keep only candidates whose every k-size subset is in L_k</strong>; then <strong>scan the database</strong> to count their support and keep those ≥ minimum support.</p>
+<hr />
+<p><strong>Q13:</strong> Explain the sampling algorithm and the negative border.</p>
+<p><strong>A13:</strong> Mine <strong>in-memory samples</strong> for frequent itemsets; if these form a <strong>superset</strong> of the true frequent itemsets, scan the rest of the database to get the real ones. The <strong>negative border</strong> is the set of <strong>minimal itemsets not in the frequent set but all of whose subsets are</strong> — the closest candidates that could also be frequent; if one of them proves frequent, a <strong>second pass</strong> is needed.</p>
+<hr />
+<p><strong>Q14:</strong> How does the FP-tree algorithm reduce candidate generation?</p>
+<p><strong>A14:</strong> It <strong>compresses the database into an FP-tree</strong> (frequent items sorted by decreasing count; transactions sharing prefixes share nodes with counts), then <strong>FP-growth</strong> mines frequent patterns from the tree using <strong>conditional pattern bases/conditional FP-trees</strong> — <strong>without generating</strong> large numbers of candidate itemsets.</p>
+<hr />
+<p><strong>Q15 (Tracing):</strong> Build the FP-tree for transactions {milk, bread, cookies, juice}, {milk, juice}, {milk}, {bread, cookies} (minimum support 2; order milk, bread, cookies, juice). Give the counts at the root's children.</p>
+<p><strong>A15:</strong> Root → <strong>milk (3)</strong> and root → <strong>bread (1).</strong> Under milk: bread (1) → cookies (1) → juice (1) and juice (1). Under the root's bread: cookies (1).</p>
+<hr />
+<p><strong>Q16:</strong> Describe the partition algorithm and its key property.</p>
+<p><strong>A16:</strong> Split the DB into <strong>non-overlapping partitions</strong>, find <strong>locally frequent itemsets</strong> in each, <strong>union</strong> them into global candidates, <strong>scan the full DB</strong> to get global support and <strong>retain</strong> those meeting the global threshold. <strong>Key property:</strong> a globally frequent itemset must be frequent in <strong>at least one partition.</strong></p>
+<hr />
+<p><strong>Q17:</strong> Why might "beverages ⇒ desserts" fail while "healthy-brand frozen yogurt ⇒ bottled water" succeeds?</p>
+<p><strong>A17:</strong> The <strong>broad groups</strong> are too general to show strong association; <strong>specific lower-level items in the taxonomy</strong> can show <strong>enough support and confidence</strong> to be valid rules.</p>
+<hr />
+<p><strong>Q18:</strong> What is a multidimensional association rule? Give an example, and explain how quantitative attributes are handled.</p>
+<p><strong>A18:</strong> A rule involving <strong>several attributes (dimensions)</strong>, e.g., <strong>Time(6:30…8:00) ⇒ Items_bought(milk).</strong> Quantitative attributes are <strong>partitioned into non-overlapping intervals</strong> (e.g., salary bands ⇒ car brands).</p>
+<hr />
+<p><strong>Q19:</strong> Why are negative association rules hard to discover?</p>
+<p><strong>A19:</strong> They describe items <strong>unlikely</strong> to be bought together, so their <strong>support is very low by definition.</strong></p>
+<hr />
+<p><strong>Q20:</strong> List four complications of association rule mining.</p>
+<p><strong>A20:</strong> Extremely <strong>large itemset cardinality</strong>; <strong>variability</strong> by location/season; <strong>multi-dimensional item classifications</strong>; <strong>poor data quality</strong> (missing, erroneous, conflicting, redundant).</p>
+<hr />
+<h3 id="section-6-classification">Section 6 — Classification</h3>
+<p><strong>Q21:</strong> Explain why classification is "supervised" and what a decision tree represents.</p>
+<p><strong>A21:</strong> The <strong>classes are predetermined</strong> and the model is learned from a <strong>pre-classified training set.</strong> A decision tree <strong>partitions records by attribute tests</strong>, each root-to-leaf path forming a <strong>classification rule.</strong></p>
+<hr />
+<p><strong>Q22 (Tracing):</strong> Using the Figure 28.7 tree (Salary &lt; 20K → no; 20K–50K → Age: &lt; 25 → no, ≥ 25 → yes; ≥ 50K → yes), classify (a) salary 30K, age 22; (b) salary 30K, age 40; (c) salary 60K, age 20.</p>
+<p><strong>A22:</strong> (a) 20K–50K, age &lt; 25 → <strong>"no."</strong> (b) 20K–50K, age ≥ 25 → <strong>"yes."</strong> (c) salary ≥ 50K → <strong>"yes."</strong></p>
+<hr />
+<p><strong>Q23:</strong> In <code>Build_tree</code>, how is the splitting attribute chosen and when is a leaf created?</p>
+<p><strong>A23:</strong> The attribute with the <strong>highest information gain</strong> is chosen. A <strong>leaf</strong> is created when <strong>all records belong to the same class</strong>, when <strong>no attributes remain</strong> (majority class), or when a branch's <strong>subset is empty</strong> (majority class of the parent's records).</p>
+<hr />
+<h3 id="section-7-clustering">Section 7 — Clustering</h3>
+<p><strong>Q24:</strong> Distinguish classification from clustering.</p>
+<p><strong>A24:</strong> Classification is <strong>supervised</strong> (predefined classes, training set with labels) and produces trees/rules; clustering is <strong>unsupervised</strong> (no labels) and <strong>groups similar records</strong> by a distance/similarity measure.</p>
+<hr />
+<p><strong>Q25 (Tracing):</strong> Apply k-means (k = 2, initial centroids 1 and 10) to the values 1, 2, 10, 11. Give the final clusters and centroids.</p>
+<p><strong>A25:</strong> Assign: {1, 2} → centroid 1; {10, 11} → centroid 10. Recalculate: <strong>1.5</strong> and <strong>10.5.</strong> Reassigning changes nothing → converged: <strong>{1, 2}</strong> (centroid 1.5) and <strong>{10, 11}</strong> (centroid 10.5).</p>
+<hr />
+<p><strong>Q26:</strong> State three factors that affect k-means results and one limitation.</p>
+<p><strong>A26:</strong> <strong>Initialisation, choice of k, feature scaling, outliers.</strong> Limitation: suited to <strong>numerical data</strong>; poor with clusters of very different <strong>sizes, densities or non-spherical shapes.</strong></p>
+<hr />
+<h3 id="section-8-other-techniques">Section 8 — Other Techniques</h3>
+<p><strong>Q27:</strong> Distinguish sequential pattern mining from time-series analysis.</p>
+<p><strong>A27:</strong> <strong>Sequential pattern mining</strong> finds <strong>recurring ordered sequences of events/itemsets</strong> (e.g., phone → case → screen protector); <strong>time-series analysis</strong> examines <strong>numerical observations over time</strong> for trends, seasonality, anomalies and forecasting. They can overlap.</p>
+<hr />
+<p><strong>Q28:</strong> What is regression and when is it "linear regression"?</p>
+<p><strong>A28:</strong> A regression function <strong>estimates a dependent variable from independent variables and constants</strong> (a special application of the classification rule, mapping variables to a numeric target). It is <strong>linear regression</strong> when the function <strong>f is linear in the variables x_i</strong>, e.g., y = a + b₁x₁ + b₂x₂.</p>
+<hr />
+<p><strong>Q29:</strong> State two strengths and two weaknesses of neural networks.</p>
+<p><strong>A29:</strong> <strong>Strengths:</strong> model <strong>complex relationships</strong>; applicable to images, text, anomaly detection, forecasting, classification. <strong>Weaknesses:</strong> need <strong>substantial data and compute</strong>; decisions are <strong>hard to interpret.</strong></p>
+<hr />
+<p><strong>Q30:</strong> Describe the steps of a genetic algorithm and its main limitation.</p>
+<p><strong>A30:</strong> Initialise a <strong>population</strong>; evaluate with a <strong>fitness function</strong>; <strong>select</strong> candidates; apply <strong>crossover</strong> and <strong>mutation</strong>; form a <strong>new population</strong>; repeat until a stopping condition. <strong>Limitation:</strong> it is <strong>heuristic</strong> — no guarantee of the <strong>global optimum.</strong></p>
+<hr />
+<p><strong>Q31 (Scenario):</strong> For each task choose a technique: (a) group customers into segments; (b) decide whether a loan applicant is a good or bad risk using past labelled cases; (c) find which products are bought together; (d) minimise delivery distance under time windows; (e) forecast hourly electricity demand.</p>
+<p><strong>A31:</strong> (a) <strong>Clustering</strong> (e.g., k-means). (b) <strong>Classification</strong> (decision tree). (c) <strong>Association rules</strong> (Apriori/FP-growth). (d) <strong>Genetic algorithm</strong> (optimisation). (e) <strong>Time-series analysis</strong> (or regression/neural networks).</p>
+<hr />
+<p><strong>Q32:</strong> Name four tools/environments for data mining and one factor in choosing among them.</p>
+<p><strong>A32:</strong> <strong>Python (pandas, scikit-learn), R, Spark MLlib, BigQuery ML, KNIME.</strong> Factors: <strong>dataset size, computing resources, analytical requirements, cost, explainability, integration with existing systems.</strong></p>
+<hr />
+<p><strong>Q33:</strong> How does data mining relate to the big-data technologies of Lecture 21?</p>
+<p><strong>A33:</strong> Mining increasingly targets <strong>terabytes/petabytes</strong> held in big-data systems; those systems provide their own libraries (<strong>Mahout on Hadoop, Spark MLlib</strong>); and mining uses <strong>cloud data warehouses via OLAP servers.</strong> Business analytics is the primary goal of <strong>Spark.</strong></p>
+<hr />
+<p><em>End of Lecture 22 Notes (Data Mining Concepts).</em></p>
+<hr />
+<blockquote>
+<p><strong>Revision Tip:</strong> Likely exam focus: (a) <strong>KDD stages</strong> and <strong>PICO</strong>; (b) <strong>support/confidence calculations</strong> from a small transaction table (practise both directions of a rule — confidence is <strong>not symmetric</strong>); (c) <strong>tracing Apriori</strong> (L₁, C₂, L₂, … with pruning) and generating rules above a minimum confidence; (d) explaining <strong>downward closure/anti-monotonicity</strong>, and describing <strong>Sampling (negative border), FP-tree and Partition</strong> algorithms; (e) <strong>reading a decision tree</strong> and extracting IF-THEN rules; (f) <strong>k-means</strong> iteration; (g) choosing the <strong>right technique for a scenario</strong> (association rules, classification, clustering, regression, sequential patterns, time series, neural networks, GAs); and (h) <strong>supervised vs unsupervised</strong> distinctions. Scenario-based marks reward naming the technique, <strong>justifying</strong> it against the data and goal, and noting <strong>limitations.</strong></p>
+</blockquote></article><div class="article-tools"><a href="lecture-14.html">← Previous</a><a href="lecture-16.html">Next lecture →</a></div></main><footer><span>COS326 STUDY STUDIO</span><p>Built from the supplied course materials. Your progress stays on this device.</p></footer></body></html>
